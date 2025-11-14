@@ -9,20 +9,39 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  PROJECT_DIR: "./PVGSolution"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Show repo layout (debug)
+        run: |
+          echo "Working dir: $(pwd)"
+          echo "Root listing:"
+          ls -la
+          echo "Project dir listing:"
+          ls -la ${{ env.PROJECT_DIR }} || true
+
       - name: Install dependencies
-        run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Upload artifact for GitHub Pages
-        # <-- update to v3 so it doesn't pull the deprecated upload-artifact@v3
+        run: npm ci --prefix ${{ env.PROJECT_DIR }}
+
+      - name: Build Vite site
+        run: npm run build --prefix ${{ env.PROJECT_DIR }}
+
+      - name: Upload artifact to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ${{ env.PROJECT_DIR }}/dist
 
   deploy:
     needs: build
@@ -31,5 +50,5 @@ jobs:
       name: github-pages
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v2
+        id: deployment
