@@ -7,8 +7,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // user site
 const HomePage = React.lazy(() => import("./routes/index.tsx"));
-const ProductsPage = React.lazy(() => import("./routes/products.tsx"));
-const RequestCustomerPage = React.lazy(() => import("./routes/request.tsx"));
+const ProductsPage = React.lazy(() => import("./routes/products/products.tsx"));
+const ProductDetailPage = React.lazy(
+  () => import("./routes/products/productDetail.tsx")
+);
+const RequestCustomerPage = React.lazy(
+  () => import("./routes/requestCustomer/request.tsx")
+);
 
 // admin
 const RequestCustomerAdmin = React.lazy(
@@ -25,6 +30,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "products", element: <ProductsPage /> },
+      { path: "product/detail", element: <ProductDetailPage /> },
       { path: "request", element: <RequestCustomerPage /> },
     ],
   },

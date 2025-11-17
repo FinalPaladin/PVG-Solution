@@ -1,4 +1,7 @@
+import { Link } from "react-router-dom";
+
 export default function Header() {
+
   return (
     <header className="max-w-7xl mx-auto px-6 bg-white">
       {/* Top small links bar */}
@@ -54,18 +57,24 @@ export default function Header() {
 
             {/* Primary nav (center area) - hidden on small screens */}
             <nav className="hidden lg:flex items-center gap-8 text-base text-gray-700 font-medium">
-              <a href="#" className="flex items-center gap-1 hover:text-black">
+              <Link
+                to="/products"
+                className="flex items-center gap-1 hover:text-black"
+              >
                 Sản phẩm & Dịch vụ <span className="text-xs">▾</span>
-              </a>
-              <a href="#" className="flex items-center gap-1 hover:text-black">
-                Công cụ & Tiện ích <span className="text-xs">▾</span>
-              </a>
-              <a href="#" className="flex items-center gap-1 hover:text-black">
+              </Link>
+              <Link
+                to="/news"
+                className="flex items-center gap-1 hover:text-black"
+              >
+                Tin tức <span className="text-xs">▾</span>
+              </Link>
+              <Link
+                to="/supports"
+                className="flex items-center gap-1 hover:text-black"
+              >
                 Liên hệ & Hỗ trợ <span className="text-xs">▾</span>
-              </a>
-              <a href="#" className="flex items-center gap-1 hover:text-black">
-                Giao dịch an toàn
-              </a>
+              </Link>
             </nav>
           </div>
 
