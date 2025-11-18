@@ -14,6 +14,8 @@ const ProductDetailPage = React.lazy(
 const RequestCustomerPage = React.lazy(
   () => import("./routes/requestCustomer/request.tsx")
 );
+const NewsPage = React.lazy(() => import("./routes/news/news.tsx"));
+const NewsDetailPage = React.lazy(() => import("./routes/news/detail.tsx"));
 
 // admin
 const RequestCustomerAdmin = React.lazy(
@@ -31,6 +33,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "products", element: <ProductsPage /> },
       { path: "product/detail", element: <ProductDetailPage /> },
+      { path: "news", element: <NewsPage /> },
+      { path: "news/detail", element: <NewsDetailPage /> },
       { path: "request", element: <RequestCustomerPage /> },
     ],
   },

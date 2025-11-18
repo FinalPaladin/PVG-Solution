@@ -104,14 +104,14 @@ export default function ProductsPage() {
               <CardFooter className="flex gap-3 px-6 pb-6">
                 <Button
                   className="bg-[#9cc31c] hover:bg-[#8bb019] text-white flex-1 rounded-md"
-                  onClick={() => navigate("/request")}
+                  onClick={() => navigate("/PVG-Solution/request")}
                 >
                   Đăng ký ngay
                 </Button>
                 <Button
                   variant="outline"
                   className="flex-1 rounded-md"
-                  onClick={() => navigate("/products")}
+                  onClick={() => navigate("/PVG-Solution/products/detail")}
                 >
                   Xem chi tiết
                 </Button>

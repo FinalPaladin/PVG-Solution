@@ -40,7 +40,10 @@ export default function RequestDetail(): JSX.Element {
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Chi tiết yêu cầu</h1>
-        <Link to="/admin/requests" className="text-sm text-gray-600">
+        <Link
+          to="/PVG-Solution/admin/requests"
+          className="text-sm text-gray-600"
+        >
           Back
         </Link>
       </div>

@@ -72,7 +72,9 @@ export default function RequestsList(): JSX.Element {
               </div>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => navigate(`/admin/requests/${it.id}`)}
+                  onClick={() =>
+                    navigate(`/PVG-Solution/admin/requests/${it.id}`)
+                  }
                   className="px-3 py-2 border rounded hover:bg-gray-50"
                 >
                   Detail

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 export default function Header() {
-
   return (
     <header className="max-w-7xl mx-auto px-6 bg-white">
       {/* Top small links bar */}
@@ -13,23 +12,11 @@ export default function Header() {
               <a href="#" className="hover:text-black">
                 Cá nhân
               </a>
-              <a href="#" className="hover:text-black">
-                Tổ chức
-              </a>
-              <a href="#" className="hover:text-black">
-                Khách hàng Ưu tiên
-              </a>
             </nav>
           </div>
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-black">
-              Về Vietcombank
-            </a>
-            <a href="#" className="hover:text-black">
               Tin tức
-            </a>
-            <a href="#" className="hover:text-black">
-              Tuyển dụng
             </a>
           </div>
         </div>
@@ -58,19 +45,19 @@ export default function Header() {
             {/* Primary nav (center area) - hidden on small screens */}
             <nav className="hidden lg:flex items-center gap-8 text-base text-gray-700 font-medium">
               <Link
-                to="/products"
+                to="/PVG-Solution/products"
                 className="flex items-center gap-1 hover:text-black"
               >
                 Sản phẩm & Dịch vụ <span className="text-xs">▾</span>
               </Link>
               <Link
-                to="/news"
+                to="/PVG-Solution/news"
                 className="flex items-center gap-1 hover:text-black"
               >
                 Tin tức <span className="text-xs">▾</span>
               </Link>
               <Link
-                to="/supports"
+                to="/PVG-Solution/supports"
                 className="flex items-center gap-1 hover:text-black"
               >
                 Liên hệ & Hỗ trợ <span className="text-xs">▾</span>
@@ -112,16 +99,8 @@ export default function Header() {
               </svg>
             </button>
 
-            {/* Login button */}
-            <a
-              href="#"
-              className="hidden sm:inline-flex items-center gap-2 bg-[#92B83D] hover:bg-[#7DA22F] text-white px-4 py-2 rounded-md font-medium"
-            >
-              Đăng nhập
-            </a>
-
             {/* Phone */}
-            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
+            {/* <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
               <svg
                 width="16"
                 height="16"
@@ -138,7 +117,7 @@ export default function Header() {
                 />
               </svg>
               <span>1900 545413</span>
-            </div>
+            </div> */}
 
             {/* Mobile menu button (small screens) */}
             <button className="lg:hidden inline-flex items-center justify-center p-2 rounded-md border border-gray-200">
