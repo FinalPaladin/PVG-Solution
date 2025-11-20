@@ -15,7 +15,7 @@ export type RequestItem = {
 };
 
 // --- Dashboard ---
-export function AdminDashboard(): JSX.Element {
+export default function AdminDashboard(): JSX.Element {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>

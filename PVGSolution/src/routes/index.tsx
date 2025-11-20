@@ -1,6 +1,7 @@
 // Option A: import hero image from src/assets
 // import hero from "../assets/hero.jpg";
 
+import { paths } from "@/commons/paths";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +11,7 @@ const heroUrl = "/hero.jpg";
 export default function HomePage() {
   const navigate = useNavigate();
   useEffect(() => {
-    navigate("/products");
+    navigate(paths.PRODUCTS);
   }, []);
 
   return (

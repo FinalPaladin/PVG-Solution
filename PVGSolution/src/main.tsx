@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import Admin from "./routes/admin/admin.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { adminPaths, paths } from "./commons/paths.ts";
 
 // user site
 const HomePage = React.lazy(() => import("./routes/index.tsx"));
@@ -18,6 +19,7 @@ const NewsPage = React.lazy(() => import("./routes/news/news.tsx"));
 const NewsDetailPage = React.lazy(() => import("./routes/news/detail.tsx"));
 
 // admin
+const AdminDashboard = React.lazy(() => import("./routes/admin/dashboard.tsx"));
 const RequestCustomerAdmin = React.lazy(
   () => import("./routes/admin/request/index.tsx")
 );
@@ -27,24 +29,24 @@ const RequestCustomerDetail = React.lazy(
 
 const router = createBrowserRouter([
   {
-    path: "/PVG-Solution/",
+    path: "/PVG-Solution",
     element: <App />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "products", element: <ProductsPage /> },
-      { path: "product/detail", element: <ProductDetailPage /> },
-      { path: "news", element: <NewsPage /> },
-      { path: "news/detail", element: <NewsDetailPage /> },
-      { path: "request", element: <RequestCustomerPage /> },
+      { path: paths.PRODUCTS, element: <ProductsPage /> },
+      { path: paths.PRODUCT_DETAIL, element: <ProductDetailPage /> },
+      { path: paths.NEWS, element: <NewsPage /> },
+      { path: paths.NEWS_DETAIL, element: <NewsDetailPage /> },
+      { path: paths.REQUEST, element: <RequestCustomerPage /> },
     ],
   },
   {
     path: "/PVG-Solution/admin",
     element: <Admin />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: "requests", element: <RequestCustomerAdmin /> },
-      { path: "requests/detail", element: <RequestCustomerDetail /> },
+      { index: true, element: <AdminDashboard /> },
+      { path: adminPaths.REQUESTS, element: <RequestCustomerAdmin /> },
+      { path: adminPaths.REQUEST_DETAIL, element: <RequestCustomerDetail /> },
     ],
   },
 ]);

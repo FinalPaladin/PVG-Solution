@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { paths } from "@/commons/paths";
 
 // RequestsListTable.tsx
 // - Uses shadcn/ui Table components (Table, TableHeader, TableHead, TableBody, TableRow, TableCell)
@@ -138,7 +139,7 @@ export default function RequestsListTable(): JSX.Element {
                       <div className="flex justify-end gap-2">
                         <Button
                           onClick={() =>
-                            navigate(`/PVG-Solution/admin/requests/${it.id}`)
+                            navigate(`${paths.PRODUCT_DETAIL}/${it.id}`)
                           }
                           size="sm"
                         >

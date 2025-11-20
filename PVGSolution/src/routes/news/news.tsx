@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { paths } from "@/commons/paths";
 
 interface INews {
   id: number;
@@ -108,7 +109,7 @@ function NewsCardInner({ item }: INewsCardProps) {
             size="sm"
             className="flex items-center gap-2"
             onClick={() => {
-              navigate("/PVG-Solution/news/detail");
+              navigate(paths.NEWS_DETAIL);
             }}
           >
             Xem chi tiết <ArrowRight size={16} />

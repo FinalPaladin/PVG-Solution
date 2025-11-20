@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { paths } from "@/commons/paths";
 
 export default function Header() {
   return (
@@ -45,19 +46,19 @@ export default function Header() {
             {/* Primary nav (center area) - hidden on small screens */}
             <nav className="hidden lg:flex items-center gap-8 text-base text-gray-700 font-medium">
               <Link
-                to="/PVG-Solution/products"
+                to={paths.PRODUCTS}
                 className="flex items-center gap-1 hover:text-black"
               >
                 Sản phẩm & Dịch vụ <span className="text-xs">▾</span>
               </Link>
               <Link
-                to="/PVG-Solution/news"
+                to={paths.NEWS}
                 className="flex items-center gap-1 hover:text-black"
               >
                 Tin tức <span className="text-xs">▾</span>
               </Link>
               <Link
-                to="/PVG-Solution/supports"
+                to={paths.SUPPORT}
                 className="flex items-center gap-1 hover:text-black"
               >
                 Liên hệ & Hỗ trợ <span className="text-xs">▾</span>
