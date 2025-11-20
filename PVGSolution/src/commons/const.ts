@@ -1,0 +1,1 @@
+export const apiHost = "https://localhost:7138/";

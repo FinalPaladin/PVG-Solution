@@ -1,3 +1,4 @@
+import { apiHost } from "@/commons/const";
 import React, { useState, type JSX } from "react";
 
 type FormState = {
@@ -49,19 +50,20 @@ export default function RequestCustomerPage(): JSX.Element {
     try {
       // Build payload as array of key/value objects with phone included per example
       const payload = {
+        phone: form.phone,
+        productId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         data: [
-          { phone: form.phone, key: "fullname", value: form.fullname },
-          { phone: form.phone, key: "phone", value: form.phone },
-          { phone: form.phone, key: "address", value: form.address },
+          { key: "fullname", value: form.fullname },
+          { key: "phone", value: form.phone },
+          { key: "address", value: form.address },
           {
-            phone: form.phone,
             key: "redBookAddress",
             value: form.redBookAddress,
           },
         ],
       };
 
-      const res = await fetch("/api/request_customer/Save", {
+      const res = await fetch(`${apiHost}/api/request_customer/save`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
