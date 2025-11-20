@@ -1,10 +1,18 @@
 // Option A: import hero image from src/assets
 // import hero from "../assets/hero.jpg";
 
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 // Option B (recommended for big background): place the image in /public and use '/hero.jpg'
 const heroUrl = "/hero.jpg";
 
 export default function HomePage() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/products");
+  }, []);
+
   return (
     <main className="relative w-full h-screen overflow-hidden">
       {/* background image */}
