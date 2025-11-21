@@ -1,4 +1,4 @@
-import { apiHost } from "@/commons/const";
+import { requestCustomerSave } from "@/api/requestCustomer";
 import React, { useState, type JSX } from "react";
 
 type FormState = {
@@ -63,17 +63,10 @@ export default function RequestCustomerPage(): JSX.Element {
         ],
       };
 
-      const res = await fetch(`${apiHost}/api/request_customer/save`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await requestCustomerSave(payload);
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || `HTTP ${res.status}`);
+      if (!res.isSuccess) {
+        throw new Error(res.message || `HTTP ${res.message}`);
       }
 
       // try parse JSON response
