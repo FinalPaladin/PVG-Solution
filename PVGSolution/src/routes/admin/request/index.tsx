@@ -1,6 +1,5 @@
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { RequestItem } from "../dashboard";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -12,18 +11,27 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { paths } from "@/commons/paths";
+import { adminPaths } from "@/commons/paths";
+import { getCustomerRequest } from "@/api/admin/adRequestCustomer";
+import type { IRequestCustomerItemDetails } from "@/models/admin/requestCustomer";
 
-// RequestsListTable.tsx
-// - Uses shadcn/ui Table components (Table, TableHeader, TableHead, TableBody, TableRow, TableCell)
-// - Also uses Button, Badge, Skeleton from your ui components
-// - Keep the same API endpoints as original component
+interface IRequestSearchParams {
+  phone: string
+  page: number
+  pageSize: number
+}
 
-export default function RequestsListTable(): JSX.Element {
-  const [items, setItems] = useState<RequestItem[]>([]);
+const RequestsListTable = () => {
+  const [items, setItems] = useState<IRequestCustomerItemDetails[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const [requestSearchParams, setRequestSearchParams] = useState<IRequestSearchParams>({
+    phone: '',
+    page: 1,
+    pageSize: 10
+  })
 
   useEffect(() => {
     let cancelled = false;
@@ -31,10 +39,11 @@ export default function RequestsListTable(): JSX.Element {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/request_customer/list");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (!cancelled) setItems(Array.isArray(data) ? data : data.items ?? []);
+        const query = buildRequestQuery(requestSearchParams)
+        const res = await getCustomerRequest(query);
+        if (!res.isSuccess) throw new Error(`HTTP ${res.message}`);
+        const data = res.result?.items || []
+        setItems([...data])
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Load error");
       } finally {
@@ -103,21 +112,19 @@ export default function RequestsListTable(): JSX.Element {
             ) : (
               items.map((it) => {
                 const fullname =
-                  it.fullname ??
-                  it.data.find((d) => d.key === "fullname")?.value ??
+                  it.listRequestCustomer.find((d) => d.key === "fullname")?.value ??
                   "—";
                 const phone =
-                  it.phone ??
-                  it.data.find((d) => d.key === "phone")?.value ??
+                  it.listRequestCustomer.find((d) => d.key === "phone")?.value ??
                   "—";
-                const createdAt = new Date(it.createdAt).toLocaleString();
+                const createdAt = new Date(it.createdDate).toLocaleString();
 
                 // example: derive a status from item (customize as needed)
                 const status: string =
                   (it as unknown as { status?: string }).status ?? "new";
 
                 return (
-                  <TableRow key={it.id}>
+                  <TableRow key={it.requestCode}>
                     <TableCell>
                       <div className="flex flex-col">
                         <div className="font-medium">{fullname}</div>
@@ -139,37 +146,11 @@ export default function RequestsListTable(): JSX.Element {
                       <div className="flex justify-end gap-2">
                         <Button
                           onClick={() =>
-                            navigate(`${paths.PRODUCT_DETAIL}/${it.id}`)
+                            navigate(`${adminPaths.REQUEST_DETAIL.replace(':id', it.requestCode)}`)
                           }
                           size="sm"
                         >
-                          Detail
-                        </Button>
-
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={async () => {
-                            if (!confirm("Xác nhận xoá yêu cầu?")) return;
-                            try {
-                              const r = await fetch(
-                                `/api/request_customer/${it.id}`,
-                                {
-                                  method: "DELETE",
-                                }
-                              );
-                              if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                              setItems((s) => s.filter((x) => x.id !== it.id));
-                            } catch (err: unknown) {
-                              alert(
-                                err instanceof Error
-                                  ? err.message
-                                  : "Delete failed"
-                              );
-                            }
-                          }}
-                        >
-                          Delete
+                          Chi tiết
                         </Button>
                       </div>
                     </TableCell>
@@ -188,3 +169,19 @@ export default function RequestsListTable(): JSX.Element {
     </div>
   );
 }
+
+function buildRequestQuery(params: IRequestSearchParams): string {
+  const query = Object.entries(
+    params as unknown as Record<string, string | number | boolean | null | undefined>
+  )
+    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
+    )
+    .join("&");
+
+  return query ? `?${query}` : "";
+}
+
+export default RequestsListTable

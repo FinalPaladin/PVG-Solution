@@ -1,11 +1,13 @@
 import { useEffect, useState, type JSX } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { RequestItem } from "../dashboard";
+import { getCustomerRequestDetail } from "@/api/admin/adRequestCustomer";
+import type { IRequestCustomerDetail } from "@/models/admin/requestCustomer";
+import { RequestCustomerLabels } from "@/commons/mappings";
 
 // --- Request detail page ---
 export default function RequestDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
-  const [item, setItem] = useState<RequestItem | null>(null);
+  const [item, setItem] = useState<IRequestCustomerDetail[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,10 +18,10 @@ export default function RequestDetail(): JSX.Element {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/request_customer/${id}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (!cancelled) setItem(data);
+        const res = await getCustomerRequestDetail(id || '');
+        if (!res.isSuccess) throw new Error(`HTTP ${res.statusCode}`);
+        const data = res.result;
+        if (!cancelled) setItem([...data || []]);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Load error");
       } finally {
@@ -44,35 +46,39 @@ export default function RequestDetail(): JSX.Element {
           to="/PVG-Solution/admin/requests"
           className="text-sm text-gray-600"
         >
-          Back
+          Quay lại
         </Link>
       </div>
 
       <div className="bg-white p-6 rounded shadow-sm space-y-4">
         <div>
-          <b>ID:</b> {item.id}
+          <b>Mã đơn:</b> {item[0]?.productId}
         </div>
         <div>
-          <b>Phone:</b> {item.phone}
+          <b>Số điện thoại:</b> {item[0]?.phone}
         </div>
         <div>
-          <b>Created:</b> {new Date(item.createdAt).toLocaleString()}
+          <b>Ngày tạo:</b> {new Date(item[0]?.createdDate).toLocaleString()}
         </div>
 
         <div>
-          <h3 className="font-medium mb-2">Data</h3>
+          {/* <h3 className="font-medium mb-2">Thông tin yêu cầu</h3> */}
           <table className="w-full text-left table-auto">
             <thead>
               <tr className="text-sm text-gray-500">
-                <th className="pr-4 pb-2">Key</th>
-                <th className="pb-2">Value</th>
+                <th className="pr-4 pb-2">Thông tin yêu cầu</th>
+                <th className="pb-2"></th>
               </tr>
             </thead>
             <tbody>
-              {item.data.map((d, i) => (
+              {item.map((d, i) => (
                 <tr key={i} className="border-t">
-                  <td className="py-2 pr-4 text-sm text-gray-700">{d.key}</td>
-                  <td className="py-2 text-sm text-gray-700">{d.value}</td>
+                  <td className="py-2 pr-4 text-sm text-gray-700">
+                    {RequestCustomerLabels[d.key] ?? d.key}
+                  </td>
+                  <td className="py-2 text-sm text-gray-700">
+                    {d.value}
+                  </td>
                 </tr>
               ))}
             </tbody>

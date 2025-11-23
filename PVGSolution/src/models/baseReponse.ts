@@ -30,3 +30,10 @@ export class BaseResponse<T = unknown> {
     this.message = "";
   }
 }
+
+export interface IPagingResponse {
+  totalItems: number;
+  totalPages: number;
+  perPage: number;
+  pageNumber: number;
+}
