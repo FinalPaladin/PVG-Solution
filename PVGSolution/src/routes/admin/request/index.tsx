@@ -16,9 +16,9 @@ import { getCustomerRequest } from "@/api/admin/adRequestCustomer";
 import type { IRequestCustomerItemDetails } from "@/models/admin/requestCustomer";
 
 interface IRequestSearchParams {
-  phone: string
-  page: number
-  pageSize: number
+  phone: string;
+  page: number;
+  pageSize: number;
 }
 
 const RequestsListTable = () => {
@@ -27,11 +27,12 @@ const RequestsListTable = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const [requestSearchParams, setRequestSearchParams] = useState<IRequestSearchParams>({
-    phone: '',
-    page: 1,
-    pageSize: 10
-  })
+  const [requestSearchParams, setRequestSearchParams] =
+    useState<IRequestSearchParams>({
+      phone: "",
+      page: 1,
+      pageSize: 10,
+    });
 
   useEffect(() => {
     let cancelled = false;
@@ -39,11 +40,11 @@ const RequestsListTable = () => {
       setLoading(true);
       setError(null);
       try {
-        const query = buildRequestQuery(requestSearchParams)
+        const query = buildRequestQuery(requestSearchParams);
         const res = await getCustomerRequest(query);
         if (!res.isSuccess) throw new Error(`HTTP ${res.message}`);
-        const data = res.result?.items || []
-        setItems([...data])
+        const data = res.result?.items || [];
+        setItems([...data]);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Load error");
       } finally {
@@ -112,11 +113,11 @@ const RequestsListTable = () => {
             ) : (
               items.map((it) => {
                 const fullname =
-                  it.listRequestCustomer.find((d) => d.key === "fullname")?.value ??
-                  "—";
+                  it.listRequestCustomer.find((d) => d.key === "fullname")
+                    ?.value ?? "—";
                 const phone =
-                  it.listRequestCustomer.find((d) => d.key === "phone")?.value ??
-                  "—";
+                  it.listRequestCustomer.find((d) => d.key === "phone")
+                    ?.value ?? "—";
                 const createdAt = new Date(it.createdDate).toLocaleString();
 
                 // example: derive a status from item (customize as needed)
@@ -146,7 +147,12 @@ const RequestsListTable = () => {
                       <div className="flex justify-end gap-2">
                         <Button
                           onClick={() =>
-                            navigate(`${adminPaths.REQUEST_DETAIL.replace(':id', it.requestCode)}`)
+                            navigate(
+                              `${adminPaths.ADMIN_REQUEST_DETAIL.replace(
+                                ":id",
+                                it.requestCode
+                              )}`
+                            )
                           }
                           size="sm"
                         >
@@ -168,13 +174,18 @@ const RequestsListTable = () => {
       </div>
     </div>
   );
-}
+};
 
 function buildRequestQuery(params: IRequestSearchParams): string {
   const query = Object.entries(
-    params as unknown as Record<string, string | number | boolean | null | undefined>
+    params as unknown as Record<
+      string,
+      string | number | boolean | null | undefined
+    >
   )
-    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .filter(
+      ([, value]) => value !== undefined && value !== null && value !== ""
+    )
     .map(
       ([key, value]) =>
         `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
@@ -184,4 +195,4 @@ function buildRequestQuery(params: IRequestSearchParams): string {
   return query ? `?${query}` : "";
 }
 
-export default RequestsListTable
+export default RequestsListTable;

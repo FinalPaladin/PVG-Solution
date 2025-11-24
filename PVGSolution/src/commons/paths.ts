@@ -1,4 +1,5 @@
 const BASE_URL = "/PVG-Solution";
+const BASE_ADMIN_URL = `${BASE_URL}/admin`;
 
 export const paths = {
   HOME: `${BASE_URL}`,
@@ -11,6 +12,8 @@ export const paths = {
 };
 
 export const adminPaths = {
-  REQUESTS: `${BASE_URL}/admin/requests`,
-  REQUEST_DETAIL: `${BASE_URL}/admin/request/:id`,
+  ADMIN: `${BASE_ADMIN_URL}`,
+  ADMIN_REQUESTS: `${BASE_ADMIN_URL}/requests`,
+  ADMIN_REQUEST_DETAIL: `${BASE_ADMIN_URL}/request/:id`,
+  ADMIN_LOGIN: `${BASE_ADMIN_URL}/login`,
 };
