@@ -11,6 +11,7 @@ import Cookies from "js-cookie";
 type AuthData = {
   token: string | null;
   userName: string | null;
+  fullName?: string | null;
 };
 
 type AuthContextType = {
@@ -38,10 +39,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // ưu tiên token trong cookie nếu có
         const token = cookieToken ?? parsed.token;
         if (token) {
-          setAuth({ token, userName: parsed.userName });
+          setAuth({
+            token,
+            userName: parsed.userName,
+            fullName: parsed.fullName,
+          });
         }
       } else if (cookieToken) {
-        setAuth({ token: cookieToken, userName: null });
+        setAuth({ token: cookieToken, userName: null, fullName: null });
       }
     } catch {
       // ignore
@@ -52,12 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuth(data);
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data));
     if (data.token) {
-      Cookies.set(AUTH_COOKIE_KEY, data.token, { expires: 7 }); // 7 ngày
+      Cookies.set(AUTH_COOKIE_KEY, data.token, { expires: 30 }); // 30 ngày
     }
   };
 
   const logout = () => {
-    setAuth({ token: null, userName: null });
+    setAuth({ token: null, userName: null, fullName: null });
     localStorage.removeItem(AUTH_STORAGE_KEY);
     Cookies.remove(AUTH_COOKIE_KEY);
   };

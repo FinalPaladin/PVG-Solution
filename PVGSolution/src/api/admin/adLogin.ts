@@ -11,3 +11,9 @@ export function loginAsync(input: ILoginRequest) {
     input
   );
 }
+
+export function logoutAsync() {
+  return requestAdmin.post<unknown, BaseResponse<boolean>>(`api/user/logout`, {
+    Headers: { Authorization: "" },
+  });
+}

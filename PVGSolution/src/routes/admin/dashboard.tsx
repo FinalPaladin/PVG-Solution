@@ -33,22 +33,3 @@ export default function AdminDashboard(): JSX.Element {
     </div>
   );
 }
-
-// --- Route snippet (example) ---
-// In your router configuration (App.tsx or routes file) add:
-//
-// import { AdminLayout, AdminDashboard, RequestsList, RequestDetail } from './admin/AdminPages';
-//
-// <Route path="/admin" element={<AdminLayout />}>
-//   <Route index element={<AdminDashboard />} />
-//   <Route path="requests" element={<RequestsList />} />
-//   <Route path="requests/:id" element={<RequestDetail />} />
-// </Route>
-
-// Notes:
-// - You must implement backend endpoints or adapt fetch URLs used above:
-//   GET /api/request_customer/list  -> returns array of RequestItem
-//   GET /api/request_customer/:id   -> returns single RequestItem
-//   DELETE /api/request_customer/:id -> deletes the request
-// - The components use simple fetch; replace with axios or your utils as desired.
-// - Add authentication/guards to admin routes if needed.
