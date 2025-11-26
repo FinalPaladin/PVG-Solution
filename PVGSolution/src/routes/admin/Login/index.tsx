@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { adminPaths } from "@/commons/paths";
+import type { ILoginRequest } from "@/models/admin/authen.model";
+import { loginAsync } from "@/api/admin/adLogin";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -21,12 +23,11 @@ export default function LoginPage() {
 
     try {
       // TODO: call API thật ở đây
-      // const res = await axios.post("/api/auth/login", { userName, password });
-      // const token = res.data.token;
-
-      // fake token để demo
-      await new Promise((r) => setTimeout(r, 800));
-      const token = "fake-demo-token";
+      const res = await loginAsync({
+        userName: userName,
+        password: password,
+      } as ILoginRequest);
+      const token = res.result?.token ?? "";
 
       login({ token, userName });
       navigate(adminPaths.ADMIN, { replace: true });
