@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,34 +35,60 @@ const RequestsListTable = () => {
       pageSize: 10,
     });
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const query = buildRequestQuery(requestSearchParams);
-        const res = await getCustomerRequest(query);
-        if (!res.isSuccess) throw new Error(`HTTP ${res.message}`);
-        const data = res.result?.items || [];
-        setItems([...data]);
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Load error");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+  // state cho ô input search (để gõ mà không gọi API liên tục)
+  const [searchPhone, setSearchPhone] = useState("");
+
+  // ---- HÀM LOAD DATA TÁCH RIÊNG RA ----
+  const loadData = useCallback(async (params: IRequestSearchParams) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const query = buildRequestQuery(params);
+      const res = await getCustomerRequest(query);
+      if (!res.isSuccess) throw new Error(`HTTP ${res.message}`);
+      const data = res.result?.items || [];
+      setItems([...data]);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Load error");
+    } finally {
+      setLoading(false);
     }
-    load();
-    return () => {
-      cancelled = true;
-    };
   }, []);
+
+  // gọi lại loadData mỗi khi requestSearchParams đổi (lần đầu và khi search)
+  useEffect(() => {
+    loadData(requestSearchParams);
+  }, [loadData, requestSearchParams]);
+
+  // ---- HANDLE SEARCH ----
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    setRequestSearchParams((prev) => ({
+      ...prev,
+      phone: searchPhone.trim(),
+      page: 1, // search thì về page 1
+    }));
+    // không cần gọi loadData ở đây, useEffect sẽ tự bắn lại khi state đổi
+  };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Quản lý Yêu cầu khách</h1>
-        {/* If you want a "New" button enable it here */}
+
+        {/* form search: Enter hoặc click nút đều chạy handleSearch */}
+        <form onSubmit={handleSearch} className="flex items-center gap-2">
+          <Input
+            placeholder="Tìm theo SĐT..."
+            value={searchPhone}
+            onChange={(e) => setSearchPhone(e.target.value)}
+            className="w-64"
+          />
+          <Button type="submit">Tìm kiếm</Button>
+        </form>
+
+        {/* Nếu muốn nút tạo mới thì thêm bên này hoặc chuyển vào form */}
         {/* <Button onClick={() => navigate('/admin/requests/new')}>Tạo yêu cầu mới</Button> */}
       </div>
 
@@ -120,7 +147,6 @@ const RequestsListTable = () => {
                     ?.value ?? "—";
                 const createdAt = new Date(it.createdDate).toLocaleString();
 
-                // example: derive a status from item (customize as needed)
                 const status: string =
                   (it as unknown as { status?: string }).status ?? "new";
 
@@ -168,7 +194,6 @@ const RequestsListTable = () => {
         </Table>
       </div>
 
-      {/* Optional: simple footer / count */}
       <div className="mt-4 text-sm text-gray-600">
         Tổng: {items.length} yêu cầu
       </div>
