@@ -18,10 +18,10 @@ export default function RequestDetail(): JSX.Element {
       setLoading(true);
       setError(null);
       try {
-        const res = await getCustomerRequestDetail(id || '');
+        const res = await getCustomerRequestDetail(id || "");
         if (!res.isSuccess) throw new Error(`HTTP ${res.statusCode}`);
         const data = res.result;
-        if (!cancelled) setItem([...data || []]);
+        if (!cancelled) setItem([...(data || [])]);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Load error");
       } finally {
@@ -42,10 +42,7 @@ export default function RequestDetail(): JSX.Element {
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Chi tiết yêu cầu</h1>
-        <Link
-          to="/PVG-Solution/admin/requests"
-          className="text-sm text-gray-600"
-        >
+        <Link to="/admin/requests" className="text-sm text-gray-600">
           Quay lại
         </Link>
       </div>
@@ -76,9 +73,7 @@ export default function RequestDetail(): JSX.Element {
                   <td className="py-2 pr-4 text-sm text-gray-700">
                     {RequestCustomerLabels[d.key] ?? d.key}
                   </td>
-                  <td className="py-2 text-sm text-gray-700">
-                    {d.value}
-                  </td>
+                  <td className="py-2 text-sm text-gray-700">{d.value}</td>
                 </tr>
               ))}
             </tbody>

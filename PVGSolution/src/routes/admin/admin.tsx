@@ -85,9 +85,9 @@ export default function AdminLayout(): JSX.Element {
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           <Link
-            to="/PVG-Solution/admin"
+            to="/admin"
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin")
+              isActive("/admin")
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -97,9 +97,9 @@ export default function AdminLayout(): JSX.Element {
           </Link>
 
           <Link
-            to="/PVG-Solution/admin/requests"
+            to="/admin/requests"
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin/requests")
+              isActive("/admin/requests")
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
