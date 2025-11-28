@@ -10,7 +10,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN corepack enable
 
 # Copy file config pnpm
-COPY package.json pnpm-lock.yaml* ./
+COPY PVGSolution/package.json PVGSolution/pnpm-lock.yaml* ./
 
 # Cài deps
 RUN pnpm install --frozen-lockfile
