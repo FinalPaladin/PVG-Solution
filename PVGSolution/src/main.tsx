@@ -21,14 +21,14 @@ const NewsPage = React.lazy(() => import("./routes/news/news.tsx"));
 const NewsDetailPage = React.lazy(() => import("./routes/news/detail.tsx"));
 
 // admin
-const AdminDashboard = React.lazy(() => import("./routes/admin/dashboard.tsx"));
+const AdminDashboard = React.lazy(() => import("./routes/admin/dashboard/dashboard.tsx"));
 const RequestCustomerAdmin = React.lazy(
   () => import("./routes/admin/request/index.tsx")
 );
 const RequestCustomerDetail = React.lazy(
   () => import("./routes/admin/request/detail.tsx")
 );
-const AdminLogin = React.lazy(() => import("./routes/admin/Login/index.tsx"));
+const AdminLogin = React.lazy(() => import("./routes/admin/login/index.tsx"));
 
 const router = createBrowserRouter([
   {

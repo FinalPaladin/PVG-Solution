@@ -6,7 +6,7 @@ export default function Header() {
     <header className="max-w-7xl mx-auto px-6 bg-white">
       {/* Top small links bar */}
 
-      <div className="container mx-auto px-4 lg:px-8">
+      {/* <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-10 text-sm">
           <div className="flex items-center gap-6">
             <nav className="flex gap-4">
@@ -21,7 +21,7 @@ export default function Header() {
             </a>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main header */}
       <div className="container mx-auto px-4 lg:px-8">
