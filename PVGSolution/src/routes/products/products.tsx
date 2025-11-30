@@ -4,6 +4,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { RedBookBanner } from "./redbookBanner";
+import { LoanBenefits } from "./loanBenefit";
 
 const products = [
   {
@@ -45,6 +47,7 @@ export default function ProductsPage() {
 
   return (
     <>
+      <RedBookBanner />
       <h1 className="text-3xl font-bold mb-6 mt-6">Danh sách sản phẩm</h1>
       <Tabs defaultValue="all">
         <div className="relative pb-4">
@@ -121,6 +124,8 @@ export default function ProductsPage() {
           </motion.div>
         ))}
       </div>
+
+      <LoanBenefits />
     </>
   );
 }
