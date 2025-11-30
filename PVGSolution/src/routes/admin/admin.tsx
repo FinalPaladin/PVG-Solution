@@ -106,6 +106,28 @@ export default function AdminLayout(): JSX.Element {
             <ClipboardList className="h-5 w-5" />
             {!collapsed && <span>Quản lý Yêu cầu khách</span>}
           </Link>
+          <Link
+            to="/PVG-Solution/admin/configuration"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive("/PVG-Solution/admin/configuration")
+                ? "bg-emerald-50 text-emerald-700"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            {!collapsed && <span>Cài đặt</span>}
+          </Link>
+          <Link
+            to="/PVG-Solution/admin/ChangePassword"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive("/PVG-Solution/admin/configuration")
+                ? "bg-emerald-50 text-emerald-700"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            {!collapsed && <span>Đổi mật khẩu</span>}
+          </Link>
         </nav>
 
         {/* User box bottom-left */}

@@ -15,5 +15,7 @@ export const adminPaths = {
   ADMIN: `${BASE_ADMIN_URL}`,
   ADMIN_REQUESTS: `${BASE_ADMIN_URL}/requests`,
   ADMIN_REQUEST_DETAIL: `${BASE_ADMIN_URL}/request/:id`,
-  ADMIN_LOGIN: `${BASE_ADMIN_URL}/login`,
+  ADMIN_LOGIN: `${BASE_ADMIN_URL}/login`,  
+  ADMIN_CONFIG: `${BASE_ADMIN_URL}/configuration`,
+  ADMIN_CHANGEPASSWORD: `${BASE_ADMIN_URL}/changepassword`,
 };
