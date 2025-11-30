@@ -56,11 +56,11 @@ function NewsDetailPageInner() {
   return (
     <div className="container mx-auto px-4 py-10">
       <nav className="text-sm text-gray-400 mb-4">
-        <Link to="/PVG-Solution" className="hover:underline">
+        <Link to="" className="hover:underline">
           Trang thông tin điện tử
         </Link>
         <span className="mx-2">/</span>
-        <Link to="/PVG-Solution/news" className="hover:underline">
+        <Link to="/news" className="hover:underline">
           Tin tức và sự kiện
         </Link>
         <span className="mx-2">/</span>
@@ -127,10 +127,7 @@ function NewsDetailPageInner() {
         ))}
 
         <div className="mt-8">
-          <Link
-            to="/PVG-Solution/news"
-            className="text-sm text-green-600 hover:underline"
-          >
+          <Link to="/news" className="text-sm text-green-600 hover:underline">
             ← Quay lại danh sách tin
           </Link>
         </div>

@@ -18,6 +18,7 @@ type AuthContextType = {
   auth: AuthData;
   login: (data: AuthData) => void;
   logout: () => void;
+  initialized: boolean; // đã load xong localStorage/cookie hay chưa
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +27,13 @@ const AUTH_STORAGE_KEY = "app_auth";
 const AUTH_COOKIE_KEY = "auth_token";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [auth, setAuth] = useState<AuthData>({ token: null, userName: null });
+  const [auth, setAuth] = useState<AuthData>({
+    token: null,
+    userName: null,
+    fullName: null,
+  });
+
+  const [initialized, setInitialized] = useState(false);
 
   // load từ localStorage / cookie
   useEffect(() => {
@@ -36,13 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (stored) {
         const parsed: AuthData = JSON.parse(stored);
-        // ưu tiên token trong cookie nếu có
-        const token = cookieToken ?? parsed.token;
+        const token = cookieToken ?? parsed.token; // ưu tiên cookie
         if (token) {
           setAuth({
             token,
             userName: parsed.userName,
-            fullName: parsed.fullName,
+            fullName: parsed.fullName ?? null,
           });
         }
       } else if (cookieToken) {
@@ -50,6 +56,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch {
       // ignore
+    } finally {
+      setInitialized(true);
     }
   }, []);
 
@@ -69,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return createElement(
     AuthContext.Provider,
-    { value: { auth, login, logout } },
+    { value: { auth, login, logout, initialized } },
     children
   );
 }

@@ -9,11 +9,15 @@ import {
   LogOut,
   Info,
 } from "lucide-react";
-import { useAuth } from "../../auth/authContext"; // chỉnh lại path theo project của bạn
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { useAuth } from "../../auth/authContext";
 
 export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const location = useLocation();
   const { auth, logout } = useAuth();
 
@@ -25,13 +29,11 @@ export default function AdminLayout(): JSX.Element {
 
   const handleLogout = async () => {
     try {
-      // TODO: chỉnh lại URL logout theo API backend của bạn
       await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
     } catch (e) {
-      // có thể hiển thị toast nếu muốn, tạm thời bỏ qua
       console.error("Logout error", e);
     } finally {
       logout();
@@ -39,7 +41,6 @@ export default function AdminLayout(): JSX.Element {
   };
 
   const handleShowVersion = () => {
-    // Có thể lấy từ env nếu có set VITE_APP_VERSION
     const version = import.meta.env.VITE_APP_VERSION ?? "1.0.0";
     alert(`Version: ${version}`);
   };
@@ -84,9 +85,9 @@ export default function AdminLayout(): JSX.Element {
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           <Link
-            to="/PVG-Solution/admin"
+            to="/admin"
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin")
+              isActive("/admin")
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -96,9 +97,9 @@ export default function AdminLayout(): JSX.Element {
           </Link>
 
           <Link
-            to="/PVG-Solution/admin/requests"
+            to="/admin/requests"
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin/requests")
+              isActive("/admin/requests")
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -130,53 +131,52 @@ export default function AdminLayout(): JSX.Element {
           </Link>
         </nav>
 
-        {/* User box bottom-left */}
+        {/* User box bottom-left + Popover */}
         <div className="border-t border-gray-100 px-3 py-3">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setUserMenuOpen((v) => !v)}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100">
-                <User2 className="h-5 w-5 text-emerald-600" />
-              </div>
-              {!collapsed && (
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-semibold text-gray-900 line-clamp-1">
-                    {auth.fullName || auth.userName || "User"}
-                  </span>
-                  <span className="text-xs text-gray-500">Quản trị viên</span>
-                </div>
-              )}
-            </button>
-
-            {/* Dropdown menu */}
-            {userMenuOpen && (
-              <div
-                className={`absolute left-0 right-0 mt-2 rounded-xl border border-gray-200 bg-white shadow-lg ${
-                  collapsed ? "w-56 translate-x-20" : ""
-                }`}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 hover:bg-gray-50 transition-colors"
               >
-                <button
-                  type="button"
-                  onClick={handleShowVersion}
-                  className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  <Info className="h-4 w-4" />
-                  <span>Xem Version</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100">
+                  <User2 className="h-5 w-5 text-emerald-600" />
+                </div>
+                {!collapsed && (
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-semibold text-gray-900 line-clamp-1">
+                      {auth.fullName || auth.userName || "User"}
+                    </span>
+                    <span className="text-xs text-gray-500">Quản trị viên</span>
+                  </div>
+                )}
+              </button>
+            </PopoverTrigger>
+
+            <PopoverContent
+              side="top"
+              align="start"
+              className="w-60 p-0 rounded-xl border border-gray-200 shadow-xl"
+            >
+              {" "}
+              <button
+                type="button"
+                onClick={handleShowVersion}
+                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                <Info className="h-4 w-4" />
+                <span>Xem Version</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
       </aside>
 

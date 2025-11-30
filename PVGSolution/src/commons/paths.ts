@@ -1,4 +1,4 @@
-const BASE_URL = "/PVG-Solution";
+const BASE_URL = "";
 const BASE_ADMIN_URL = `${BASE_URL}/admin`;
 
 export const paths = {
