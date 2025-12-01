@@ -1,9 +1,11 @@
 import type { BaseResponse } from "@/models/baseReponse";
 import request from "@/utils/request";
 
-export function requestCustomerSave(payload: unknown) {
+export function requestCustomerSave(payload: FormData) {
   return request.post<unknown, BaseResponse<boolean>>(
-    "/api/request_customer/Save",
-    payload
+    "/api/request/save",
+    payload, {
+        headers: { "Content-Type": "multipart/form-data" }
+    }
   );
 }

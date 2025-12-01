@@ -1,4 +1,5 @@
 import { requestCustomerSave } from "@/api/requestCustomer";
+import { RequestCustomerLabels } from "@/commons/mappings";
 import React, { useState, type JSX } from "react";
 
 type FormState = {
@@ -49,21 +50,22 @@ export default function RequestCustomerPage(): JSX.Element {
     setLoading(true);
     try {
       // Build payload as array of key/value objects with phone included per example
-      const payload = {
-        phone: form.phone,
-        productId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        data: [
-          { key: "fullname", value: form.fullname },
-          { key: "phone", value: form.phone },
-          { key: "address", value: form.address },
+      let formData = new FormData();
+      formData.append("Phone", form.phone);
+      formData.append("ProductId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
+      
+      formData.append('dataJson', JSON.stringify([
+          { key: "fullname", value: form.fullname, name: RequestCustomerLabels.fullname },
+          { key: "phone", value: form.phone , name: RequestCustomerLabels.phone},
+          { key: "address", value: form.address, name: RequestCustomerLabels.address },
           {
             key: "redBookAddress",
             value: form.redBookAddress,
+            name: RequestCustomerLabels.redBookAddress
           },
-        ],
-      };
+        ]));
 
-      const res = await requestCustomerSave(payload);
+      const res = await requestCustomerSave(formData);
 
       if (!res.isSuccess) {
         throw new Error(res.message || `HTTP ${res.message}`);
@@ -157,6 +159,7 @@ export default function RequestCustomerPage(): JSX.Element {
             placeholder="Số nhà, đường, quận, TP (Địa chỉ trên sổ đỏ)"
           />
         </label>
+
       </div>
 
       <div className="mt-6 flex items-center gap-3">
