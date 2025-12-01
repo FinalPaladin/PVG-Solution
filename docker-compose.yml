@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile     # Dockerfile pnpm t đã viết cho FE
+    container_name: pvg-frontend
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+    ports:
+      - "4173:4173"              # Nginx reverse proxy tới đây
+    restart: unless-stopped
