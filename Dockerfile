@@ -14,6 +14,7 @@ RUN corepack enable
 # 3. CHỈ COPY CÁC FILE CẦN THIẾT ĐỂ CÀI ĐẶT DEPENDENCIES
 # Dựa trên cấu trúc: PVG-FE/PVGSolution/{package.json, pnpm-lock.yaml}
 # Copy file package.json và pnpm-lock.yaml từ PVGSolution vào thư mục làm việc /app
+# Copy file config pnpm
 COPY PVGSolution/package.json PVGSolution/pnpm-lock.yaml* ./
 
 # 4. Cài đặt dependencies
