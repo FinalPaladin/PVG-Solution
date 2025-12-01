@@ -9,7 +9,7 @@ export interface IRequestCustomerItemDetails {
     requestCode: string;
     phone: string;
     productId: string;
-    listRequestCustomer: IRequestCustomerField[];
+    details: IRequestCustomerField[];
     createdDate: string
 }
 

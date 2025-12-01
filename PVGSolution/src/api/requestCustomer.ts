@@ -8,7 +8,10 @@ export function requestCustomerSave(payload: unknown) {
     payload
   );
 }
-
+    // {
+    //     headers: { "Content-Type": "multipart/form-data" }
+    // }
+    
 // POST /api/media/image/upload
 export function mediaImageUpload(file: File) {
   const formData = new FormData();
