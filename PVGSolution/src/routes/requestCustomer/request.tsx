@@ -53,6 +53,7 @@ export default function RequestCustomerPage(): JSX.Element {
       let formData = new FormData();
       formData.append("Phone", form.phone);
       formData.append("ProductId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
+      formData.append("FullName", form.fullname);
       
       formData.append('dataJson', JSON.stringify([
           { key: "fullname", value: form.fullname, name: RequestCustomerLabels.fullname },
