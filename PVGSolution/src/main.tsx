@@ -33,6 +33,11 @@ const AdminLogin = React.lazy(() => import("./routes/admin/login/index.tsx"));
 const AdminConfiguration = React.lazy(() => import("./routes/admin/configuration/index.tsx"));
 const AdminChangePassword = React.lazy(() => import("./routes/admin/changePassword/index.tsx"));
 
+const AdminProduct = React.lazy(() => import("./routes/admin/product/index.tsx"));
+const AdminProductDetail = React.lazy(() => import("./routes/admin/product/detail.tsx"));
+const AdminProductCategory = React.lazy(() => import("./routes/admin/productCategory/index.tsx"));
+const AdminProductCategoryDetail = React.lazy(() => import("./routes/admin/productCategory/detail.tsx"));
+
 
 const router = createBrowserRouter([
   {
@@ -75,6 +80,22 @@ const router = createBrowserRouter([
           {
             path: adminPaths.ADMIN_CHANGEPASSWORD,
             element: <AdminChangePassword />,
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCT,
+            element: <AdminProduct />,
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCT_DETAIL,
+            element: <AdminProductDetail />,
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCTCATEGORY,
+            element: <AdminProductCategory />,
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCTCATEGORY_DETAIL,
+            element: <AdminProductCategoryDetail />,
           },
         ],
       },

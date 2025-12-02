@@ -8,6 +8,10 @@ import {
   User2,
   LogOut,
   Info,
+  Cog,
+  SquareAsterisk,
+  ChartBarStacked,
+  SquareChartGantt,
 } from "lucide-react";
 import {
   Popover,
@@ -108,26 +112,48 @@ export default function AdminLayout(): JSX.Element {
             {!collapsed && <span>Quản lý Yêu cầu khách</span>}
           </Link>
           <Link
-            to="/PVG-Solution/admin/configuration"
+            to="/admin/configuration"
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin/configuration")
+              isActive("/admin/configuration")
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
           >
-            <LayoutDashboard className="h-5 w-5" />
+            <Cog className="h-5 w-5" />
             {!collapsed && <span>Cài đặt</span>}
           </Link>
           <Link
-            to="/PVG-Solution/admin/ChangePassword"
+            to="/admin/ChangePassword"
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin/configuration")
+              isActive("/admin/ChangePassword")
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
           >
-            <LayoutDashboard className="h-5 w-5" />
+            <SquareAsterisk className="h-5 w-5" />
             {!collapsed && <span>Đổi mật khẩu</span>}
+          </Link>
+          <Link
+            to="/admin/productcategory"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive("/admin/productcategory")
+                ? "bg-emerald-50 text-emerald-700"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <ChartBarStacked className="h-5 w-5" />
+            {!collapsed && <span>Danh mục sản phẩm</span>}
+          </Link>
+          <Link
+            to="/admin/product"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive("/admin/product")
+                ? "bg-emerald-50 text-emerald-700"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <SquareChartGantt className="h-5 w-5" />
+            {!collapsed && <span>Sản phẩm</span>}
           </Link>
         </nav>
 

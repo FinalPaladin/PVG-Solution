@@ -126,20 +126,20 @@ export default function ChangePassword(): JSX.Element {
                 defaultValue={payload.userName}
                 onChange={(e) => {setPayload({...payload, userName: e.target.value});}}/>
             </div> */}
-            <div className="justify-content-center">
+            <div className="bg-white justify-content-center p-6 rounded shadow-sm grid grid-cols-1">
                 <div className="grid grid-cols-1">
                     <span className="text-sm font-medium mb-1">Mật khẩu cũ:</span>
                     <input type="password" className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                     defaultValue={payload.currentPassword}
                     onChange={(e) => {setPayload({...payload, currentPassword: e.target.value});}}/>
                 </div>
-                <div className="grid grid-cols-1">
+                <div className="grid grid-cols-1 mt-2">
                     <span className="text-sm font-medium mb-1">Mật khẩu mới:</span>
                     <input type="password" className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                     defaultValue={payload.newPassword}
                     onChange={(e) => {setPayload({...payload, newPassword: e.target.value});}}/>
                 </div>
-                <div className="grid grid-cols-1">
+                <div className="grid grid-cols-1 mt-2">
                     <span className="text-sm font-medium mb-1">Xác nhận mật khẩu mới:</span>
                     <input type="password" className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                     defaultValue={confirmNewPassword}

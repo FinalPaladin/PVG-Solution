@@ -161,9 +161,15 @@ export default function ConfigurationPage(): JSX.Element {
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded shadow-sm grid-cols-1">
-                    <h6 className="font-semibold mb-4">Thông tin liên hệ</h6>
+                    <h6 className="font-semibold mb-4">Thông tin chung</h6>
+                    <div className="grid grid-cols-1 mb-1">
+                        <span className="text-sm font-medium mb-1">Tên Web:</span>
+                        <input type="text" className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                        defaultValue={config.WebName}
+                        onChange={(e) => {setConfig({...config, WebName: e.target.value})}}/>
+                    </div>
                     <div className="grid grid-cols-1">
-                        <span className="text-sm font-medium mb-1">SĐT nhân viên tư vấn:</span>
+                        <span className="text-sm font-medium mb-1">Hotline:</span>
                         <input type="tel" className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                         defaultValue={config.SDTSales}
                         onChange={(e) => {setConfig({...config, SDTSales: e.target.value})}}/>
