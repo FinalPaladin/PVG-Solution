@@ -30,8 +30,8 @@ const RequestCustomerDetail = React.lazy(
 );
 const AdminLogin = React.lazy(() => import("./routes/admin/login/index.tsx"));
 
-const AdminConfiguration = React.lazy(() => import("./routes/admin/Configuration/index.tsx"));
-const AdminChangePassword = React.lazy(() => import("./routes/admin/ChangePassword/index.tsx"));
+const AdminConfiguration = React.lazy(() => import("./routes/admin/configuration/index.tsx"));
+const AdminChangePassword = React.lazy(() => import("./routes/admin/changePassword/index.tsx"));
 
 
 const router = createBrowserRouter([

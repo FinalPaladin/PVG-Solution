@@ -5,13 +5,12 @@ import request from "@/utils/request";
 export function requestCustomerSave(payload: unknown) {
   return request.post<unknown, BaseResponse<boolean>>(
     "/api/request/Save",
-    payload
+    payload,{
+        headers: { "Content-Type": "multipart/form-data" }
+    }
   );
 }
-    // {
-    //     headers: { "Content-Type": "multipart/form-data" }
-    // }
-    
+
 // POST /api/media/image/upload
 export function mediaImageUpload(file: File) {
   const formData = new FormData();
