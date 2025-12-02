@@ -18,4 +18,8 @@ export const adminPaths = {
   ADMIN_LOGIN: `${BASE_ADMIN_URL}/login`,  
   ADMIN_CONFIG: `${BASE_ADMIN_URL}/configuration`,
   ADMIN_CHANGEPASSWORD: `${BASE_ADMIN_URL}/changepassword`,
+  ADMIN_PRODUCT: `${BASE_ADMIN_URL}/product`,
+  ADMIN_PRODUCT_DETAIL: `${BASE_ADMIN_URL}/product/:id`,
+  ADMIN_PRODUCTCATEGORY: `${BASE_ADMIN_URL}/productcategory`,
+  ADMIN_PRODUCTCATEGORY_DETAIL: `${BASE_ADMIN_URL}/productcategory/:id`,
 };
