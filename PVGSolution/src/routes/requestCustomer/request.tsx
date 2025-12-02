@@ -1,5 +1,5 @@
 import React, { useState, type JSX } from "react";
-import { mediaImageDelete, mediaImageUpload, requestCustomerSave } from "@/api/requestCustomer";
+import { requestCustomerSave } from "@/api/requestCustomer";
 import type { IResponseUpdateImage } from "@/models/requestCustomer";
 import { RequestCustomerLabels } from "@/commons/mappings";
 
@@ -27,8 +27,8 @@ export default function RequestCustomerPage(): JSX.Element {
   } | null>(null);
 
   const [images, setImages] = useState<UploadedImage[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
+  // const [uploading, setUploading] = useState(false);
+  // const [uploadError, setUploadError] = useState<string | null>(null);
 
   function onChange<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((s) => ({ ...s, [key]: value }));
@@ -296,14 +296,14 @@ export default function RequestCustomerPage(): JSX.Element {
                 </label>
               )}
             </div>
-            {uploadError && (
+            {/* {uploadError && (
               <p className="mt-1 text-xs text-red-600">{uploadError}</p>
             )}
             {uploading && (
               <p className="mt-1 text-xs text-gray-500">
                 Đang xử lý ảnh...
               </p>
-            )}
+            )} */}
           </div>
         </div>
 
