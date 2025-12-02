@@ -1,9 +1,6 @@
-// ProductInfoPage.tsx
-// React + Tailwind + TypeScript component that renders a 'Thông tin sản phẩm' page.
-// Usage: place this file in your project, ensure Tailwind and Manrope font are configured,
-// and import HeaderComponent (Header) in the same folder or adjust path.
-
+import FAQSection from "@/components/common/FAQSections";
 import React, { useState, type JSX } from "react";
+
 // --- Types ---
 export type TabKey = "info" | "docs" | "process" | "fee";
 
@@ -21,7 +18,7 @@ const TABs: { key: TabKey; label: string }[] = [
   { key: "info", label: "Thông tin chung" },
   { key: "docs", label: "Hồ sơ chuẩn bị" },
   { key: "process", label: "Quy trình & Ngày trả nợ" },
-  { key: "fee", label: "Biểu phí" },
+  // { key: "fee", label: "Biểu phí" },
 ];
 
 // --- Component ---
@@ -39,32 +36,57 @@ export default function ProductInfoPage(): JSX.Element {
 
         {/* Tabs */}
         <div className="mb-6">
-          <nav className="flex items-end gap-6 border-b border-[#e5e7eb] pb-3">
+          {/* Desktop Tabs: hidden on small screens */}
+          <nav className="hidden sm:flex items-end gap-6 border-b border-[#e5e7eb] pb-3" role="tablist" aria-label="Product info tabs">
             {TABs.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setActive(t.key)}
-                className={`relative pb-2 text-lg font-medium focus:outline-none ${
-                  active === t.key
-                    ? "text-[#14532d]"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
+                role="tab"
+                aria-selected={active === t.key}
+                className={`relative pb-2 text-lg font-medium focus:outline-none transition-colors ${active === t.key ? "text-[#14532d]" : "text-gray-600 hover:text-gray-800"
+                  }`}
               >
                 {t.label}
-                {/* underline indicator (separate element to avoid using before:content complexities) */}
+                {/* underline indicator */}
                 {active === t.key && (
                   <div className="absolute left-0 right-0 -bottom-3 h-1 bg-[#14532d] rounded-t-sm" />
                 )}
               </button>
             ))}
           </nav>
+
+          {/* Mobile: show select/dropdown (block on small, hidden on sm+) */}
+          <div className="sm:hidden">
+            <label htmlFor="product-info-select" className="sr-only">
+              Chọn thông tin
+            </label>
+            <div className="border border-[#e5e7eb] rounded-md overflow-hidden bg-white">
+              <select
+                id="product-info-select"
+                className="w-full px-4 py-3 text-base appearance-none focus:outline-none"
+                value={active}
+                onChange={(e) => setActive(e.target.value as TabKey)}
+              >
+                {TABs.map((t) => (
+                  <option key={t.key} value={t.key}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Content card list (left title + right content) */}
         <div className="space-y-6">
           <CardList active={active} />
         </div>
+
+
+        <FAQSection />
       </div>
+
     </div>
   );
 }
@@ -143,9 +165,7 @@ function CardList({ active }: CardListProps): JSX.Element {
     fee: [
       {
         title: "Biểu phí",
-        body: [
-          "Thông tin về biểu phí sẽ cập nhật theo thông báo của Vietcombank.",
-        ],
+        body: ["Thông tin về biểu phí sẽ cập nhật theo thông báo của Vietcombank."],
       },
     ],
   };
@@ -164,9 +184,7 @@ function CardList({ active }: CardListProps): JSX.Element {
         <div key={idx} className="bg-[#f7f7f8] rounded-lg p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
             <div className="md:col-span-4 lg:col-span-3">
-              <h3 className="text-xl font-semibold text-gray-800">
-                {item.title}
-              </h3>
+              <h3 className="text-xl font-semibold text-gray-800">{item.title}</h3>
             </div>
             <div className="md:col-span-8 lg:col-span-9 text-gray-700">
               {item.body.map((b, i) => (

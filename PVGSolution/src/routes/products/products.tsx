@@ -53,7 +53,7 @@ export default function ProductsPage() {
       <h1 className="text-3xl font-bold mb-6 mt-6">Danh sách sản phẩm</h1>
 
       {/* Mobile: select */}
-      <div className="md:hidden px-4">
+      <div className="md:hidden mb-4">
         <label htmlFor="productTabsSelect" className="sr-only">
           Chọn danh mục sản phẩm
         </label>
@@ -75,7 +75,7 @@ export default function ProductsPage() {
       {/* Desktop / tablet: Tabs */}
       <div className="hidden md:block">
         <Tabs value={value} onValueChange={setValue}>
-          <div className="relative pb-3">
+          <div className="relative pb-5">
             {/* gray baseline slightly above green underline */}
             <div
               className="absolute left-0 right-0 h-px pointer-events-none"
@@ -88,7 +88,7 @@ export default function ProductsPage() {
 
             {/* make the list scrollable horizontally only, prevent vertical scrollbar */}
             <TabsList
-              className="flex gap-8 pb-4 bg-transparent border-none shadow-none overflow-x-auto whitespace-nowrap px-4"
+              className="flex gap-4 pb-3 bg-transparent border-none shadow-none overflow-x-auto whitespace-nowrap "
               // inline style to ensure vertical overflow hidden -> no vertical scrollbar
               style={{
                 overflowY: "hidden",
@@ -99,10 +99,10 @@ export default function ProductsPage() {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="tabs-trigger relative px-3 pb-3 text-lg text-gray-700 font-medium bg-transparent border-none shadow-none focus:outline-none flex-shrink-0"
+                  className="tabs-trigger relative px-3 pb-3 text-lg text-gray-700 font-medium bg-transparent border-none shadow-none focus:outline-none shrink-0"
                   style={{ backgroundColor: "transparent", boxShadow: "none" }}
                 >
-                  <span className="tabs-trigger-label">{tab.label}</span>
+                  <span>{tab.label}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -111,7 +111,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Product Cards */}
-      <div className="px-4">
+      <div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products
             // optionally filter by `value` here if you have categories mapped
