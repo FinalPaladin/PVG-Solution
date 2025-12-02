@@ -1,6 +1,7 @@
 import React, { useState, type JSX } from "react";
 import { mediaImageDelete, mediaImageUpload, requestCustomerSave } from "@/api/requestCustomer";
 import type { IResponseUpdateImage } from "@/models/requestCustomer";
+import { RequestCustomerLabels } from "@/commons/mappings";
 
 type FormState = {
   fullname: string;
@@ -41,6 +42,7 @@ export default function RequestCustomerPage(): JSX.Element {
     return null;
   }
 
+  /*
   async function uploadImage(file: File) {
     setUploading(true);
     setUploadError(null);
@@ -61,6 +63,7 @@ export default function RequestCustomerPage(): JSX.Element {
       setUploading(false);
     }
   }
+  */
 
   async function handleSelectFiles(
     e: React.ChangeEvent<HTMLInputElement>
@@ -70,32 +73,41 @@ export default function RequestCustomerPage(): JSX.Element {
 
     const remainSlots = 3 - images.length;
     const toUpload = Array.from(files).slice(0, remainSlots);
-
+    
+    let listImg = [...images] as UploadedImage[];
     for (const file of toUpload) {
-      await uploadImage(file);
+      let url = URL.createObjectURL(file);
+      listImg.push({
+        file: file,
+        keyUrl: "",
+        publicUrl: url
+      } as UploadedImage);
     }
+    setImages(listImg);
 
     // reset input để có thể chọn lại cùng file
     e.target.value = "";
   }
 
   async function handleRemoveImage(img: UploadedImage) {
-    setUploading(true);
-    setUploadError(null);
-    try {
-      const res = await mediaImageDelete(img.keyUrl);
-      if (!res.isSuccess) {
-        throw new Error(res.message || "Xoá ảnh thất bại");
-      }
+    // setUploading(true);
+    // setUploadError(null);
+    // try {
+      // const res = await mediaImageDelete(img.keyUrl);
+      // if (!res.isSuccess) {
+      //   throw new Error(res.message || "Xoá ảnh thất bại");
+      // }
 
-      setImages((prev) => prev.filter((x) => x.keyUrl !== img.keyUrl));
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Không xoá được ảnh";
-      setUploadError(msg);
-    } finally {
-      setUploading(false);
-    }
+    //   setImages((prev) => prev.filter((x) => x.keyUrl !== img.keyUrl));
+    // } catch (err) {
+    //   const msg =
+    //     err instanceof Error ? err.message : "Không xoá được ảnh";
+    //   setUploadError(msg);
+    // } finally {
+    //   setUploading(false);
+    // }
+    
+    setImages((prev) => prev.filter((x) => x.keyUrl !== img.keyUrl));
   }
 
   async function handleSubmit(e?: React.FormEvent) {
@@ -109,41 +121,48 @@ export default function RequestCustomerPage(): JSX.Element {
 
     setLoading(true);
     try {
-      const data: { key: string; value: string }[] = [
-        { key: "fullname", value: form.fullname },
-        { key: "phone", value: form.phone },
-        { key: "address", value: form.address },
-        { key: "redBookAddress", value: form.redBookAddress },
-      ];
+      // const data: { key: string; value: string }[] = [
+      //   { key: "fullname", value: form.fullname },
+      //   { key: "phone", value: form.phone },
+      //   { key: "address", value: form.address },
+      //   { key: "redBookAddress", value: form.redBookAddress },
+      // ];
 
-      if (images.length > 0) {
-        // tuỳ BE, nếu muốn mỗi ảnh 1 item thì map; tạm gộp list key
-        data.push({
-          key: "imageKeys",
-          value: images.map((x) => x.keyUrl).join(","),
-        });
-      }
+      // if (images.length > 0) {
+      //   // tuỳ BE, nếu muốn mỗi ảnh 1 item thì map; tạm gộp list key
+      //   data.push({
+      //     key: "imageKeys",
+      //     value: images.map((x) => x.keyUrl).join(","),
+      //   });
+      // }
 
-      const payload = {
-        phone: form.phone,
-        productId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        data,
-      };
-      // let formData = new FormData();
-      // formData.append("Phone", form.phone);
-      // formData.append("ProductId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
-      // formData.append("FullName", form.fullname);
+      // const payload = {
+      //   phone: form.phone,
+      //   productId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      //   data,
+      // };
+      let payload = new FormData();
+      payload.append("Phone", form.phone);
+      payload.append("ProductId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
+      payload.append("FullName", form.fullname);
       
-      // formData.append('dataJson', JSON.stringify([
-      //     { key: "fullname", value: form.fullname, name: RequestCustomerLabels.fullname },
-      //     { key: "phone", value: form.phone , name: RequestCustomerLabels.phone},
-      //     { key: "address", value: form.address, name: RequestCustomerLabels.address },
-      //     {
-      //       key: "redBookAddress",
-      //       value: form.redBookAddress,
-      //       name: RequestCustomerLabels.redBookAddress
-      //     },
-      //   ]));
+      payload.append('dataJson', JSON.stringify([
+          { key: "fullname", value: form.fullname, name: RequestCustomerLabels.fullname },
+          { key: "phone", value: form.phone , name: RequestCustomerLabels.phone},
+          { key: "address", value: form.address, name: RequestCustomerLabels.address },
+          {
+            key: "redBookAddress",
+            value: form.redBookAddress,
+            name: RequestCustomerLabels.redBookAddress
+          },
+        ]));
+
+      images.forEach((img, index) => {
+        if (!img.file) return;
+          payload.append(`DataImage[${index}].key`, img.keyUrl);
+          payload.append(`DataImage[${index}].imgFile`, img.file, img.file.name);
+      });
+
       const res = await requestCustomerSave(payload);
 
       if (!res.isSuccess) {
