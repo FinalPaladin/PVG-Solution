@@ -169,7 +169,7 @@ export default function ConfigurationPage(): JSX.Element {
                     <h6 className="font-semibold mb-4">Hình ảnh</h6>
                     <div className="grid grid-cols-1">
                         <span className="text-sm font-medium mb-1">Logo:</span>
-                        <ImageControl imageKey="Logo" img={config.Logo} isUpload={true} onImageChange={(file) => { AddImg("Logo", file!); }} />
+                        <ImageControl imageKey="ImgLogo" img={config.ImgLogo} isUpload={true} onImageChange={(file) => {AddImg("ImgLogo", file!);}}/>
                     </div>
                     <div className="grid grid-cols-1 mt-2">
                         <span className="text-sm font-medium mb-1">Ảnh trang chủ:</span>

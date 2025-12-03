@@ -17,7 +17,7 @@ export interface IObjConfigurationModel
     EmailPort: string,
     SDTSales: string,
     WebName: string,
-    Logo: string,
+    ImgLogo: string,
     ImgHome: string,
     ImgBackground: string,
 }
