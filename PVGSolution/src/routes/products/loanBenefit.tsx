@@ -4,7 +4,7 @@ export function LoanBenefits() {
             <div className="max-w-7xl mx-auto">
 
                 {/* Title */}
-                <h2 className="text-2xl font-semibold text-slate-900 mb-8">
+                <h2 className="text-2xl font-semibold text-slate-900 mb-4">
                     Lợi ích khi lựa chọn sản phẩm vay tại PVG Solution
                 </h2>
 

@@ -45,7 +45,6 @@ const RequestsListTable = () => {
     try {
       const query = buildRequestQuery(params);
       const res = await getCustomerRequest(query);
-      debugger
       if (!res.isSuccess) throw new Error(`HTTP ${res.message}`);
       const data = res.result?.items || [];
       setItems([...data]);
@@ -141,11 +140,9 @@ const RequestsListTable = () => {
             ) : (
               items.map((it) => {
                 const fullname =
-                  it.details.find((d) => d.key === "fullname")
-                    ?.value ?? "—";
+                  it.details.find((d) => d.key === "fullname")?.value ?? "—";
                 const phone =
-                  it.details.find((d) => d.key === "phone")
-                    ?.value ?? "—";
+                  it.details.find((d) => d.key === "phone")?.value ?? "—";
                 const createdAt = new Date(it.createdDate).toLocaleString();
 
                 const status: string =

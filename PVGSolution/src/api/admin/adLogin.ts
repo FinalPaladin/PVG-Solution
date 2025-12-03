@@ -7,13 +7,13 @@ import requestAdmin from "@/utils/requestAdmin";
 
 export function loginAsync(input: ILoginRequest) {
   return requestAdmin.post<unknown, BaseResponse<ILoginResponse>>(
-    `api/user/login`,
+    `/api/user/login`,
     input
   );
 }
 
 export function logoutAsync() {
-  return requestAdmin.post<unknown, BaseResponse<boolean>>(`api/user/logout`, {
+  return requestAdmin.post<unknown, BaseResponse<boolean>>(`/api/user/logout`, {
     Headers: { Authorization: "" },
   });
 }
