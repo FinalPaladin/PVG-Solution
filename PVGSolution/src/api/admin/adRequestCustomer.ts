@@ -4,12 +4,12 @@ import requestAdmin from "@/utils/requestAdmin";
 
 export function getCustomerRequest(query: string) {
     return requestAdmin.get<unknown, BaseResponse<IGetRequestCustomerResponse>>(
-        `api/request/search${query}`
+        `/api/request/search${query}`
     );
 }
 
 export function getCustomerRequestDetail(requestCode: string) {
     return requestAdmin.get<unknown, BaseResponse<IRequestCustomerDetail[]>>(
-        `api/request/${requestCode}`
+        `/api/request/${requestCode}`
     );
 }
