@@ -1,28 +1,32 @@
 import type { IPagingResponse } from "../baseReponse";
 
 export interface IRequestCustomerField {
-    key: string;
-    value: string;
+  key: string;
+  value: string;
 }
 
 export interface IRequestCustomerItemDetails {
-    requestCode: string;
-    phone: string;
-    productId: string;
-    details: IRequestCustomerField[];
-    createdDate: string
+  requestCode: string;
+  phone: string;
+  productId: string;
+  details: IRequestCustomerField[];
+  createdDate: string;
+  fullName: string;
+  isProcessed: boolean;
+  isSentEmail: boolean;
+  strCreatedDate: string;
 }
 
 export interface IGetRequestCustomerResponse extends IPagingResponse {
-    items: IRequestCustomerItemDetails[];
+  items: IRequestCustomerItemDetails[];
 }
 
 export interface IRequestCustomerDetail {
-    id: string;
-    requestCode: string;
-    phone: string;
-    key: string;
-    value: string;
-    productId: string;
-    createdDate: string; // ISO datetime string
+  id: string;
+  requestCode: string;
+  phone: string;
+  key: string;
+  value: string;
+  productId: string;
+  createdDate: string; // ISO datetime string
 }
