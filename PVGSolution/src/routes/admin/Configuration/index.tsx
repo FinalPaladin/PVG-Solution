@@ -2,7 +2,9 @@
 import { configsGetall, configsSave } from "@/api/admin/adConfiguration";
 import { useAuth } from "@/auth/authContext";
 import ImageControl from "@/components/Controls/Image";
+import { Button } from "@/components/ui/button";
 import type { IImageConfigurationModel, IObjConfigurationModel } from "@/models/admin/config.model";
+import { Save } from "lucide-react";
 import { useEffect, useState, type JSX } from "react";
 
 export default function ConfigurationPage(): JSX.Element {
@@ -29,8 +31,9 @@ export default function ConfigurationPage(): JSX.Element {
             throw new Error("Chưa có cài đặt chung");
         }
 
+        console.log(res?.result?.data);
+        
         const objConfig = Object.fromEntries(res?.result?.data.map(item => [item.key, item.value]) ?? []) as unknown as IObjConfigurationModel;
-
         setConfig(objConfig);
     }
 
@@ -93,9 +96,13 @@ export default function ConfigurationPage(): JSX.Element {
             <div className="grid grid-cols-2 gap-4">
                 <h1 className="text-2xl font-semibold mb-4">Cài Đặt Chung</h1>
                 <div className="text-end">
-                    <button type="button"
+                    <Button type="button"
                         className="px-4 py-2 rounded-md border border-gray-200 bg-[#92B83D] text-white hover:bg-[#7DA22F] cursor-pointer"
-                        onClick={handleSave}>Lưu</button>
+                        onClick={handleSave}>
+                            <span className="flex">
+                                <Save className="h-5 w-5"/>&nbsp;Lưu
+                            </span>
+                        </Button>
                 </div>
             </div>
             <div>

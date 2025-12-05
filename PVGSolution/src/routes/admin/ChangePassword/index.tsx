@@ -1,7 +1,9 @@
 
 import { changePassword } from "@/api/admin/adUser";
 import { useAuth } from "@/auth/authContext";
+import { Button } from "@/components/ui/button";
 import type { IRQ_ChangePasswordModel } from "@/models/admin/user.model";
+import { RotateCcwKey } from "lucide-react";
 import { useEffect, useState, type JSX } from "react";
 
 export default function ChangePassword(): JSX.Element {
@@ -145,11 +147,15 @@ export default function ChangePassword(): JSX.Element {
                     defaultValue={confirmNewPassword}
                     onChange={(e) => {setConfirmNewPassword(e.target.value)}}/>
                 </div>
-                <div className="grid grid-cols-1">
+                <div className="grid grid-cols-1 mt-2">
                     <div className="text-end">
-                        <button type="button" hidden={!isValid} disabled={!isValid}
+                        <Button type="button" hidden={!isValid} disabled={!isValid}
                             className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 bg-[#92B83D] text-white hover:bg-[#7DA22F] cursor-pointer"
-                            onClick={handleChange}>Đổi mật khẩu</button>
+                            onClick={handleChange}>
+                            <span className="flex">
+                                <RotateCcwKey className="h-5 w-5"/>&nbsp;Đổi mật khẩu
+                            </span>
+                        </Button>
                     </div>
                 </div>
             </div>

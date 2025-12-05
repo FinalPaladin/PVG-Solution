@@ -195,7 +195,7 @@ export default function RequestCustomerPage(): JSX.Element {
       {/* form align left, không card wrapper */}
       <form onSubmit={handleSubmit} className="max-w-xl">
         <h2 className="text-xl font-semibold mb-4">
-          Gửi yêu cầu khách hàng
+          Đăng ký vay
         </h2>
 
         {message && (
@@ -332,7 +332,7 @@ export default function RequestCustomerPage(): JSX.Element {
             }}
             className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
           >
-            Xóa
+            Làm lại
           </button>
         </div>
       </form>

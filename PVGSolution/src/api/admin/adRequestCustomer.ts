@@ -13,3 +13,17 @@ export function getCustomerRequestDetail(requestCode: string) {
         `/api/request/${requestCode}`
     );
 }
+
+export function exportDataCustomerRequest(_payload: string) {
+    return requestAdmin.get<Blob>(
+        `/api/request/exportexcel${_payload}`, {
+            responseType: "blob"
+        }
+    );
+}
+
+export function processedCustomerRequest(requestCode: string) {
+    return requestAdmin.get<unknown, BaseResponse>(
+        `/api/request/processed/${requestCode}`
+    );
+}

@@ -13,8 +13,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { adminPaths } from "@/commons/paths";
-import { getCustomerRequest } from "@/api/admin/adRequestCustomer";
+import { exportDataCustomerRequest, getCustomerRequest } from "@/api/admin/adRequestCustomer";
 import type { IRequestCustomerItemDetails } from "@/models/admin/requestCustomer";
+import { Download, ReceiptText, Search } from "lucide-react";
 
 interface IRequestSearchParams {
   phone: string;
@@ -72,6 +73,25 @@ const RequestsListTable = () => {
     // không cần gọi loadData ở đây, useEffect sẽ tự bắn lại khi state đổi
   };
 
+  const handleExport = async () => {
+    let query = buildRequestQuery(requestSearchParams);
+    let res = await exportDataCustomerRequest(query);
+
+    if (!(res instanceof Blob)) {
+      console.log("Response is not a Blob", res);
+      return;
+    }
+
+    let url = window.URL.createObjectURL(res);
+    let link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "Report.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -85,7 +105,16 @@ const RequestsListTable = () => {
             onChange={(e) => setSearchPhone(e.target.value)}
             className="w-64"
           />
-          <Button type="submit">Tìm kiếm</Button>
+          <Button type="submit" className="bg-[#a8a8a8]">
+            <span className="flex">
+                <Search className="h-5 w-5"/>&nbsp;Tìm kiếm
+            </span>
+          </Button>
+          <Button type="button" onClick={handleExport} className="bg-[#388700]">
+            <span className="flex">
+                <Download className="h-5 w-5"/>&nbsp;Tải báo cáo
+            </span>
+          </Button>
         </form>
 
         {/* Nếu muốn nút tạo mới thì thêm bên này hoặc chuyển vào form */}
@@ -179,8 +208,11 @@ const RequestsListTable = () => {
                             )
                           }
                           size="sm"
+                          className="bg-[#6b92d6]"
                         >
-                          Chi tiết
+                          <span className="flex">
+                              <ReceiptText className="h-5 w-5"/>&nbsp;Chi tiết
+                          </span>
                         </Button>
                       </div>
                     </TableCell>

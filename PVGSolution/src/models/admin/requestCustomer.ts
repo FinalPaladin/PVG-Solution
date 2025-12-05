@@ -18,6 +18,7 @@ export interface IGetRequestCustomerResponse extends IPagingResponse {
 }
 
 export interface IRequestCustomerDetail {
+    isProcessed:boolean;
     id: string;
     requestCode: string;
     phone: string;

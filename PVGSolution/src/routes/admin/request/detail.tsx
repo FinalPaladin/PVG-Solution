@@ -1,14 +1,20 @@
 import { useEffect, useState, type JSX } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getCustomerRequestDetail } from "@/api/admin/adRequestCustomer";
+import { getCustomerRequestDetail, processedCustomerRequest } from "@/api/admin/adRequestCustomer";
 import type { IRequestCustomerDetail } from "@/models/admin/requestCustomer";
 import { RequestCustomerLabels } from "@/commons/mappings";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 
 export default function RequestDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const [item, setItem] = useState<IRequestCustomerDetail[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState<{
+        type: "success" | "error";
+        text: string;
+    } | null>(null);
 
   // modal
   const [isOpen, setIsOpen] = useState(false);
@@ -76,15 +82,60 @@ export default function RequestDetail(): JSX.Element {
     setIsOpen(true);
   };
 
+  const handleProcessed = async () => {
+    try {
+      if(!item[0]?.requestCode)
+      {
+        setMessage({ type: "error", text: "Lỗi không tìm thấy mã đơn." });
+        return;
+      }
+
+      let res = await processedCustomerRequest(item[0]?.requestCode);
+
+      if (!res.isSuccess) {
+          throw new Error(res.message || `HTTP ${res.message}`);
+      }
+
+      setMessage({ type: "success", text: res.message });
+    }
+    catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+
+        setMessage({
+            type: "error",
+            text: `Lưu thất bại: ${errorMessage}`,
+        });
+    }
+  }
+
   return (
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Chi tiết yêu cầu</h1>
+      </div>
+
+      <div className="flex items-center justify-between mb-4">
         <Link to="/admin/requests" className="text-sm text-gray-600">
           Quay lại
         </Link>
+        <Button type="button" onClick={handleProcessed} className="bg-[#388700]">
+          <span className="flex">
+              <Check className="h-5 w-5"/>&nbsp;Duyệt
+          </span>
+        </Button>
       </div>
-
+      <div>
+          {message && (
+              <div
+                  className={`mb-4 px-4 py-2 rounded ${message.type === "success"
+                      ? "bg-green-50 text-green-800"
+                      : "bg-red-50 text-red-800"
+                      }`}
+              >
+                  {message.text}
+              </div>
+          )}
+      </div>
       <div className="bg-white p-6 rounded shadow-sm space-y-4">
         <div>
           <b>Mã đơn:</b> {item[0]?.productId}
