@@ -138,15 +138,22 @@ export default function RequestDetail(): JSX.Element {
       </div>
       <div className="bg-white p-6 rounded shadow-sm space-y-4">
         <div>
-          <b>Mã đơn:</b> {item[0]?.productId}
+          <b>Mã đơn:</b> {id}
         </div>
         <div>
-          <b>Số điện thoại:</b> {item[0]?.phone}
+          <b>Số điện thoại:</b> {item.find((c) => c.key === "phone")?.value}
         </div>
         <div>
           <b>Ngày tạo:</b>{" "}
           {item[0]?.createdDate
-            ? new Date(item[0].createdDate).toLocaleString()
+            ? new Date(item[0].createdDate).toLocaleString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })
             : "—"}
         </div>
 
