@@ -1,7 +1,7 @@
 import { useEffect, useState, type JSX } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getCustomerRequestDetail, processedCustomerRequest } from "@/api/admin/adRequestCustomer";
-import type { IRequestCustomerDetail } from "@/models/admin/requestCustomer";
+import { getDataCustomerRequest, processedCustomerRequest } from "@/api/admin/adRequestCustomer";
+import type { IRequestCustomerDetail, IRQ_GetRequestCustomerModel } from "@/models/admin/requestCustomer";
 import { RequestCustomerLabels } from "@/commons/mappings";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
@@ -9,6 +9,7 @@ import { Check } from "lucide-react";
 export default function RequestDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const [item, setItem] = useState<IRequestCustomerDetail[]>([]);
+  const [isProcessed, setIsProcessed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<{
@@ -27,9 +28,11 @@ export default function RequestDetail(): JSX.Element {
       setLoading(true);
       setError(null);
       try {
-        const res = await getCustomerRequestDetail(id || "");
+        // const res = await getCustomerRequestDetail(id || "");
+        let res = await getDataCustomerRequest({requestCode: id} as IRQ_GetRequestCustomerModel);
         if (!res.isSuccess) throw new Error(`HTTP ${res.statusCode}`);
-        const data = res.result;
+        const data = res.result?.details;
+        setIsProcessed(res.result?.data?.isProcessed || false);
         if (!cancelled) setItem([...(data || [])]);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Load error");
@@ -84,18 +87,19 @@ export default function RequestDetail(): JSX.Element {
 
   const handleProcessed = async () => {
     try {
-      if(!item[0]?.requestCode)
+      if(!id)
       {
         setMessage({ type: "error", text: "Lỗi không tìm thấy mã đơn." });
         return;
       }
 
-      let res = await processedCustomerRequest(item[0]?.requestCode);
+      let res = await processedCustomerRequest(id);
 
       if (!res.isSuccess) {
           throw new Error(res.message || `HTTP ${res.message}`);
       }
 
+      setIsProcessed(true);
       setMessage({ type: "success", text: res.message });
     }
     catch (err: unknown) {
@@ -118,11 +122,18 @@ export default function RequestDetail(): JSX.Element {
         <Link to="/admin/requests" className="text-sm text-gray-600">
           Quay lại
         </Link>
-        <Button type="button" onClick={handleProcessed} className="bg-[#388700]">
-          <span className="flex">
-              <Check className="h-5 w-5"/>&nbsp;Duyệt
-          </span>
-        </Button>
+        {
+          isProcessed ?
+          <Button type="button" className="bg-[#388700]  hover:bg-[white] hover:text-[black]">
+            Đã duyệt
+          </Button>
+          :
+          <Button type="button" onClick={handleProcessed} className="bg-[#8FA3FF] hover:bg-[white] hover:text-[black]">
+            <span className="flex">
+                <Check className="h-5 w-5"/>&nbsp;Duyệt
+            </span>
+          </Button>
+        }
       </div>
       <div>
           {message && (

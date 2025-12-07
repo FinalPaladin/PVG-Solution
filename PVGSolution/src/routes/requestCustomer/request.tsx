@@ -2,6 +2,8 @@ import React, { useState, type JSX } from "react";
 import { requestCustomerSave } from "@/api/requestCustomer";
 import type { IResponseUpdateImage } from "@/models/requestCustomer";
 import { RequestCustomerLabels } from "@/commons/mappings";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Recycle, Send } from "lucide-react";
 
 type FormState = {
   fullname: string;
@@ -11,6 +13,13 @@ type FormState = {
 };
 
 type UploadedImage = IResponseUpdateImage;
+
+const tabRequest = [
+  {code: 1, name: "THÔNG TIN CÁ NHÂN"},
+  {code: 2, name: "THÔNG TIN LIÊN LẠC"},
+  {code: 3, name: "THÔNG TIN VIỆC LÀM"},
+  {code: 4, name: "THÔNG TIN TÍN DỤNG"},
+]
 
 export default function RequestCustomerPage(): JSX.Element {
   const [form, setForm] = useState<FormState>({
@@ -27,6 +36,8 @@ export default function RequestCustomerPage(): JSX.Element {
   } | null>(null);
 
   const [images, setImages] = useState<UploadedImage[]>([]);
+
+  const [tab, setTab] = useState(tabRequest[0]);
   // const [uploading, setUploading] = useState(false);
   // const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -208,115 +219,177 @@ export default function RequestCustomerPage(): JSX.Element {
             {message.text}
           </div>
         )}
-
-        <div className="grid grid-cols-1 gap-4">
-          <label className="flex flex-col">
-            <span className="text-sm font-medium mb-1">Họ &amp; Tên</span>
-            <input
-              type="text"
-              value={form.fullname}
-              onChange={(e) => onChange("fullname", e.target.value)}
-              className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-              placeholder="Nhập họ và tên"
-              required
-            />
-          </label>
-
-          <label className="flex flex-col">
-            <span className="text-sm font-medium mb-1">SĐT</span>
-            <input
-              type="tel"
-              value={form.phone}
-              onChange={(e) => onChange("phone", e.target.value)}
-              className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-              placeholder="Nhập số điện thoại"
-              required
-            />
-          </label>
-
-          <label className="flex flex-col">
-            <span className="text-sm font-medium mb-1">Địa chỉ</span>
-            <input
-              type="text"
-              value={form.address}
-              onChange={(e) => onChange("address", e.target.value)}
-              className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-              placeholder="Số nhà, đường, quận, TP"
-            />
-          </label>
-
-          <label className="flex flex-col">
-            <span className="text-sm font-medium mb-1">Địa chỉ sổ đỏ</span>
-            <input
-              type="text"
-              value={form.redBookAddress}
-              onChange={(e) => onChange("redBookAddress", e.target.value)}
-              className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-              placeholder="Số nhà, đường, quận, TP (Địa chỉ trên sổ đỏ)"
-            />
-          </label>
-
-          {/* Ảnh đính kèm */}
-          <div className="flex flex-col">
-            <span className="text-sm font-medium mb-1">
-              Ảnh sổ đỏ / giấy tờ (tối đa 3)
-            </span>
-            <div className="mt-2 flex flex-wrap gap-3">
-              {images.map((img) => (
-                <div
-                  key={img.keyUrl}
-                  className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200"
-                >
-                  <img
-                    src={img.publicUrl}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(img)}
-                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-gray-300 text-xs font-semibold flex items-center justify-center hover:bg-red-50 hover:border-red-400 hover:text-red-500"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-
-              {images.length < 3 && (
-                <label className="w-24 h-24 flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 text-xs text-gray-500 cursor-pointer hover:border-green-400 hover:text-green-600">
-                  <span className="text-lg">＋</span>
-                  <span>Thêm ảnh</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleSelectFiles}
-                  />
-                </label>
-              )}
-            </div>
-            {/* {uploadError && (
-              <p className="mt-1 text-xs text-red-600">{uploadError}</p>
-            )}
-            {uploading && (
-              <p className="mt-1 text-xs text-gray-500">
-                Đang xử lý ảnh...
-              </p>
-            )} */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center">
+            <h4 className="text-l font-semibold mb-4">
+              {tab.name}
+            </h4>
+          </div>
+          <div className="text-end">          
+            <Button type="button" disabled={tab == tabRequest[0]} 
+              onClick={() => {
+                if(tab.code > tabRequest[0].code){
+                  let prevTab = tabRequest.find(x => x.code == (tab.code - 1));
+                  if(prevTab){setTab(prevTab)};
+                }
+              }} 
+              className="bg-[#8FA3FF]  hover:bg-[white] hover:text-[black] mr-2">
+              <span className="flex">
+                  <ChevronLeft className="h-5 w-5"/>&nbsp;Trở lại                
+              </span>
+            </Button>
+            <Button type="button" disabled={tab == tabRequest[tabRequest.length-1]} 
+              onClick={() => {
+                if(tab.code < tabRequest[tabRequest.length-1].code){                
+                  let nextTab = tabRequest.find(x => x.code == (tab.code + 1));
+                  console.log(nextTab);
+                  if(nextTab){setTab(nextTab)}
+                }
+              }} 
+              className="bg-[#8FA3FF]  hover:bg-[white] hover:text-[black]">
+              <span className="flex">
+                  Tiếp tục&nbsp;<ChevronRight className="h-5 w-5"/>
+              </span>
+            </Button>
           </div>
         </div>
 
-        <div className="mt-6 flex items-center gap-3">
+        {
+          tabRequest[0].code == tab.code ?//Thông tin cá nhân
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              <label className="flex flex-col">
+                <span className="text-sm font-medium mb-1">Họ &amp; Tên</span>
+                <input
+                  type="text"
+                  value={form.fullname}
+                  onChange={(e) => onChange("fullname", e.target.value)}
+                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  placeholder="Nhập họ và tên"
+                  required
+                />
+              </label>
+              <label className="flex flex-col">
+                <span className="text-sm font-medium mb-1">Ngày sinh</span>
+                <input type="date"
+                className="border rounded-md px-3 py-2 w-full"/>
+              </label>
+              <label className="flex flex-col">
+                <span className="text-sm font-medium mb-1">Địa chỉ</span>
+                <input
+                  type="text"
+                  value={form.address}
+                  onChange={(e) => onChange("address", e.target.value)}
+                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  placeholder="Số nhà, đường, quận, TP"
+                />
+              </label>
+            </div>
+          </>
+          :
+          tabRequest[1].code == tab.code ?//Thông tin liên lạc
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              <label className="flex flex-col">
+                <span className="text-sm font-medium mb-1">SĐT</span>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => onChange("phone", e.target.value)}
+                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  placeholder="Nhập số điện thoại"
+                  required
+                />
+              </label>
+              
+            </div>
+          </>
+          :
+          tabRequest[2].code == tab.code ?//Thông tin việc làm
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              
+            </div>
+          </>
+          :
+          tabRequest[3].code == tab.code ?//Thông tin tín dụng
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              <label className="flex flex-col">
+                <span className="text-sm font-medium mb-1">Địa chỉ sổ đỏ</span>
+                <input
+                  type="text"
+                  value={form.redBookAddress}
+                  onChange={(e) => onChange("redBookAddress", e.target.value)}
+                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  placeholder="Số nhà, đường, quận, TP (Địa chỉ trên sổ đỏ)"
+                />
+              </label>
+
+              {/* Ảnh đính kèm */}
+              <div className="flex flex-col">
+                <span className="text-sm font-medium mb-1">
+                  Ảnh sổ đỏ / giấy tờ (tối đa 3)
+                </span>
+                <div className="mt-2 flex flex-wrap gap-3">
+                  {images.map((img) => (
+                    <div
+                      key={img.keyUrl}
+                      className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200"
+                    >
+                      <img
+                        src={img.publicUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(img)}
+                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-gray-300 text-xs font-semibold flex items-center justify-center hover:bg-red-50 hover:border-red-400 hover:text-red-500"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+
+                  {images.length < 3 && (
+                    <label className="w-24 h-24 flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 text-xs text-gray-500 cursor-pointer hover:border-green-400 hover:text-green-600">
+                      <span className="text-lg">＋</span>
+                      <span>Thêm ảnh</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={handleSelectFiles}
+                      />
+                    </label>
+                  )}
+                </div>
+                {/* {uploadError && (
+                  <p className="mt-1 text-xs text-red-600">{uploadError}</p>
+                )}
+                {uploading && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Đang xử lý ảnh...
+                  </p>
+                )} */}
+              </div>
+            </div>
+          </>
+          :
+          <></>
+        }
+        <div className="mt-6 text-end gap-3">
           <button
             type="submit"
             disabled={loading}
-            className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium ${loading
+            className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
               ? "bg-gray-200 text-gray-700"
               : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
               }`}
           >
-            {loading ? "Đang gửi..." : "Gửi yêu cầu"}
+            <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Gửi yêu cầu"}
           </button>
 
           <button
@@ -330,9 +403,9 @@ export default function RequestCustomerPage(): JSX.Element {
               });
               setImages([]);
             }}
-            className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
           >
-            Làm lại
+            <Recycle className="h-5 w-5"/>&nbsp;Làm lại
           </button>
         </div>
       </form>

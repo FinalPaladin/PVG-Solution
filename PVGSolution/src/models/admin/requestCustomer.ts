@@ -31,3 +31,12 @@ export interface IRequestCustomerDetail {
     productId: string;
     createdDate: string; // ISO datetime string
 }
+
+export interface IRQ_GetRequestCustomerModel{
+  requestCode: string;
+}
+
+export interface IRS_GetRequestCustomerModel{
+  data: IRequestCustomerItemDetails;
+  details: IRequestCustomerDetail[];
+}

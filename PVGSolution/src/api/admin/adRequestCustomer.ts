@@ -1,4 +1,4 @@
-import type { IGetRequestCustomerResponse, IRequestCustomerDetail } from "@/models/admin/requestCustomer";
+import type { IGetRequestCustomerResponse, IRequestCustomerDetail, IRQ_GetRequestCustomerModel, IRS_GetRequestCustomerModel } from "@/models/admin/requestCustomer";
 import type { BaseResponse } from "@/models/baseReponse";
 import requestAdmin from "@/utils/requestAdmin";
 
@@ -25,5 +25,11 @@ export function exportDataCustomerRequest(_payload: string) {
 export function processedCustomerRequest(requestCode: string) {
     return requestAdmin.get<unknown, BaseResponse>(
         `/api/request/processed/${requestCode}`
+    );
+}
+
+export function getDataCustomerRequest(_payload: IRQ_GetRequestCustomerModel) {
+    return requestAdmin.post<unknown, BaseResponse<IRS_GetRequestCustomerModel>>(
+        `/api/request/getdata`, _payload
     );
 }
