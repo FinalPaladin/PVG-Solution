@@ -1,4 +1,4 @@
-import { useErrorStore } from "@/stores/useErrorStore";
+import { useAlert } from "@/stores/useAlertStore";
 import axios from "axios";
 
 const requestAdmin = axios.create({
@@ -27,7 +27,7 @@ requestAdmin.interceptors.response.use(
   },
   (error) => {
     if (!error.response) {
-      useErrorStore
+      useAlert
         .getState()
         .showError("Không thể kết nối server. Vui lòng thử lại sau!");
       return Promise.reject(error);
@@ -37,7 +37,7 @@ requestAdmin.interceptors.response.use(
       error.response?.data?.error?.errorMessage ||
       error.message ||
       "Hệ thống xảy ra lỗi";
-    useErrorStore.getState().showError(msg);
+    useAlert.getState().showError(msg);
     return Promise.reject(error);
   }
 );
