@@ -39,7 +39,7 @@ type FormState = {
   placeofissue: string;
   dateofissue: Date;
   nationality: string;
-  matialstatus: string;
+  marialstatus: string;
   email: string;
   companyname: string;
   jobtitle: string;
@@ -49,7 +49,7 @@ type FormState = {
   monthincome: string;
   loanpurpose: string;
   outstandingloansatotherbanks: string;
-  loanamountequested: string;
+  loanamountrequested: string;
   collateral: string;
   loanproducttype: string;
   otherinfo: string;
