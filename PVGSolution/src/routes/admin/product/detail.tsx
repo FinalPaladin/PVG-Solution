@@ -129,7 +129,7 @@ export default function ProductForm(): JSX.Element {
   const [categoryId, setCategoryId] = useState("");
   const [loanAmountId, setLoanAmountId] = useState("");
   const [loanTermId, setLoanTermId] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | undefined>();
 
   // details

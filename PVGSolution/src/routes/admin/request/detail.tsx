@@ -1,13 +1,11 @@
 import { useEffect, useState, type JSX } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
-  deleteCustomerRequest,
   getDataCustomerRequest,
   processedCustomerRequest,
 } from "@/api/admin/adRequestCustomer";
 import type {
   IRequestCustomerDetail,
-  IRQ_DeleteRequestCustomerModel,
   IRQ_GetRequestCustomerModel,
   IRQ_ProcessedModel,
 } from "@/models/admin/requestCustomer";
@@ -21,7 +19,7 @@ export default function RequestDetail(): JSX.Element {
   const { auth } = useAuth();
   const [item, setItem] = useState<IRequestCustomerDetail[]>([]);
   const [isProcessed, setIsProcessed] = useState(false);
-  const [isRejected, setIsRejected] = useState(false);
+  const [, setIsRejected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<{
