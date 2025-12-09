@@ -15,6 +15,7 @@ export interface IRequestCustomerItemDetails {
   isProcessed: boolean;
   isSentEmail: boolean;
   strCreatedDate: string;
+  isDeleled: boolean;
 }
 
 export interface IGetRequestCustomerResponse extends IPagingResponse {
@@ -39,4 +40,15 @@ export interface IRQ_GetRequestCustomerModel{
 export interface IRS_GetRequestCustomerModel{
   data: IRequestCustomerItemDetails;
   details: IRequestCustomerDetail[];
+}
+
+export interface IRQ_ProcessedModel{
+  requestCode: string;
+  userName: string;
+}
+
+export interface IRQ_DeleteRequestCustomerModel{
+  requestCode: string;
+  userDelete: string;
+  idDetail: string;
 }

@@ -1,15 +1,18 @@
 import { useEffect, useState, type JSX } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getDataCustomerRequest, processedCustomerRequest } from "@/api/admin/adRequestCustomer";
-import type { IRequestCustomerDetail, IRQ_GetRequestCustomerModel } from "@/models/admin/requestCustomer";
+import { deleteCustomerRequest, getDataCustomerRequest, processedCustomerRequest } from "@/api/admin/adRequestCustomer";
+import type { IRequestCustomerDetail, IRQ_DeleteRequestCustomerModel, IRQ_GetRequestCustomerModel, IRQ_ProcessedModel } from "@/models/admin/requestCustomer";
 import { RequestCustomerLabels } from "@/commons/mappings";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { useAuth } from "@/auth/authContext";
 
 export default function RequestDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
+  const { auth } = useAuth();
   const [item, setItem] = useState<IRequestCustomerDetail[]>([]);
   const [isProcessed, setIsProcessed] = useState(false);
+  const [isRejected, setIsRejected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<{
@@ -33,6 +36,7 @@ export default function RequestDetail(): JSX.Element {
         if (!res.isSuccess) throw new Error(`HTTP ${res.statusCode}`);
         const data = res.result?.details;
         setIsProcessed(res.result?.data?.isProcessed || false);
+        setIsRejected(res.result?.data?.isDeleled || false);
         if (!cancelled) setItem([...(data || [])]);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Load error");
@@ -93,7 +97,34 @@ export default function RequestDetail(): JSX.Element {
         return;
       }
 
-      let res = await processedCustomerRequest(id);
+      let res = await processedCustomerRequest({requestCode: id, userName: auth.userName} as IRQ_ProcessedModel);
+
+      if (!res.isSuccess) {
+          throw new Error(res.message || `HTTP ${res.message}`);
+      }
+
+      setIsProcessed(true);
+      setMessage({ type: "success", text: res.message });
+    }
+    catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+
+        setMessage({
+            type: "error",
+            text: `Lưu thất bại: ${errorMessage}`,
+        });
+    }
+  }
+
+  const handleRejected = async () => {
+    try {
+      if(!id)
+      {
+        setMessage({ type: "error", text: "Lỗi không tìm thấy mã đơn." });
+        return;
+      }
+
+      let res = await deleteCustomerRequest({requestCode: id, userDelete: auth.userName, idDetail: ""} as IRQ_DeleteRequestCustomerModel);
 
       if (!res.isSuccess) {
           throw new Error(res.message || `HTTP ${res.message}`);

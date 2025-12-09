@@ -77,7 +77,7 @@ const defaultForm = {
     cmnd: "",
     placeofissue: "",
     dateofissue: new Date(),
-    nationality: "",
+    nationality: "Việt Nam",
     email: "",
     matialstatus: "",
     companyname: "",
