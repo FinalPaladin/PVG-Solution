@@ -49,9 +49,6 @@ const AdminProductDetail = React.lazy(
 const AdminProductCategory = React.lazy(
   () => import("./routes/admin/productCategory/index.tsx")
 );
-const AdminProductCategoryDetail = React.lazy(
-  () => import("./routes/admin/productCategory/detail.tsx")
-);
 
 const router = createBrowserRouter([
   {
@@ -100,16 +97,16 @@ const router = createBrowserRouter([
             element: <AdminProduct />,
           },
           {
+            path: adminPaths.ADMIN_PRODUCT_NEW,
+            element: <AdminProductDetail />,
+          },
+          {
             path: adminPaths.ADMIN_PRODUCT_DETAIL,
             element: <AdminProductDetail />,
           },
           {
             path: adminPaths.ADMIN_PRODUCTCATEGORY,
             element: <AdminProductCategory />,
-          },
-          {
-            path: adminPaths.ADMIN_PRODUCTCATEGORY_DETAIL,
-            element: <AdminProductCategoryDetail />,
           },
         ],
       },

@@ -19,6 +19,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { useAuth } from "../../auth/authContext";
+import { adminPaths } from "@/commons/paths";
 
 export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
@@ -89,9 +90,9 @@ export default function AdminLayout(): JSX.Element {
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           <Link
-            to="/admin"
+            to={adminPaths.ADMIN}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin")
+              isActive(adminPaths.ADMIN)
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -101,9 +102,9 @@ export default function AdminLayout(): JSX.Element {
           </Link>
 
           <Link
-            to="/admin/requests"
+            to={adminPaths.ADMIN_REQUESTS}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin/requests")
+              isActive(adminPaths.ADMIN_REQUESTS)
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -112,9 +113,9 @@ export default function AdminLayout(): JSX.Element {
             {!collapsed && <span>Quản lý Yêu cầu khách</span>}
           </Link>
           <Link
-            to="/admin/configuration"
+            to={adminPaths.ADMIN_CONFIG}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin/configuration")
+              isActive(adminPaths.ADMIN_CONFIG)
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -123,9 +124,9 @@ export default function AdminLayout(): JSX.Element {
             {!collapsed && <span>Cài đặt</span>}
           </Link>
           <Link
-            to="/admin/ChangePassword"
+            to={adminPaths.ADMIN_CHANGEPASSWORD}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin/ChangePassword")
+              isActive(adminPaths.ADMIN_CHANGEPASSWORD)
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -134,9 +135,9 @@ export default function AdminLayout(): JSX.Element {
             {!collapsed && <span>Đổi mật khẩu</span>}
           </Link>
           <Link
-            to="/admin/productcategory"
+            to={adminPaths.ADMIN_PRODUCTCATEGORY}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin/productcategory")
+              isActive(adminPaths.ADMIN_PRODUCTCATEGORY)
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}
@@ -145,9 +146,9 @@ export default function AdminLayout(): JSX.Element {
             {!collapsed && <span>Danh mục sản phẩm</span>}
           </Link>
           <Link
-            to="/admin/product"
+            to={adminPaths.ADMIN_PRODUCT}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin/product")
+              isActive(adminPaths.ADMIN_PRODUCT)
                 ? "bg-emerald-50 text-emerald-700"
                 : "text-gray-700 hover:bg-gray-50"
             }`}

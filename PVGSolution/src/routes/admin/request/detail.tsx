@@ -1,7 +1,14 @@
 import { useEffect, useState, type JSX } from "react";
 import { Link, useParams } from "react-router-dom";
-import { deleteCustomerRequest, getDataCustomerRequest, processedCustomerRequest } from "@/api/admin/adRequestCustomer";
-import type { IRequestCustomerDetail, IRQ_DeleteRequestCustomerModel, IRQ_GetRequestCustomerModel, IRQ_ProcessedModel } from "@/models/admin/requestCustomer";
+import {
+  getDataCustomerRequest,
+  processedCustomerRequest,
+} from "@/api/admin/adRequestCustomer";
+import type {
+  IRequestCustomerDetail,
+  IRQ_GetRequestCustomerModel,
+  IRQ_ProcessedModel,
+} from "@/models/admin/requestCustomer";
 import { RequestCustomerLabels } from "@/commons/mappings";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
@@ -12,13 +19,13 @@ export default function RequestDetail(): JSX.Element {
   const { auth } = useAuth();
   const [item, setItem] = useState<IRequestCustomerDetail[]>([]);
   const [isProcessed, setIsProcessed] = useState(false);
-  const [isRejected, setIsRejected] = useState(false);
+  const [, setIsRejected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    const [message, setMessage] = useState<{
-        type: "success" | "error";
-        text: string;
-    } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // modal
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +39,9 @@ export default function RequestDetail(): JSX.Element {
       setError(null);
       try {
         // const res = await getCustomerRequestDetail(id || "");
-        let res = await getDataCustomerRequest({requestCode: id} as IRQ_GetRequestCustomerModel);
+        const res = await getDataCustomerRequest({
+          requestCode: id,
+        } as IRQ_GetRequestCustomerModel);
         if (!res.isSuccess) throw new Error(`HTTP ${res.statusCode}`);
         const data = res.result?.details;
         setIsProcessed(res.result?.data?.isProcessed || false);
@@ -91,57 +100,60 @@ export default function RequestDetail(): JSX.Element {
 
   const handleProcessed = async () => {
     try {
-      if(!id)
-      {
+      if (!id) {
         setMessage({ type: "error", text: "Lỗi không tìm thấy mã đơn." });
         return;
       }
 
-      let res = await processedCustomerRequest({requestCode: id, userName: auth.userName} as IRQ_ProcessedModel);
+      const res = await processedCustomerRequest({
+        requestCode: id,
+        userName: auth.userName,
+      } as IRQ_ProcessedModel);
 
       if (!res.isSuccess) {
-          throw new Error(res.message || `HTTP ${res.message}`);
+        throw new Error(res.message || `HTTP ${res.message}`);
       }
 
       setIsProcessed(true);
       setMessage({ type: "success", text: res.message });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+
+      setMessage({
+        type: "error",
+        text: `Lưu thất bại: ${errorMessage}`,
+      });
     }
-    catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+  };
 
-        setMessage({
-            type: "error",
-            text: `Lưu thất bại: ${errorMessage}`,
-        });
-    }
-  }
+  // const handleRejected = async () => {
+  //   try {
+  //     if (!id) {
+  //       setMessage({ type: "error", text: "Lỗi không tìm thấy mã đơn." });
+  //       return;
+  //     }
 
-  const handleRejected = async () => {
-    try {
-      if(!id)
-      {
-        setMessage({ type: "error", text: "Lỗi không tìm thấy mã đơn." });
-        return;
-      }
+  //     const res = await deleteCustomerRequest({
+  //       requestCode: id,
+  //       userDelete: auth.userName,
+  //       idDetail: "",
+  //     } as IRQ_DeleteRequestCustomerModel);
 
-      let res = await deleteCustomerRequest({requestCode: id, userDelete: auth.userName, idDetail: ""} as IRQ_DeleteRequestCustomerModel);
+  //     if (!res.isSuccess) {
+  //       throw new Error(res.message || `HTTP ${res.message}`);
+  //     }
 
-      if (!res.isSuccess) {
-          throw new Error(res.message || `HTTP ${res.message}`);
-      }
+  //     setIsProcessed(true);
+  //     setMessage({ type: "success", text: res.message });
+  //   } catch (err: unknown) {
+  //     const errorMessage = err instanceof Error ? err.message : "Unknown error";
 
-      setIsProcessed(true);
-      setMessage({ type: "success", text: res.message });
-    }
-    catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "Unknown error";
-
-        setMessage({
-            type: "error",
-            text: `Lưu thất bại: ${errorMessage}`,
-        });
-    }
-  }
+  //     setMessage({
+  //       type: "error",
+  //       text: `Lưu thất bại: ${errorMessage}`,
+  //     });
+  //   }
+  // };
 
   return (
     <div className="max-w-3xl">
@@ -153,30 +165,38 @@ export default function RequestDetail(): JSX.Element {
         <Link to="/admin/requests" className="text-sm text-gray-600">
           Quay lại
         </Link>
-        {
-          isProcessed ?
-          <Button type="button" className="bg-[#388700]  hover:bg-[white] hover:text-[black]">
+        {isProcessed ? (
+          <Button
+            type="button"
+            className="bg-[#388700]  hover:bg-[white] hover:text-[black]"
+          >
             Đã duyệt
           </Button>
-          :
-          <Button type="button" onClick={handleProcessed} className="bg-[#8FA3FF] hover:bg-[white] hover:text-[black]">
+        ) : (
+          <Button
+            type="button"
+            onClick={handleProcessed}
+            className="bg-[#8FA3FF] hover:bg-[white] hover:text-[black]"
+          >
             <span className="flex">
-                <Check className="h-5 w-5"/>&nbsp;Duyệt
+              <Check className="h-5 w-5" />
+              &nbsp;Duyệt
             </span>
           </Button>
-        }
+        )}
       </div>
       <div>
-          {message && (
-              <div
-                  className={`mb-4 px-4 py-2 rounded ${message.type === "success"
-                      ? "bg-green-50 text-green-800"
-                      : "bg-red-50 text-red-800"
-                      }`}
-              >
-                  {message.text}
-              </div>
-          )}
+        {message && (
+          <div
+            className={`mb-4 px-4 py-2 rounded ${
+              message.type === "success"
+                ? "bg-green-50 text-green-800"
+                : "bg-red-50 text-red-800"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
       </div>
       <div className="bg-white p-6 rounded shadow-sm space-y-4">
         <div>

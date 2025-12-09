@@ -1,5 +1,6 @@
 import FAQSection from "@/components/common/FAQSections";
 import React, { useState, type JSX } from "react";
+import { DollarSign, Shield, Zap, type LucideIcon } from "lucide-react";
 
 // --- Types ---
 export type TabKey = "info" | "docs" | "process" | "fee";
@@ -34,18 +35,98 @@ export default function ProductInfoPage(): JSX.Element {
       <div className="max-w-7xl mx-auto px-6 py-10">
         <h1 className="text-3xl font-semibold mb-6">Thông tin sản phẩm</h1>
 
+        {/* --- HERO / Banner --- */}
+        <section className="rounded-xl overflow-hidden bg-white shadow-sm mb-10">
+          <div className="relative flex flex-col md:flex-row items-stretch">
+            {/* Left content */}
+            <div className="md:w-2/3 p-8 md:p-12 flex flex-col justify-center bg-linear-to-r from-white/90 via-white/70 to-transparent">
+              <span className="inline-block text-xs font-semibold bg-white rounded-full px-3 py-1 text-[#14532d] shadow-sm mb-4">
+                VAY TIÊU DÙNG
+              </span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-[#14532d] mb-4">
+                Vay tín chấp theo lương
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 text-gray-700">
+                <div>
+                  <div className="text-xs uppercase text-gray-500">Mức vay</div>
+                  <div className="text-lg font-semibold">Linh hoạt</div>
+                </div>
+
+                <div>
+                  <div className="text-xs uppercase text-gray-500">
+                    Thời hạn vay tối đa
+                  </div>
+                  <div className="text-lg font-semibold">84 tháng</div>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  className="inline-block px-6 py-3 rounded-md bg-emerald-400 text-[#064e3b] font-medium shadow-sm hover:brightness-95"
+                >
+                  Đăng ký ngay
+                </button>
+              </div>
+            </div>
+
+            {/* Right image */}
+            <div className="md:w-1/3 relative h-56 md:h-auto">
+              <img
+                src="https://www.vietcombank.com.vn/-/media/Project/VCB-Sites/VCB/KHCN/San-pham-Dich-vu/Vay/SAN-PHAM-TIN-DUNG/Ava_Vay-tin-chap-voi-nguoi-LD_195-x-343_.jpg?h=1125&w=2436&ts=20250529074158"
+                alt="banner"
+                className="w-full h-full object-cover"
+              />
+              {/* overlay to mimic soft fade like mockup */}
+              <div
+                className="absolute inset-0 bg-linear-to-l from-transparent via-white/40 to-white/90"
+                aria-hidden
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* --- 3 Info cards under banner --- */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <InfoCard
+            Icon={DollarSign}
+            title="Số tiền cho vay tối đa"
+            body="Linh hoạt, theo chính sách áp dụng với từng phân khúc khách hàng."
+          />
+
+          <InfoCard
+            Icon={Shield}
+            title="Lãi suất cạnh tranh"
+            body="Lãi suất cạnh tranh trên thị trường."
+          />
+
+          <InfoCard
+            Icon={Zap}
+            title="Không cần Tài sản bảo đảm"
+            body="Không yêu cầu Tài sản bảo đảm."
+          />
+        </section>
+
         {/* Tabs */}
         <div className="mb-6">
           {/* Desktop Tabs: hidden on small screens */}
-          <nav className="hidden sm:flex items-end gap-6 border-b border-[#e5e7eb] pb-3" role="tablist" aria-label="Product info tabs">
+          <nav
+            className="hidden sm:flex items-end gap-6 border-b border-[#e5e7eb] pb-3"
+            role="tablist"
+            aria-label="Product info tabs"
+          >
             {TABs.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setActive(t.key)}
                 role="tab"
                 aria-selected={active === t.key}
-                className={`relative pb-2 text-lg font-medium focus:outline-none transition-colors ${active === t.key ? "text-[#14532d]" : "text-gray-600 hover:text-gray-800"
-                  }`}
+                className={`relative pb-2 text-lg font-medium focus:outline-none transition-colors ${
+                  active === t.key
+                    ? "text-[#14532d]"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
               >
                 {t.label}
                 {/* underline indicator */}
@@ -83,10 +164,29 @@ export default function ProductInfoPage(): JSX.Element {
           <CardList active={active} />
         </div>
 
-
         <FAQSection />
       </div>
+    </div>
+  );
+}
 
+// --- small InfoCard component ---
+function InfoCard({
+  Icon,
+  title,
+  body,
+}: {
+  Icon: LucideIcon;
+  title: string;
+  body: string;
+}): JSX.Element {
+  return (
+    <div className="bg-[#f7f7f8] rounded-xl p-6 flex flex-col items-start gap-4 shadow-sm">
+      <div className="w-12 h-12 rounded-full bg-white/60 flex items-center justify-center shadow">
+        <Icon className="w-6 h-6 text-[#14532d]" />
+      </div>
+      <h4 className="text-lg font-semibold text-gray-800">{title}</h4>
+      <p className="text-sm text-gray-600">{body}</p>
     </div>
   );
 }
@@ -165,7 +265,9 @@ function CardList({ active }: CardListProps): JSX.Element {
     fee: [
       {
         title: "Biểu phí",
-        body: ["Thông tin về biểu phí sẽ cập nhật theo thông báo của Vietcombank."],
+        body: [
+          "Thông tin về biểu phí sẽ cập nhật theo thông báo của Vietcombank.",
+        ],
       },
     ],
   };
@@ -184,7 +286,9 @@ function CardList({ active }: CardListProps): JSX.Element {
         <div key={idx} className="bg-[#f7f7f8] rounded-lg p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
             <div className="md:col-span-4 lg:col-span-3">
-              <h3 className="text-xl font-semibold text-gray-800">{item.title}</h3>
+              <h3 className="text-xl font-semibold text-gray-800">
+                {item.title}
+              </h3>
             </div>
             <div className="md:col-span-8 lg:col-span-9 text-gray-700">
               {item.body.map((b, i) => (
