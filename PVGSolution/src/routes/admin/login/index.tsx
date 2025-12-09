@@ -28,8 +28,9 @@ export default function LoginPage() {
         password: password,
       } as ILoginRequest);
       const token = res.result?.token ?? "";
+      const permission = res.result?.permission ?? "";
 
-      login({ token, userName });
+      login({ token, userName , permission});
       navigate(adminPaths.ADMIN, { replace: true });
     } catch {
       setError("Đăng nhập thất bại. Vui lòng kiểm tra lại.");
