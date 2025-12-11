@@ -8,6 +8,7 @@ import { adminPaths, paths } from "./commons/paths.ts";
 import { AuthProvider } from "./auth/authContext.ts";
 import ProtectedRoute from "./auth/protectedRoute.ts";
 import { GlobalErrorAlert } from "./components/common/errorDialog.tsx";
+import { WebConfigProvider } from "./auth/webConfigContext.ts";
 
 // user site
 const HomePage = React.lazy(() => import("./routes/index.tsx"));
@@ -116,9 +117,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <GlobalErrorAlert />
-    </AuthProvider>
+    <WebConfigProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <GlobalErrorAlert />
+      </AuthProvider>
+    </WebConfigProvider>
   </StrictMode>
 );

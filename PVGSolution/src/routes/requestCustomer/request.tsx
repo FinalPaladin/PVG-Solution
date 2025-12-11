@@ -1,8 +1,11 @@
-import React, { useState, type JSX } from "react";
+import React, { useEffect, useState, type JSX } from "react";
 import { requestCustomerSave } from "@/api/requestCustomer";
 import type { IResponseUpdateImage } from "@/models/requestCustomer";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Recycle, Send } from "lucide-react";
+import { useAlert } from "@/stores/useAlertStore";
+import imageCompression from 'browser-image-compression';
+import { ProgressBar } from "@/components/ui/progress-bar";
 
 const matialStatus = [
   {code: "", name: "Chọn"},
@@ -12,7 +15,7 @@ const matialStatus = [
 ];
 
 const salaryIncom = [
-  {code: "", name: "Chọn"},
+  {code: "Không có thu nhập từ lương", name: "Không có thu nhập từ lương"},
   {code: "Chuyển khoản", name: "Chuyển khoản"},
   {code: "Tiền mặt", name: "Tiền mặt"},
 ];
@@ -39,7 +42,7 @@ type FormState = {
   placeofissue: string;
   dateofissue: Date;
   nationality: string;
-  matialstatus: string;
+  marialstatus: string;
   email: string;
   companyname: string;
   jobtitle: string;
@@ -49,7 +52,7 @@ type FormState = {
   monthincome: string;
   loanpurpose: string;
   outstandingloansatotherbanks: string;
-  loanamountequested: string;
+  loanamountrequested: string;
   collateral: string;
   loanproducttype: string;
   otherinfo: string;
@@ -59,10 +62,10 @@ type FormState = {
 type UploadedImage = IResponseUpdateImage;
 
 const tabRequest = [
-  {code: 1, name: "THÔNG TIN CÁ NHÂN"},
-  {code: 2, name: "THÔNG TIN LIÊN LẠC"},
-  {code: 3, name: "THÔNG TIN VIỆC LÀM"},
-  {code: 4, name: "THÔNG TIN TÍN DỤNG"},
+  {code: 1, name: "THÔNG TIN CÁ NHÂN", percent: 0, bg: "#283678"},
+  {code: 2, name: "THÔNG TIN LIÊN LẠC", percent: 33, bg: "#a7ab35"},
+  {code: 3, name: "THÔNG TIN VIỆC LÀM", percent: 66, bg: "#56ae76"},
+  {code: 4, name: "THÔNG TIN TÍN DỤNG", percent: 100, bg: "#079a52"},
 ]
 
 const defaultForm = {
@@ -77,24 +80,29 @@ const defaultForm = {
     cmnd: "",
     placeofissue: "",
     dateofissue: new Date(),
-    nationality: "",
+    nationality: "Việt Nam",
     email: "",
-    matialstatus: "",
+  marialstatus: matialStatus[0].code,
     companyname: "",
     jobtitle: "",
     department: "",
     companyphone: "",
-    salaryincome: "",
-    monthincome: "Dưới 5 triệu",
+    salaryincome: salaryIncom[0].code,
+    monthincome: monthIncom[0].code,
     loanpurpose: "",
     outstandingloansatotherbanks: "",
-    loanamountequested: "",
+    loanamountrequested: "",
     collateral: "",
     loanproducttype: "",
     otherinfo: "",
     otherincome: "",
   } as FormState;
 
+const optionsResizeImg = {
+    maxSizeMB: 1, // tối đa 1MB sau khi nén
+    maxWidthOrHeight: 1024, // Resize chiều to nhất còn 1024px
+    useWebWorker: true
+  };
 export default function RequestCustomerPage(): JSX.Element {
   const [form, setForm] = useState<FormState>(defaultForm);
 
@@ -109,6 +117,13 @@ export default function RequestCustomerPage(): JSX.Element {
   const [tab, setTab] = useState(tabRequest[0]);
   // const [uploading, setUploading] = useState(false);
   // const [uploadError, setUploadError] = useState<string | null>(null);
+
+  useEffect(() => {    
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, []);
 
   function onChange<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((s) => ({ ...s, [key]: value }));
@@ -151,14 +166,15 @@ export default function RequestCustomerPage(): JSX.Element {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const remainSlots = 3 - images.length;
+    const remainSlots = 5 - images.length;
     const toUpload = Array.from(files).slice(0, remainSlots);
     
-    let listImg = [...images] as UploadedImage[];
+    const listImg = [...images] as UploadedImage[];
     for (const file of toUpload) {
-      let url = URL.createObjectURL(file);
+      const newFile = await imageCompression(file, optionsResizeImg);
+      const url = URL.createObjectURL(newFile);
       listImg.push({
-        file: file,
+        file: newFile,
         keyUrl: "",
         publicUrl: url
       } as UploadedImage);
@@ -187,7 +203,7 @@ export default function RequestCustomerPage(): JSX.Element {
     //   setUploading(false);
     // }
     
-    setImages((prev) => prev.filter((x) => x.keyUrl !== img.keyUrl));
+    setImages((prev) => prev.filter((x) => x.publicUrl !== img.publicUrl));
   }
 
   async function handleSubmit(e?: React.FormEvent) {
@@ -195,7 +211,7 @@ export default function RequestCustomerPage(): JSX.Element {
     setMessage(null);
     const err = validate();
     if (err) {
-      setMessage({ type: "error", text: err });
+      useAlert.getState().showError(err);
       return;
     }
 
@@ -221,13 +237,12 @@ export default function RequestCustomerPage(): JSX.Element {
       //   productId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
       //   data,
       // };
-      let payload = new FormData();
+      const payload = new FormData();
       payload.append("Phone", form.phone);
       payload.append("ProductId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
       payload.append("FullName", form.fullname);
-      debugger
       
-      let dataJson = JSON.stringify([
+      const dataJson = JSON.stringify([
           { key: "fullname", value: form.fullname },
           { key: "phone", value: form.phone },
           { key: "address", value: form.address },
@@ -240,7 +255,7 @@ export default function RequestCustomerPage(): JSX.Element {
           { key: "placeofissue", value: form.placeofissue },
           { key: "dateofissue", value: form.dateofissue.toLocaleDateString("vi-VN") },
           { key: "nationality", value: form.nationality },
-          { key: "matialstatus", value: form.matialstatus },
+          { key: "marialstatus", value: form.marialstatus },
           { key: "email", value: form.email },
           { key: "companyname", value: form.companyname },
           { key: "jobtitle", value: form.jobtitle },
@@ -250,7 +265,7 @@ export default function RequestCustomerPage(): JSX.Element {
           { key: "monthincome", value: form.monthincome },
           { key: "loanpurpose", value: form.loanpurpose },
           { key: "outstandingloansatotherbanks", value: form.outstandingloansatotherbanks },
-          { key: "loanamountequested", value: form.loanamountequested },
+          { key: "loanamountrequested", value: form.loanamountrequested },
           { key: "collateral", value: form.collateral },
           { key: "loanproducttype", value: form.loanproducttype },
           { key: "otherinfo", value: form.otherinfo },
@@ -269,18 +284,14 @@ export default function RequestCustomerPage(): JSX.Element {
       if (!res.isSuccess) {
         throw new Error(res.message || `HTTP lỗi`);
       }
-
-      setMessage({ type: "success", text: "Gửi yêu cầu thành công." });
+      useAlert.getState().show("Gửi yêu cầu thành công.", "success");
       setForm(defaultForm);
       setImages([]);
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Unknown error";
 
-      setMessage({
-        type: "error",
-        text: `Gửi thất bại: ${errorMessage}`,
-      });
+      useAlert.getState().showError(`Gửi thất bại: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -304,21 +315,24 @@ export default function RequestCustomerPage(): JSX.Element {
             {message.text}
           </div>
         )}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div className="flex items-center">
             <h4 className="text-l font-semibold mb-4">
               {tab.name}
             </h4>
           </div>
+          <div className="flex items-center">
+            <ProgressBar value={tab.percent}/>
+          </div>
           <div className="text-end">          
             <Button type="button" disabled={tab == tabRequest[0]} 
               onClick={() => {
                 if(tab.code > tabRequest[0].code){
-                  let prevTab = tabRequest.find(x => x.code == (tab.code - 1));
+                  const prevTab = tabRequest.find(x => x.code == (tab.code - 1));
                   if(prevTab){setTab(prevTab)};
                 }
               }} 
-              className="bg-[#8FA3FF]  hover:bg-[white] hover:text-[black] mr-2">
+              className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2">
               <span className="flex">
                   <ChevronLeft className="h-5 w-5"/>&nbsp;Trở lại                
               </span>
@@ -326,12 +340,11 @@ export default function RequestCustomerPage(): JSX.Element {
             <Button type="button" disabled={tab == tabRequest[tabRequest.length-1]} 
               onClick={() => {
                 if(tab.code < tabRequest[tabRequest.length-1].code){                
-                  let nextTab = tabRequest.find(x => x.code == (tab.code + 1));
-                  console.log(nextTab);
+                  const nextTab = tabRequest.find(x => x.code == (tab.code + 1));
                   if(nextTab){setTab(nextTab)}
                 }
               }} 
-              className="bg-[#8FA3FF]  hover:bg-[white] hover:text-[black]">
+              className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium">
               <span className="flex">
                   Tiếp tục&nbsp;<ChevronRight className="h-5 w-5"/>
               </span>
@@ -384,7 +397,8 @@ export default function RequestCustomerPage(): JSX.Element {
               <label className="flex flex-col">
                 <span className="text-sm font-medium mb-1">Ngày sinh</span>
                 <input type="date" onChange={(e) => {onChange("birthday", new Date(e.target.value))}}
-                className="border rounded-md px-3 py-2 w-full"/>
+                className="border rounded-md px-3 py-2 w-full"
+                required/>
               </label>
               <label className="flex flex-col">
                 <span className="text-sm font-medium mb-1">Tuổi</span>
@@ -394,6 +408,7 @@ export default function RequestCustomerPage(): JSX.Element {
                   onChange={(e) => onChange("age", parseInt(e.target.value))}
                   className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Tuổi"
+                  required
                 />
               </label>
               <label className="flex flex-col">
@@ -404,6 +419,7 @@ export default function RequestCustomerPage(): JSX.Element {
                   onChange={(e) => onChange("cccd", e.target.value)}
                   className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="CCCD"
+                  required
                 />
               </label>
               <label className="flex flex-col">
@@ -414,12 +430,14 @@ export default function RequestCustomerPage(): JSX.Element {
                   onChange={(e) => onChange("placeofissue", e.target.value)}
                   className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Nơi cấp CCCD"
+                  required
                 />
               </label>
               <label className="flex flex-col">
                 <span className="text-sm font-medium mb-1">Ngày cấp CCCD</span>
                 <input type="date" onChange={(e) => {onChange("dateofissue", new Date(e.target.value))}}
-                className="border rounded-md px-3 py-2 w-full"/>
+                className="border rounded-md px-3 py-2 w-full"
+                  required/>
               </label>
               <label className="flex flex-col">
                 <span className="text-sm font-medium mb-1">Chứng minh nhân nhân</span>
@@ -439,13 +457,14 @@ export default function RequestCustomerPage(): JSX.Element {
                   onChange={(e) => onChange("nationality", e.target.value)}
                   className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Quốc tịch"
+                  required
                 />
               </label>  
               <label className="flex flex-col">
                 <span className="text-sm font-medium mb-1">Tình trạng hôn nhân</span>
                 <select className="w-full px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={form.matialstatus}
-                onChange={(e) => {onChange("matialstatus", e.target.value)}}>
+                defaultValue={form.marialstatus}
+                onChange={(e) => {onChange("marialstatus", e.target.value)}}>
                   {
                     matialStatus.map((matial) =>
                       <option value={matial.name}>{matial.name}</option>
@@ -489,6 +508,7 @@ export default function RequestCustomerPage(): JSX.Element {
                   onChange={(e) => onChange("address", e.target.value)}
                   className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Số nhà, đường, quận, TP"
+                  required
                 />
               </label>        
             </div>
@@ -609,8 +629,8 @@ export default function RequestCustomerPage(): JSX.Element {
                 <span className="text-sm font-medium mb-1">Số tiền muốn vay</span>
                 <input
                   type="text"
-                  value={form.loanamountequested}
-                  onChange={(e) => onChange("loanamountequested", e.target.value)}
+                  value={form.loanamountrequested}
+                  onChange={(e) => onChange("loanamountrequested", e.target.value)}
                   className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Số tiền muốn vay"
                 />
@@ -648,7 +668,7 @@ export default function RequestCustomerPage(): JSX.Element {
               {/* Ảnh đính kèm */}
               <div className="flex flex-col">
                 <span className="text-sm font-medium mb-1">
-                  Ảnh sổ đỏ / giấy tờ (tối đa 3)
+                  Ảnh sổ đỏ / giấy tờ (tối đa 5)
                 </span>
                 <div className="mt-2 flex flex-wrap gap-3">
                   {images.map((img) => (
@@ -663,7 +683,7 @@ export default function RequestCustomerPage(): JSX.Element {
                       />
                       <button
                         type="button"
-                        onClick={() => handleRemoveImage(img)}
+                        onClick={() => {handleRemoveImage(img)}}
                         className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-gray-300 text-xs font-semibold flex items-center justify-center hover:bg-red-50 hover:border-red-400 hover:text-red-500"
                       >
                         ×
@@ -671,7 +691,7 @@ export default function RequestCustomerPage(): JSX.Element {
                     </div>
                   ))}
 
-                  {images.length < 3 && (
+                  {images.length < 5 && (
                     <label className="w-24 h-24 flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 text-xs text-gray-500 cursor-pointer hover:border-green-400 hover:text-green-600">
                       <span className="text-lg">＋</span>
                       <span>Thêm ảnh</span>
@@ -695,33 +715,33 @@ export default function RequestCustomerPage(): JSX.Element {
                 )} */}
               </div>
             </div>
+            <div className="mt-6 text-end gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
+                  ? "bg-gray-200 text-gray-700"
+                  : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
+                  }`}
+              >
+                <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Gửi yêu cầu"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setForm(defaultForm);
+                  setImages([]);
+                }}
+                className="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+              >
+                <Recycle className="h-5 w-5"/>&nbsp;Làm lại
+              </button>
+            </div>
           </>
           :
           <></>
         }
-        <div className="mt-6 text-end gap-3">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
-              ? "bg-gray-200 text-gray-700"
-              : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
-              }`}
-          >
-            <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Gửi yêu cầu"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setForm(defaultForm);
-              setImages([]);
-            }}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
-          >
-            <Recycle className="h-5 w-5"/>&nbsp;Làm lại
-          </button>
-        </div>
       </form>
     </div>
   );

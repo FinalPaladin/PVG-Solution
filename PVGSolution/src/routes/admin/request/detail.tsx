@@ -13,6 +13,7 @@ import { RequestCustomerLabels } from "@/commons/mappings";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useAuth } from "@/auth/authContext";
+import { useAlert } from "@/stores/useAlertStore";
 
 export default function RequestDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
@@ -115,14 +116,11 @@ export default function RequestDetail(): JSX.Element {
       }
 
       setIsProcessed(true);
-      setMessage({ type: "success", text: res.message });
+      useAlert.getState().show(res.message, "success");
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
 
-      setMessage({
-        type: "error",
-        text: `Lưu thất bại: ${errorMessage}`,
-      });
+      useAlert.getState().showError(`${errorMessage}`);
     }
   };
 

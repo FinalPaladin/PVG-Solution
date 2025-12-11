@@ -1,10 +1,12 @@
 import React, { type JSX } from "react";
 import { Link } from "react-router-dom";
 import { paths } from "@/commons/paths";
+import { useWebConfig } from "@/auth/webConfigContext";
 
 export default function Header(): JSX.Element {
   const [showSearch, setShowSearch] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const {webConfig} = useWebConfig();
 
   // lock body scroll when menu open
   React.useEffect(() => {
@@ -26,7 +28,7 @@ export default function Header(): JSX.Element {
           {/* Left - Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <Link to={paths.PRODUCTS} className="flex items-center gap-3">
-              <svg
+              {/* <svg
                 width="32"
                 height="26"
                 viewBox="0 0 44 36"
@@ -35,9 +37,12 @@ export default function Header(): JSX.Element {
                 aria-hidden
               >
                 <path d="M22 0L44 36H0L22 0Z" fill="#2B8A3E" />
-              </svg>
+              </svg> */}
+              <img width={32} height={26}
+                        alt=""
+                        src={webConfig.ImgLogo}/>
               <span className="text-base lg:text-lg font-semibold text-slate-900">
-                PVG Solution
+                {webConfig.WebName}
               </span>
             </Link>
           </div>

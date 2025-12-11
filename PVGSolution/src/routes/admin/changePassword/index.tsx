@@ -2,6 +2,7 @@ import { changePassword } from "@/api/admin/adUser";
 import { useAuth } from "@/auth/authContext";
 import { Button } from "@/components/ui/button";
 import type { IRQ_ChangePasswordModel } from "@/models/admin/user.model";
+import { useAlert } from "@/stores/useAlertStore";
 import { RotateCcwKey } from "lucide-react";
 import { useEffect, useState, type JSX } from "react";
 
@@ -34,34 +35,22 @@ export default function ChangePassword(): JSX.Element {
     //     return;
     // }
     if (!payload.currentPassword) {
-      setMessage({
-        type: "error",
-        text: `Chưa nhập mật khẩu cũ`,
-      });
+      useAlert.getState().show(`Chưa nhập mật khẩu cũ`, "warning");
       setIsValid(false);
       return;
     }
     if (!payload.newPassword) {
-      setMessage({
-        type: "error",
-        text: `Chưa nhập mật khẩu mới`,
-      });
+      useAlert.getState().show(`Chưa nhập mật khẩu mới`, "warning");
       setIsValid(false);
       return;
     }
     if (!confirmNewPassword) {
-      setMessage({
-        type: "error",
-        text: `Chưa nhập xác nhận mật khẩu`,
-      });
+      useAlert.getState().show(`Chưa nhập xác nhận mật khẩu`, "warning");
       setIsValid(false);
       return;
     }
     if (confirmNewPassword !== payload.newPassword) {
-      setMessage({
-        type: "error",
-        text: `Xác nhận mật khẩu không khớp`,
-      });
+      useAlert.getState().show(`Xác nhận mật khẩu không khớp`, "warning");
       setIsValid(false);
       return;
     }
@@ -71,10 +60,7 @@ export default function ChangePassword(): JSX.Element {
 
   const handleChange = async () => {
     if (!isValid) {
-      setMessage({
-        type: "error",
-        text: `Chưa hoàn tất nhập thông tin đổi mật khẩu`,
-      });
+      useAlert.getState().show(`Chưa hoàn tất nhập thông tin đổi mật khẩu`, "warning");
       return;
     }
     try {
@@ -83,7 +69,7 @@ export default function ChangePassword(): JSX.Element {
         throw new Error(res.message || `HTTP ${res.message}`);
       }
 
-      setMessage({ type: "success", text: "Thay đổi mật khẩu thành công." });
+      useAlert.getState().show(`Thay đổi mật khẩu thành công`, "success");
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
 

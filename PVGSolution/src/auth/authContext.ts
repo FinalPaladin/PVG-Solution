@@ -12,6 +12,7 @@ type AuthData = {
   token: string | null;
   userName: string | null;
   fullName?: string | null;
+  permission: string | null
 };
 
 type AuthContextType = {
@@ -31,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     token: null,
     userName: null,
     fullName: null,
+    permission: null,
   });
 
   const [initialized, setInitialized] = useState(false);
@@ -49,10 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             token,
             userName: parsed.userName,
             fullName: parsed.fullName ?? null,
+            permission: parsed.permission,
           });
         }
       } else if (cookieToken) {
-        setAuth({ token: cookieToken, userName: null, fullName: null });
+        setAuth({ token: cookieToken, userName: null, fullName: null, permission: null });
       }
     } catch {
       // ignore
@@ -70,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    setAuth({ token: null, userName: null, fullName: null });
+    setAuth({ token: null, userName: null, fullName: null, permission: null });
     localStorage.removeItem(AUTH_STORAGE_KEY);
     Cookies.remove(AUTH_COOKIE_KEY);
   };

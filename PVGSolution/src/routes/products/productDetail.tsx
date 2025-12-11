@@ -1,5 +1,5 @@
 import FAQSection from "@/components/common/FAQSections";
-import React, { useState, type JSX } from "react";
+import React, { useEffect, useState, type JSX } from "react";
 import { DollarSign, Shield, Zap, type LucideIcon } from "lucide-react";
 
 // --- Types ---
@@ -25,6 +25,13 @@ const TABs: { key: TabKey; label: string }[] = [
 // --- Component ---
 export default function ProductInfoPage(): JSX.Element {
   const [active, setActive] = useState<TabKey>("info"); // typed state — no more TS error
+
+  useEffect(() => {    
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-gray-800">
