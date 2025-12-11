@@ -1,6 +1,6 @@
 // src/pages/ProductForm.tsx
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -23,20 +23,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-type ProductDetailCategory = "general" | "document" | "process"; // 3 loại
-
-const PRODUCT_DETAIL_CATEGORY_LABEL: Record<ProductDetailCategory, string> = {
-  general: "Thông tin chung",
-  document: "Hồ sơ chuẩn bị",
-  process: "Quy trình & Ngày trả nợ",
-};
+import { loadMData } from "@/api/admin/adMData";
+import { MDataEnum_Group } from "@/commons/mData";
+import { useAlert } from "@/stores/useAlertStore";
 
 type DetailStatus = "active" | "inactive";
 
 interface ProductDetailItem {
   id: string;
-  category: ProductDetailCategory;
+  categoryId: number;
   title: string; // bên trái (ví dụ: Đối tượng khách hàng)
   content: string; // bên phải (khối nội dung)
   status: DetailStatus;
@@ -51,25 +46,6 @@ interface ProductFormData {
   imageUrl?: string;
   details: ProductDetailItem[];
 }
-
-// fake: data danh mục sản phẩm / mức vay / thời hạn vay
-const PRODUCT_CATEGORIES = [
-  { id: "cat-1", name: "Vay tiêu dùng" },
-  { id: "cat-2", name: "Vay mua ô tô" },
-  { id: "cat-3", name: "Vay nhu cầu bất động sản" },
-];
-
-const LOAN_AMOUNTS = [
-  { id: "amount-1", name: "Linh hoạt" },
-  { id: "amount-2", name: "02 tỷ VND" },
-  { id: "amount-3", name: "100% giá trị tài sản bảo đảm" },
-];
-
-const LOAN_TERMS = [
-  { id: "term-1", name: "Linh hoạt" },
-  { id: "term-2", name: "84 tháng" },
-  { id: "term-3", name: "120 tháng" },
-];
 
 // fake API
 async function fetchProductById(id: string): Promise<ProductFormData | null> {
@@ -88,7 +64,7 @@ async function fetchProductById(id: string): Promise<ProductFormData | null> {
       details: [
         {
           id: "d1",
-          category: "general",
+          categoryId: 1,
           title: "Đối tượng khách hàng",
           content:
             "Công dân Việt Nam từ 18 tuổi trở lên\nThu nhập sau thuế từ lương bình quân tối thiểu 07 triệu đồng/tháng...",
@@ -141,10 +117,28 @@ export default function ProductForm(): JSX.Element {
     "create"
   );
   const [editingDetailId, setEditingDetailId] = useState<string | null>(null);
-  const [detailCategory, setDetailCategory] =
-    useState<ProductDetailCategory>("general");
   const [detailTitle, setDetailTitle] = useState("");
   const [detailContent, setDetailContent] = useState("");
+
+  const [PRODUCT_CATEGORIES, setProductCategories] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [LOAN_AMOUNTS, setLoanAmounts] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [LOAN_TERMS, setLoanTerms] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [PRODUCT_DETAIL_CATEGORY, setProductDetailCategoryLabel] = useState<
+    { id: string; name: string }[]
+  >([]);
+
+  useEffect(() => {
+    const run = async () => {
+      await initGetMData();
+    };
+    run();
+  }, []);
 
   // load data khi edit
   useEffect(() => {
@@ -170,6 +164,36 @@ export default function ProductForm(): JSX.Element {
     run();
   }, [isEdit, id]);
 
+  const initGetMData = async () => {
+    const res = await loadMData(
+      `?_group=${MDataEnum_Group.PRODUCT_CATEGORY}&_group=${MDataEnum_Group.PRODUCT_AMOUNT}&_group=${MDataEnum_Group.PRODUCT_TIME}&_group=${MDataEnum_Group.PRODUCT_CATEGORY_DETAIL}`
+    );
+
+    if (!res.isSuccess) {
+      useAlert.getState().showError(res.message || "Hủy thất bại");
+    }
+
+    const mdata = res.result || [];
+
+    const categories = mdata.filter(
+      (m) => m.group === MDataEnum_Group.PRODUCT_CATEGORY
+    );
+    const amounts = mdata.filter(
+      (m) => m.group === MDataEnum_Group.PRODUCT_AMOUNT
+    );
+    const terms = mdata.filter((m) => m.group === MDataEnum_Group.PRODUCT_TIME);
+    const detailCategories = mdata.filter(
+      (m) => m.group === MDataEnum_Group.PRODUCT_CATEGORY_DETAIL
+    );
+
+    setProductCategories(categories.map((c) => ({ id: c.key, name: c.value })));
+    setLoanAmounts(amounts.map((a) => ({ id: a.key, name: a.value })));
+    setLoanTerms(terms.map((t) => ({ id: t.key, name: t.value })));
+    setProductDetailCategoryLabel(
+      detailCategories.map((d) => ({ id: d.key, name: d.value }))
+    );
+  };
+
   // handle file change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -182,7 +206,6 @@ export default function ProductForm(): JSX.Element {
   const openCreateDetailDialog = () => {
     setDetailEditMode("create");
     setEditingDetailId(null);
-    setDetailCategory("general");
     setDetailTitle("");
     setDetailContent("");
     setDetailDialogOpen(true);
@@ -191,7 +214,6 @@ export default function ProductForm(): JSX.Element {
   const openEditDetailDialog = (item: ProductDetailItem) => {
     setDetailEditMode("edit");
     setEditingDetailId(item.id);
-    setDetailCategory(item.category);
     setDetailTitle(item.title);
     setDetailContent(item.content);
     setDetailDialogOpen(true);
@@ -205,7 +227,7 @@ export default function ProductForm(): JSX.Element {
     if (detailEditMode === "create") {
       const newItem: ProductDetailItem = {
         id: crypto.randomUUID(),
-        category: detailCategory,
+        categoryId: 1,
         title: trimmedTitle,
         content: trimmedContent,
         status: "active",
@@ -217,7 +239,7 @@ export default function ProductForm(): JSX.Element {
           d.id === editingDetailId
             ? {
                 ...d,
-                category: detailCategory,
+                categoryId: 1,
                 title: trimmedTitle,
                 content: trimmedContent,
               }
@@ -252,6 +274,9 @@ export default function ProductForm(): JSX.Element {
 
     if (!payload.name || !payload.categoryId) return;
 
+    // console.log("payload", JSON.stringify(payload, null, 2));
+    // return;
+
     try {
       setLoading(true);
       if (isEdit && id) {
@@ -260,7 +285,7 @@ export default function ProductForm(): JSX.Element {
         await createProduct(payload);
       }
       // sau khi lưu xong quay về list
-      navigate("/products");
+      navigate("admin/products");
     } finally {
       setLoading(false);
     }
@@ -374,7 +399,7 @@ export default function ProductForm(): JSX.Element {
       {/* Thông tin sản phẩm (list) */}
       <div className="mt-4 flex min-h-0 flex-1 flex-col rounded-md border">
         <div className="flex items-center justify-between border-b px-4 py-3">
-          <h2 className="text-lg font-semibold">Thông tin sản phẩm</h2>
+          <h2 className="text-lg font-semibold">Chi tiết</h2>
           <Button type="button" onClick={openCreateDetailDialog}>
             Thêm mới
           </Button>
@@ -402,7 +427,7 @@ export default function ProductForm(): JSX.Element {
                   <TableRow key={d.id}>
                     <TableCell className="text-center">{index + 1}</TableCell>
                     <TableCell>
-                      {PRODUCT_DETAIL_CATEGORY_LABEL[d.category]}
+                      {PRODUCT_DETAIL_CATEGORY[d.categoryId].name}
                     </TableCell>
                     <TableCell>{d.title}</TableCell>
                     <TableCell>
@@ -459,7 +484,7 @@ export default function ProductForm(): JSX.Element {
           <div className="space-y-4">
             <div className="space-y-1">
               <label className="text-sm font-medium">Category detail</label>
-              <select
+              {/* <select
                 className="w-full rounded-md border px-3 py-2 text-sm"
                 value={detailCategory}
                 onChange={(e) =>
@@ -469,7 +494,7 @@ export default function ProductForm(): JSX.Element {
                 <option value="general">Thông tin chung</option>
                 <option value="document">Hồ sơ chuẩn bị</option>
                 <option value="process">Quy trình &amp; Ngày trả nợ</option>
-              </select>
+              </select> */}
             </div>
 
             <div className="space-y-1">
