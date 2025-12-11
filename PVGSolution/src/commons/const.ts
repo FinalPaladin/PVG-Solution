@@ -1,1 +1,1 @@
-export const apiHost = "https://localhost:7138/";
+export const key_WebConfig = "web-config";

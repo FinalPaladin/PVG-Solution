@@ -16,6 +16,7 @@ export interface IRequestCustomerItemDetails {
   isSentEmail: boolean;
   strCreatedDate: string;
   isDeleled: boolean;
+  emailTitle: string;
 }
 
 export interface IGetRequestCustomerResponse extends IPagingResponse {

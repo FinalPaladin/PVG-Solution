@@ -4,6 +4,7 @@ import { useAuth } from "@/auth/authContext";
 import ImageControl from "@/components/Controls/Image";
 import { Button } from "@/components/ui/button";
 import type { IImageConfigurationModel, IObjConfigurationModel } from "@/models/admin/config.model";
+import { useAlert } from "@/stores/useAlertStore";
 import { Save } from "lucide-react";
 import { useEffect, useState, type JSX } from "react";
 
@@ -31,8 +32,6 @@ export default function ConfigurationPage(): JSX.Element {
             throw new Error("Chưa có cài đặt chung");
         }
 
-        console.log(res?.result?.data);
-        
         const objConfig = Object.fromEntries(res?.result?.data.map(item => [item.key, item.value]) ?? []) as unknown as IObjConfigurationModel;
         setConfig(objConfig);
     }
@@ -61,15 +60,12 @@ export default function ConfigurationPage(): JSX.Element {
                 throw new Error(res.message || `HTTP ${res.message}`);
             }
 
-            setMessage({ type: "success", text: "Lưu dữ liệu thành công." });
+            useAlert.getState().show(`Lưu dữ liệu thành công.`, "success");
         }
         catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "Unknown error";
 
-            setMessage({
-                type: "error",
-                text: `Lưu thất bại: ${errorMessage}`,
-            });
+            useAlert.getState().showError(`Lưu thất bại: ${errorMessage}`);
         }
     }
 
