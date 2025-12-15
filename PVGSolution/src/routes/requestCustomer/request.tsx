@@ -395,9 +395,10 @@ export default function RequestCustomerPage(): JSX.Element {
                 </div>
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Ngày sinh</span>
+                <span className="text-sm font-medium mb-1">Ngày sinh (MM/DD/YYYY)</span>
                 <input type="date" onChange={(e) => {onChange("birthday", new Date(e.target.value))}}
                 className="border rounded-md px-3 py-2 w-full"
+                defaultValue={form.birthday.toISOString().split("T")[0]}
                 required/>
               </label>
               <label className="flex flex-col">
@@ -434,9 +435,10 @@ export default function RequestCustomerPage(): JSX.Element {
                 />
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Ngày cấp CCCD</span>
+                <span className="text-sm font-medium mb-1">Ngày cấp CCCD (MM/DD/YYYY)</span>
                 <input type="date" onChange={(e) => {onChange("dateofissue", new Date(e.target.value))}}
                 className="border rounded-md px-3 py-2 w-full"
+                defaultValue={form.dateofissue.toISOString().split("T")[0]}
                   required/>
               </label>
               <label className="flex flex-col">

@@ -47,24 +47,38 @@ export function WebConfigProvider({ children }: { children: ReactNode }) {
         if(webconfigSession)
         {
             const parsed: IObjConfigurationModel = JSON.parse(webconfigSession);
+            changeTitle(parsed);
             setWebConfig(parsed);
             return;
         }
 
         const res = await configsGetall();
 
-        // if (!res.isSuccess) {
-        //     Error(res.message || `HTTP ${res.message}`);
-        // }
+        if (!res.isSuccess) {
+            return;
+        }
 
-        // if (res?.result?.data === undefined || res?.result?.data.length === 0) {
-        //     Error("Chưa có cài đặt chung");
-        // }
+        if (res?.result?.data === undefined || res?.result?.data.length === 0) {
+            console.log("Chưa có cài đặt chung");
+        }
 
         const objConfig = Object.fromEntries(res?.result?.data.map(item => [item.key, item.value]) ?? []) as unknown as IObjConfigurationModel;
 
+        changeTitle(objConfig);
         setWebConfig(objConfig);
         sessionStorage.setItem(key_WebConfig, JSON.stringify(objConfig));
+    }
+
+    const changeTitle = (configs: IObjConfigurationModel) => {
+        if(!configs)
+            return;
+
+        document.title = configs.WebName;
+        const newLink = document.getElementById("icontitle") as HTMLLinkElement;
+        if(!newLink)
+            return;
+
+        newLink.href = configs.ImgLogo;
     }
 
     return createElement(

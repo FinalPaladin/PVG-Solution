@@ -9,6 +9,7 @@ export const paths = {
   NEWS_DETAIL: `${BASE_URL}/news/detail`,
   REQUEST: `${BASE_URL}/request`,
   SUPPORT: `${BASE_URL}/supports`,
+  INITWEB: `${BASE_URL}/initweb`,
 };
 
 export const adminPaths = {

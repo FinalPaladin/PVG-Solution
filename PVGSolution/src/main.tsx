@@ -50,6 +50,9 @@ const AdminProductDetail = React.lazy(
 const AdminProductCategory = React.lazy(
   () => import("./routes/admin/productCategory/index.tsx")
 );
+const InitWebPage = React.lazy(
+  () => import("./routes/initWeb/index.tsx")
+);
 
 const router = createBrowserRouter([
   {
@@ -62,6 +65,7 @@ const router = createBrowserRouter([
       { path: paths.NEWS, element: <NewsPage /> },
       { path: paths.NEWS_DETAIL, element: <NewsDetailPage /> },
       { path: paths.REQUEST, element: <RequestCustomerPage /> },
+      { path: paths.INITWEB, element: <InitWebPage/>}
     ],
   },
   {
