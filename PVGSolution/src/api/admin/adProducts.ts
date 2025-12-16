@@ -1,39 +1,62 @@
 import type { BaseResponse } from "@/models/baseReponse";
 import requestAdmin from "@/utils/requestAdmin";
+import type {
+  ProductSearchRequest,
+  ProductResponseModel,
+  ProductCreateRequest,
+  ProductUpdateRequest,
+} from "@/models/admin/product.model";
 
-// Search
-export function productsSearch(query: string) {
-  return requestAdmin.get<unknown, BaseResponse<unknown>>(
-    `/api/products/search${query}`
+/* =========================
+ * SEARCH
+ * ========================= */
+export function productsSearch(params: ProductSearchRequest) {
+  return requestAdmin.get<
+    unknown,
+    BaseResponse<{
+      items: ProductResponseModel[];
+      totalRecords: number;
+    }>
+  >("/api/products/search", { params });
+}
+
+/* =========================
+ * GET BY ID
+ * ========================= */
+export function productsGetById(id: string) {
+  return requestAdmin.get<unknown, BaseResponse<ProductResponseModel>>(
+    `/api/products/${id}`
   );
 }
 
-// Get (theo id hoặc params trong query)
-export function productsGet(query: string) {
-  return requestAdmin.get<unknown, BaseResponse<unknown>>(
-    `/api/products${query}`
-  );
-}
-
-// Save (POST)
-export function productSave(body: unknown) {
-  return requestAdmin.post<unknown, BaseResponse<string>>(
-    `/api/products`,
+/* =========================
+ * CREATE
+ * ========================= */
+export function productCreate(body: ProductCreateRequest) {
+  return requestAdmin.post<unknown, BaseResponse<boolean>>(
+    "/api/products",
     body
   );
 }
 
-// Update (PUT)
-export function productUpdate(body: unknown) {
+/* =========================
+ * UPDATE
+ * ========================= */
+export function productUpdate(id: string, body: ProductUpdateRequest) {
   return requestAdmin.put<unknown, BaseResponse<boolean>>(
-    `/api/product/category`,
+    `/api/products/${id}`,
     body
   );
 }
 
-// Delete (DELETE /{id})
-export function productDelete(id: string) {
-  return requestAdmin.delete<unknown, BaseResponse>(
-    `/api/product/category/${id}`
+/* =========================
+ * DELETE
+ * ========================= */
+export function productDelete(id: string, userName: string) {
+  return requestAdmin.delete<unknown, BaseResponse<boolean>>(
+    `/api/products/${id}`,
+    {
+      params: { userName },
+    }
   );
 }

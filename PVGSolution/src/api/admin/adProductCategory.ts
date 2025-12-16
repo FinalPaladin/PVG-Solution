@@ -1,5 +1,6 @@
 import type {
   IGetProductCategoryResponse,
+  IProductCategoryDetails,
   ISaveProductCategoryRequest,
   IUpdateProductCategoryRequest,
 } from "@/models/admin/productCategory.model";
@@ -17,6 +18,13 @@ export function productCategorySearch(query: string) {
 export function productCategoryGet(query: string) {
   return requestAdmin.get<unknown, BaseResponse<IGetProductCategoryResponse>>(
     `/api/product/category${query}`
+  );
+}
+
+// Get All
+export function productCategoryGetAll() {
+  return requestAdmin.get<unknown, BaseResponse<IProductCategoryDetails[]>>(
+    `/api/product/category/all`
   );
 }
 

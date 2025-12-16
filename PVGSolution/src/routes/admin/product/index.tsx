@@ -17,50 +17,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { adminPaths } from "@/commons/paths";
-
-type ProductStatus = "active" | "inactive";
-
-interface ProductItem {
-  id: string;
-  name: string;
-  categoryName: string;
-  loanAmount: string; // Mức vay
-  loanTerm: string; // Thời hạn vay
-  status: ProductStatus;
-  createdAt: string;
-}
-
-// Fake data (keep as your seed; real API will replace searchProducts)
-const ALL_PRODUCTS: ProductItem[] = [
-  {
-    id: "1",
-    name: "Vay tín chấp theo lương",
-    categoryName: "Vay tiêu dùng",
-    loanAmount: "Linh hoạt",
-    loanTerm: "84 tháng",
-    status: "active",
-    createdAt: "2025-01-10T10:30:00Z",
-  },
-  {
-    id: "2",
-    name: "Vay cầm cố giấy tờ có giá",
-    categoryName: "Vay sản xuất kinh doanh",
-    loanAmount: "100% GT giấy tờ có giá",
-    loanTerm: "Linh hoạt",
-    status: "active",
-    createdAt: "2025-02-05T08:15:00Z",
-  },
-  {
-    id: "3",
-    name: "Vay tiêu dùng có tài sản bảo đảm",
-    categoryName: "Vay nhu cầu bất động sản",
-    loanAmount: "02 tỷ VND",
-    loanTerm: "120 tháng",
-    status: "inactive",
-    createdAt: "2025-03-20T14:00:00Z",
-  },
-  // ... bạn có thể thêm dữ liệu test để kiểm tra paging
-];
+import { productsSearch } from "@/api/admin/adProducts";
+import type { ProductResponseModel } from "@/models/admin/product.model";
 
 interface SearchParams {
   keyword?: string;
@@ -68,29 +26,23 @@ interface SearchParams {
   pageSize?: number;
 }
 
-// Fake search API but with paging and total to simulate server-side
 async function searchProducts(
   params: SearchParams
-): Promise<{ items: ProductItem[]; total: number }> {
-  console.log("Search products với params:", params);
-  await new Promise((r) => setTimeout(r, 300)); // simulate delay
+): Promise<{ items: ProductResponseModel[]; total: number }> {
+  const res = await productsSearch({
+    filterKeyword: params.keyword?.trim() || undefined,
+    page: params.page && params.page > 0 ? params.page : 1,
+    pageSize: params.pageSize && params.pageSize > 0 ? params.pageSize : 10,
+  });
 
-  const keyword = (params.keyword ?? "").trim().toLowerCase();
-  let filtered = ALL_PRODUCTS;
-  if (keyword) {
-    filtered = ALL_PRODUCTS.filter((p) =>
-      p.name.toLowerCase().includes(keyword)
-    );
+  if (!res.isSuccess || !res.result) {
+    return { items: [], total: 0 };
   }
 
-  const total = filtered.length;
-  const page = params.page && params.page > 0 ? params.page : 1;
-  const pageSize =
-    params.pageSize && params.pageSize > 0 ? params.pageSize : 10;
-  const start = (page - 1) * pageSize;
-  const items = filtered.slice(start, start + pageSize);
-
-  return { items, total };
+  return {
+    items: res.result.items,
+    total: res.result.totalRecords,
+  };
 }
 
 export default function ProductList(): JSX.Element {
@@ -98,7 +50,7 @@ export default function ProductList(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // list data + loading
-  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [products, setProducts] = useState<ProductResponseModel[]>([]);
   const [listLoading, setListLoading] = useState(false);
 
   // search input + ref
@@ -323,29 +275,36 @@ export default function ProductList(): JSX.Element {
                       {(page - 1) * pageSize + index + 1}
                     </TableCell>
                     <TableCell>{p.name}</TableCell>
-                    <TableCell>{p.categoryName}</TableCell>
+                    <TableCell>{p.productCategory}</TableCell>
                     <TableCell>{p.loanAmount}</TableCell>
                     <TableCell>{p.loanTerm}</TableCell>
                     <TableCell className="text-center">
                       <Badge
-                        variant={p.status === "active" ? "default" : "outline"}
+                        variant={!p.inactive ? "default" : "outline"}
                         className={
-                          p.status === "active"
+                          !p.inactive
                             ? "bg-emerald-500/90 hover:bg-emerald-500"
                             : ""
                         }
                       >
-                        {p.status === "active" ? "Active" : "Inactive"}
+                        {!p.inactive ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
-                    <TableCell>{formatDate(p.createdAt)}</TableCell>
+                    <TableCell>{formatDate(p.createdDate)}</TableCell>
                     <TableCell>
                       <div className="flex items-center justify-center">
                         <Button
                           variant="outline"
                           size="icon"
                           type="button"
-                          onClick={() => navigate(`/products/${p.id}`)}
+                          onClick={() =>
+                            navigate(
+                              adminPaths.ADMIN_PRODUCT_DETAIL.replace(
+                                ":id",
+                                p.id
+                              )
+                            )
+                          }
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
