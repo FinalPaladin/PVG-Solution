@@ -1,6 +1,6 @@
 // src/pages/ProductForm.tsx
 import type { JSX } from "react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,27 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { loadMData } from "@/api/admin/adMData";
 import { MDataEnum_Group } from "@/commons/mData";
 import { useAlert } from "@/stores/useAlertStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SelectBox } from "@/components/common/SelectBox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { X } from "lucide-react";
+import { uploadImage } from "@/api/admin/adMediaUpload";
 
 type DetailStatus = "active" | "inactive";
 
@@ -43,8 +64,9 @@ interface ProductFormData {
   categoryId: string;
   loanAmountId: string;
   loanTermId: string;
-  imageUrl?: string;
+  imageUrl: string | null;
   details: ProductDetailItem[];
+  createUser?: string;
 }
 
 // fake API
@@ -78,18 +100,18 @@ async function fetchProductById(id: string): Promise<ProductFormData | null> {
   return null;
 }
 
-async function createProduct(payload: ProductFormData): Promise<void> {
-  console.log("Create product payload:", payload);
-  await new Promise((r) => setTimeout(r, 300));
-}
+// async function createProduct(payload: ProductFormData): Promise<void> {
+//   console.log("Create product payload:", payload);
+//   await new Promise((r) => setTimeout(r, 300));
+// }
 
-async function updateProduct(
-  id: string,
-  payload: ProductFormData
-): Promise<void> {
-  console.log("Update product", id, payload);
-  await new Promise((r) => setTimeout(r, 300));
-}
+// async function updateProduct(
+//   id: string,
+//   payload: ProductFormData
+// ): Promise<void> {
+//   console.log("Update product", id, payload);
+//   await new Promise((r) => setTimeout(r, 300));
+// }
 
 export default function ProductForm(): JSX.Element {
   const navigate = useNavigate();
@@ -105,8 +127,6 @@ export default function ProductForm(): JSX.Element {
   const [categoryId, setCategoryId] = useState("");
   const [loanAmountId, setLoanAmountId] = useState("");
   const [loanTermId, setLoanTermId] = useState("");
-  const [, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | undefined>();
 
   // details
   const [details, setDetails] = useState<ProductDetailItem[]>([]);
@@ -132,6 +152,10 @@ export default function ProductForm(): JSX.Element {
   const [PRODUCT_DETAIL_CATEGORY, setProductDetailCategoryLabel] = useState<
     { id: string; name: string }[]
   >([]);
+  const [detailCategory, setDetailCategory] = useState<string>("");
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -194,13 +218,29 @@ export default function ProductForm(): JSX.Element {
     );
   };
 
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
   // handle file change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Chỉ cho phép upload ảnh");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Ảnh tối đa 5MB");
+      return;
+    }
+
     setImageFile(file);
-    const url = URL.createObjectURL(file);
-    setImagePreview(url);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const openCreateDetailDialog = () => {
@@ -251,47 +291,56 @@ export default function ProductForm(): JSX.Element {
     setDetailDialogOpen(false);
   };
 
-  const toggleDetailStatus = (id: string) => {
-    setDetails((prev) =>
-      prev.map((d) =>
-        d.id === id
-          ? { ...d, status: d.status === "active" ? "inactive" : "active" }
-          : d
-      )
-    );
-  };
-
   const handleSubmit = async () => {
-    const payload: ProductFormData = {
-      id,
-      name: name.trim(),
-      categoryId,
-      loanAmountId,
-      loanTermId,
-      imageUrl: imagePreview, // tạm thời, thực tế ông upload rồi lấy URL
-      details,
-    };
-
-    if (!payload.name || !payload.categoryId) return;
-
-    // console.log("payload", JSON.stringify(payload, null, 2));
-    // return;
+    if (!name.trim() || !categoryId) return;
 
     try {
       setLoading(true);
+
+      let uploadedImageUrl: string | null = imagePreview;
+
+      // 1️⃣ upload ảnh nếu có file mới
+      if (imageFile) {
+        const uploadRes = await uploadImage(imageFile);
+
+        if (uploadRes.isSuccess && uploadRes.result) {
+          uploadedImageUrl = uploadRes.result.publicUrl;
+        }
+      }
+
+      // 2️⃣ build payload
+      const payload: ProductFormData = {
+        id,
+        name: name.trim(),
+        categoryId,
+        loanAmountId,
+        loanTermId,
+        imageUrl: uploadedImageUrl, // URL từ Cloudflare R2
+        details,
+      };
+
+      console.log("payload", JSON.stringify(payload, null, 2));
+      return;
+
+      // 3️⃣ create / update product
       if (isEdit && id) {
         await updateProduct(id, payload);
       } else {
         await createProduct(payload);
       }
-      // sau khi lưu xong quay về list
-      navigate("admin/products");
+
+      // 4️⃣ redirect
+      navigate("/admin/products");
     } finally {
       setLoading(false);
     }
   };
 
   const pageTitle = isEdit ? "Sửa sản phẩm" : "Thêm sản phẩm";
+
+  const handleDeleteDetail = (id: string) => {
+    setDetails((prev) => prev.filter((x) => x.id !== id));
+  };
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -329,62 +378,61 @@ export default function ProductForm(): JSX.Element {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-1">
-                <label className="text-sm font-medium">Danh mục sản phẩm</label>
-                <select
-                  className="w-full rounded-md border px-3 py-2 text-sm"
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                >
-                  <option value="">-- Chọn danh mục --</option>
-                  {PRODUCT_CATEGORIES.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectBox
+                label="Danh mục sản phẩm"
+                value={categoryId}
+                placeholder="-- Chọn danh mục --"
+                options={PRODUCT_CATEGORIES}
+                onChange={setCategoryId}
+              />
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium">Mức vay</label>
-                <select
-                  className="w-full rounded-md border px-3 py-2 text-sm"
-                  value={loanAmountId}
-                  onChange={(e) => setLoanAmountId(e.target.value)}
-                >
-                  <option value="">-- Chọn mức vay --</option>
-                  {LOAN_AMOUNTS.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectBox
+                label="Mức vay"
+                value={loanAmountId}
+                placeholder="-- Chọn mức vay --"
+                options={LOAN_AMOUNTS}
+                onChange={setLoanAmountId}
+              />
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium">Thời hạn vay</label>
-                <select
-                  className="w-full rounded-md border px-3 py-2 text-sm"
-                  value={loanTermId}
-                  onChange={(e) => setLoanTermId(e.target.value)}
-                >
-                  <option value="">-- Chọn thời hạn vay --</option>
-                  {LOAN_TERMS.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectBox
+                label="Thời hạn vay"
+                value={loanTermId}
+                placeholder="-- Chọn thời hạn vay --"
+                options={LOAN_TERMS}
+                onChange={setLoanTermId}
+              />
             </div>
           </div>
 
           {/* Hình ảnh */}
           <div className="space-y-4 rounded-md border p-4">
             <h2 className="text-lg font-semibold">Hình ảnh sản phẩm</h2>
-            <Input type="file" accept="image/*" onChange={handleImageChange} />
+
+            <div className="flex items-center gap-3">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="max-w-sm"
+              />
+
+              {imagePreview && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setImageFile(null);
+                    setImagePreview(null);
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
             {imagePreview && (
-              <div className="mt-2 overflow-hidden rounded-md border">
+              <div className="relative overflow-hidden rounded-md border">
                 <img
                   src={imagePreview}
                   alt="Preview"
@@ -409,16 +457,18 @@ export default function ProductForm(): JSX.Element {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[60px] text-center">STT</TableHead>
-                <TableHead>Danh mục thông tin</TableHead>
-                <TableHead>Tiêu đề (bên trái)</TableHead>
+                <TableHead>Loại nội dung</TableHead>
+                <TableHead>Tiêu đề</TableHead>
+                <TableHead>Nội dung</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="w-40 text-center">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {details.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
+                  <TableCell colSpan={6} className="h-24 text-center">
                     Chưa có thông tin, nhấn "Thêm mới" để tạo.
                   </TableCell>
                 </TableRow>
@@ -426,10 +476,22 @@ export default function ProductForm(): JSX.Element {
                 details.map((d, index) => (
                   <TableRow key={d.id}>
                     <TableCell className="text-center">{index + 1}</TableCell>
+
                     <TableCell>
-                      {PRODUCT_DETAIL_CATEGORY[d.categoryId].name}
+                      {PRODUCT_DETAIL_CATEGORY[d.categoryId]?.name}
                     </TableCell>
+
                     <TableCell>{d.title}</TableCell>
+
+                    {/* CỘT NỘI DUNG */}
+                    <TableCell className="max-w-[300px]">
+                      <div className="line-clamp-2 text-sm text-muted-foreground">
+                        {Array.isArray(d.content)
+                          ? d.content.join(", ")
+                          : d.content}
+                      </div>
+                    </TableCell>
+
                     <TableCell>
                       <Badge
                         variant={d.status === "active" ? "default" : "outline"}
@@ -442,6 +504,7 @@ export default function ProductForm(): JSX.Element {
                         {d.status === "active" ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
+
                     <TableCell>
                       <div className="flex items-center justify-center gap-2">
                         <Button
@@ -452,14 +515,37 @@ export default function ProductForm(): JSX.Element {
                         >
                           Sửa
                         </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => toggleDetailStatus(d.id)}
-                        >
-                          {d.status === "active" ? "Disable" : "Enable"}
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                            >
+                              Xóa
+                            </Button>
+                          </AlertDialogTrigger>
+
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Hành động này không thể hoàn tác. Nội dung sẽ bị
+                                xóa vĩnh viễn.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Hủy</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteDetail(d.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Xóa
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -483,18 +569,24 @@ export default function ProductForm(): JSX.Element {
 
           <div className="space-y-4">
             <div className="space-y-1">
-              <label className="text-sm font-medium">Category detail</label>
-              {/* <select
-                className="w-full rounded-md border px-3 py-2 text-sm"
+              <label className="text-sm font-medium">Loại nội dung</label>
+
+              <Select
                 value={detailCategory}
-                onChange={(e) =>
-                  setDetailCategory(e.target.value as ProductDetailCategory)
-                }
+                onValueChange={(value) => setDetailCategory(value)}
               >
-                <option value="general">Thông tin chung</option>
-                <option value="document">Hồ sơ chuẩn bị</option>
-                <option value="process">Quy trình &amp; Ngày trả nợ</option>
-              </select> */}
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Chọn loại nội dung" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {PRODUCT_DETAIL_CATEGORY.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-1">
