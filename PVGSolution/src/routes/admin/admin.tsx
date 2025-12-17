@@ -21,6 +21,7 @@ import {
 import { useAuth } from "../../auth/authContext";
 import { adminPaths } from "@/commons/paths";
 import { useWebConfig } from "@/auth/webConfigContext";
+import { useAlert } from "@/stores/useAlertStore";
 
 export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
@@ -40,8 +41,12 @@ export default function AdminLayout(): JSX.Element {
         method: "POST",
         credentials: "include",
       });
-    } catch (e) {
-      console.error("Logout error", e);
+    } catch (error) {
+      if (error instanceof Error) {
+        useAlert.getState().showError(error.message);
+      } else {
+        useAlert.getState().showError("Đã xảy ra lỗi không xác định");
+      }
     } finally {
       logout();
     }
@@ -210,7 +215,7 @@ export default function AdminLayout(): JSX.Element {
       </aside>
 
       {/* Main area */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-6">
         <Outlet />
       </main>
     </div>

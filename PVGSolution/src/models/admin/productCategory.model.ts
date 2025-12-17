@@ -1,10 +1,10 @@
 import type { IPagingResponse } from "../baseReponse";
 
 export interface IGetProductCategoryResponse extends IPagingResponse {
-  items: IRequestCustomerItemDetails[];
+  items: IProductCategoryDetails[];
 }
 
-export interface IRequestCustomerItemDetails {
+export interface IProductCategoryDetails {
   id: string;
   name: string;
   inactive: boolean;
