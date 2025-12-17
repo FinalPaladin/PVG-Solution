@@ -1,11 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { paths } from "@/commons/paths";
 import type { IObjConfigurationModel } from "@/models/admin/config.model";
 
-export default function Header({webConfig}: { webConfig: IObjConfigurationModel }) {
+export default function Header({ webConfig }: { webConfig: IObjConfigurationModel }) {
   const [showSearch, setShowSearch] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
+
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // lock body scroll when menu open
   React.useEffect(() => {
@@ -21,7 +31,9 @@ export default function Header({webConfig}: { webConfig: IObjConfigurationModel 
   }, [menuOpen]);
 
   return (
-    <header className="bg-white border-b">
+    <header className={`sticky top-0 z-50 bg-white transition-shadow duration-300
+    ${scrolled ? "shadow-md" : "shadow-none border-b"}
+  `}>
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between py-3 lg:py-4 gap-4">
           {/* Left - Logo */}
@@ -38,8 +50,8 @@ export default function Header({webConfig}: { webConfig: IObjConfigurationModel 
                 <path d="M22 0L44 36H0L22 0Z" fill="#2B8A3E" />
               </svg> */}
               <img width={32} height={26}
-                        alt=""
-                        src={webConfig.ImgLogo}/>
+                alt=""
+                src={webConfig.ImgLogo} />
               <span className="text-base lg:text-lg font-semibold text-slate-900">
                 {webConfig.WebName}
               </span>
@@ -245,7 +257,7 @@ export default function Header({webConfig}: { webConfig: IObjConfigurationModel 
               Liên hệ &amp; Hỗ trợ
             </Link>
 
-            <div className="mt-6 px-3">
+            {/* <div className="mt-6 px-3">
               <button
                 onClick={() => {
                   setMenuOpen(false);
@@ -255,7 +267,7 @@ export default function Header({webConfig}: { webConfig: IObjConfigurationModel 
               >
                 Tải VCB Digibank
               </button>
-            </div>
+            </div> */}
           </nav>
         </aside>
       </div>
