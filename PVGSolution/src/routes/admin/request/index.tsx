@@ -76,7 +76,7 @@ const RequestsListTable = () => {
   // gọi lại loadData mỗi khi requestSearchParams đổi (lần đầu và khi search)
   useEffect(() => {
     loadData(requestSearchParams);
-  }, [loadData, requestSearchParams.page, requestSearchParams.pageSize]);
+  }, [loadData, requestSearchParams?.page, requestSearchParams?.pageSize]);
 
   // ---- HANDLE SEARCH ----
   const handleSearch = (e?: React.FormEvent) => {

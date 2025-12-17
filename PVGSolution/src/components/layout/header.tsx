@@ -1,12 +1,11 @@
-import React, { type JSX } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { paths } from "@/commons/paths";
-import { useWebConfig } from "@/auth/webConfigContext";
+import type { IObjConfigurationModel } from "@/models/admin/config.model";
 
-export default function Header(): JSX.Element {
+export default function Header({webConfig}: { webConfig: IObjConfigurationModel }) {
   const [showSearch, setShowSearch] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const {webConfig} = useWebConfig();
 
   // lock body scroll when menu open
   React.useEffect(() => {

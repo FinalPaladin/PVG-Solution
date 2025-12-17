@@ -53,3 +53,27 @@ export interface IRQ_DeleteRequestCustomerModel{
   userDelete: string;
   idDetail: string;
 }
+
+export interface IRQ_InserRequestCustomerModel{
+  requestCode: string;
+  phone: string;
+  productId: string;
+  fullName: string;
+  token: string;
+  data: IRequestCustomerField[],
+  dataImage: string[];
+}
+
+export interface IRS_InserRequestCustomerModel{
+  requestCode: string;
+}
+
+export interface IRS_UploadImageRequestCustomerModel{
+  key: string;
+  publicUrl: string;
+}
+
+export interface IRQ_RemoveImageRequestCustomerModel{
+  key: string;
+  requestCode: string;
+}

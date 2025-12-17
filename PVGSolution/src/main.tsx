@@ -9,6 +9,7 @@ import { AuthProvider } from "./auth/authContext.ts";
 import ProtectedRoute from "./auth/protectedRoute.ts";
 import { GlobalErrorAlert } from "./components/common/errorDialog.tsx";
 import { WebConfigProvider } from "./auth/webConfigContext.ts";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
 // user site
 const HomePage = React.lazy(() => import("./routes/index.tsx"));
@@ -53,6 +54,9 @@ const AdminProductCategory = React.lazy(
 const InitWebPage = React.lazy(
   () => import("./routes/initWeb/index.tsx")
 );
+const SuccessPage = React.lazy(
+  () => import("./routes/successPage")
+);
 
 const router = createBrowserRouter([
   {
@@ -65,7 +69,8 @@ const router = createBrowserRouter([
       { path: paths.NEWS, element: <NewsPage /> },
       { path: paths.NEWS_DETAIL, element: <NewsDetailPage /> },
       { path: paths.REQUEST, element: <RequestCustomerPage /> },
-      { path: paths.INITWEB, element: <InitWebPage/>}
+      { path: paths.INITWEB, element: <InitWebPage/>},
+      { path: paths.SUCCESS, element: <SuccessPage/>},
     ],
   },
   {
@@ -121,11 +126,13 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <WebConfigProvider>
-      <AuthProvider>
-        <RouterProvider router={router} />
-        <GlobalErrorAlert />
-      </AuthProvider>
-    </WebConfigProvider>
+    <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHAV3_KEY}>
+      <WebConfigProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <GlobalErrorAlert />
+        </AuthProvider>
+      </WebConfigProvider>
+    </GoogleReCaptchaProvider>
   </StrictMode>
 );

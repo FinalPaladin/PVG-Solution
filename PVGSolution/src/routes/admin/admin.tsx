@@ -20,11 +20,13 @@ import {
 } from "@/components/ui/popover";
 import { useAuth } from "../../auth/authContext";
 import { adminPaths } from "@/commons/paths";
+import { useWebConfig } from "@/auth/webConfigContext";
 
 export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { auth, logout } = useAuth();
+  const {webConfig} = useWebConfig();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -67,9 +69,9 @@ export default function AdminLayout(): JSX.Element {
               </span>
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-gray-900">
-                  Admin Panel
+                  {webConfig.WebName}
                 </span>
-                <span className="text-xs text-gray-500">PVG Solution</span>
+                <span className="text-xs text-gray-500">{auth.userName}</span>
               </div>
             </div>
           )}

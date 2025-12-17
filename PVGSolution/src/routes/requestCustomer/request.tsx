@@ -1,11 +1,16 @@
 import React, { useEffect, useState, type JSX } from "react";
-import { requestCustomerSave } from "@/api/requestCustomer";
+import { insertRequestCustomer, RemoveImageRequestCustomer, SendEmailRequest, UploadImageRequestCustomer } from "@/api/requestCustomer";
 import type { IResponseUpdateImage } from "@/models/requestCustomer";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Recycle, Send } from "lucide-react";
 import { useAlert } from "@/stores/useAlertStore";
-import imageCompression from 'browser-image-compression';
+// import imageCompression from 'browser-image-compression';
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import type { IRQ_InserRequestCustomerModel, IRQ_RemoveImageRequestCustomerModel, IRS_InserRequestCustomerModel, IRS_UploadImageRequestCustomerModel } from "@/models/admin/requestCustomer";
+import { useNavigate } from "react-router-dom";
+import { paths } from "@/commons/paths";
+// import { useParams } from "react-router-dom";
 
 const matialStatus = [
   {code: "", name: "Chọn"},
@@ -42,7 +47,7 @@ type FormState = {
   placeofissue: string;
   dateofissue: Date;
   nationality: string;
-  marialstatus: string;
+  maritalstatus: string;
   email: string;
   companyname: string;
   jobtitle: string;
@@ -62,10 +67,11 @@ type FormState = {
 type UploadedImage = IResponseUpdateImage;
 
 const tabRequest = [
-  {code: 1, name: "THÔNG TIN CÁ NHÂN", percent: 0, bg: "#283678"},
-  {code: 2, name: "THÔNG TIN LIÊN LẠC", percent: 33, bg: "#a7ab35"},
-  {code: 3, name: "THÔNG TIN VIỆC LÀM", percent: 66, bg: "#56ae76"},
-  {code: 4, name: "THÔNG TIN TÍN DỤNG", percent: 100, bg: "#079a52"},
+  {code: 1, name: "THÔNG TIN CÁ NHÂN", percent: 0, text: "Bước 1"},
+  {code: 2, name: "THÔNG TIN LIÊN LẠC", percent: 25, text: "Bước 2"},
+  {code: 3, name: "THÔNG TIN VIỆC LÀM", percent: 50, text: "Bước 3"},
+  {code: 4, name: "THÔNG TIN TÍN DỤNG", percent: 75, text: "Bước 4"},
+  {code: 5, name: "TẢI HÌNH ẢNH", percent: 100, text: "Bước 5"},
 ]
 
 const defaultForm = {
@@ -82,7 +88,7 @@ const defaultForm = {
     dateofissue: new Date(),
     nationality: "Việt Nam",
     email: "",
-  marialstatus: matialStatus[0].code,
+    maritalstatus: matialStatus[0].code,
     companyname: "",
     jobtitle: "",
     department: "",
@@ -98,12 +104,15 @@ const defaultForm = {
     otherincome: "",
   } as FormState;
 
-const optionsResizeImg = {
-    maxSizeMB: 1, // tối đa 1MB sau khi nén
-    maxWidthOrHeight: 1024, // Resize chiều to nhất còn 1024px
-    useWebWorker: true
-  };
+// const optionsResizeImg = {
+//     maxSizeMB: 5, // tối đa 1MB sau khi nén
+//     maxWidthOrHeight: 1024, // Resize chiều to nhất còn 1024px
+//     useWebWorker: true
+//   };
+  
 export default function RequestCustomerPage(): JSX.Element {
+  const navigate = useNavigate();
+  // const { idproduct } = useParams<{ idproduct: string }>();
   const [form, setForm] = useState<FormState>(defaultForm);
 
   const [loading, setLoading] = useState(false);
@@ -115,10 +124,12 @@ export default function RequestCustomerPage(): JSX.Element {
   const [images, setImages] = useState<UploadedImage[]>([]);
 
   const [tab, setTab] = useState(tabRequest[0]);
-  // const [uploading, setUploading] = useState(false);
-  // const [uploadError, setUploadError] = useState<string | null>(null);
 
-  useEffect(() => {    
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const [requestCode, setRequestCode] = useState("");
+  
+  useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth"
@@ -137,28 +148,63 @@ export default function RequestCustomerPage(): JSX.Element {
     return null;
   }
 
-  /*
-  async function uploadImage(file: File) {
-    setUploading(true);
-    setUploadError(null);
-    try {
-      const res = await mediaImageUpload(file);
+  async function handleSubmit(e?: React.FormEvent) {
+    e?.preventDefault();
+    setMessage(null);
+    const err = validate();
+    if (err) {
+      useAlert.getState().showError(err);
+      return;
+    }
 
-      if (!res.isSuccess || !res.result) {
-        throw new Error(res.message || "Upload ảnh thất bại");
+    setLoading(true);
+    try {
+      if (!executeRecaptcha) return;
+      const token = await executeRecaptcha("request");
+
+      const birthDayStr = form.birthday.toISOString().split("T")[0];
+      const dateCCCDStr = form.birthday.toISOString().split("T")[0];
+      const ageStr = form.age.toString();
+
+      const data = Object.entries(form).map(([key, value]) => ({
+        key: key,
+        value: (key == "birthday") ? birthDayStr : (key == "dateofissue") ? dateCCCDStr : (key === 'age') ? ageStr : value
+      }));
+
+      const payload = {
+        token: token,
+        fullName: form.fullname,
+        phone: form.phone,
+        productId: "3896fc82-ceab-41f8-996d-37f4f3b8ce92",//idproduct,
+        data: data,
+      } as IRQ_InserRequestCustomerModel;
+
+      const res = await insertRequestCustomer(payload);
+
+      if (!res.isSuccess) {
+        throw new Error(res.message || `HTTP lỗi`);
       }
 
-      const { keyUrl, publicUrl } = res.result;
-      setImages((prev) => [...prev, { keyUrl, publicUrl }]);
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Không upload được ảnh";
-      setUploadError(msg);
+      const dataRes = res.result as IRS_InserRequestCustomerModel;
+
+      if(!dataRes)
+      {
+        throw new Error(res.message || `HTTP lỗi`);
+      }
+      
+      useAlert.getState().show("Gửi yêu cầu thành công.", "success");
+      setRequestCode(dataRes?.requestCode);
+      setTab(tabRequest[tabRequest.length - 1]);
+      // setForm(defaultForm);
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error";
+
+      useAlert.getState().showError(`Gửi thất bại: ${errorMessage}`);
     } finally {
-      setUploading(false);
+      setLoading(false);
     }
   }
-  */
 
   async function handleSelectFiles(
     e: React.ChangeEvent<HTMLInputElement>
@@ -171,13 +217,22 @@ export default function RequestCustomerPage(): JSX.Element {
     
     const listImg = [...images] as UploadedImage[];
     for (const file of toUpload) {
-      const newFile = await imageCompression(file, optionsResizeImg);
-      const url = URL.createObjectURL(newFile);
-      listImg.push({
-        file: newFile,
-        keyUrl: "",
-        publicUrl: url
-      } as UploadedImage);
+      // const newFile = await imageCompression(file, optionsResizeImg);
+      // const url = URL.createObjectURL(newFile);
+      const payload = new FormData();
+      payload.append("ImgFile", file);
+      payload.append("RequestCode", requestCode);
+      const res = await UploadImageRequestCustomer(payload);
+      if(res.isSuccess)
+      {
+        const datares = res.result as IRS_UploadImageRequestCustomerModel;
+
+        listImg.push({
+          file: file,
+          keyUrl: datares.key,
+          publicUrl: datares.publicUrl
+        } as UploadedImage);
+      }
     }
     setImages(listImg);
 
@@ -186,107 +241,27 @@ export default function RequestCustomerPage(): JSX.Element {
   }
 
   async function handleRemoveImage(img: UploadedImage) {
-    // setUploading(true);
-    // setUploadError(null);
-    // try {
-      // const res = await mediaImageDelete(img.keyUrl);
-      // if (!res.isSuccess) {
-      //   throw new Error(res.message || "Xoá ảnh thất bại");
-      // }
-
-    //   setImages((prev) => prev.filter((x) => x.keyUrl !== img.keyUrl));
-    // } catch (err) {
-    //   const msg =
-    //     err instanceof Error ? err.message : "Không xoá được ảnh";
-    //   setUploadError(msg);
-    // } finally {
-    //   setUploading(false);
-    // }
-    
+    const res = await RemoveImageRequestCustomer({
+      key: img.keyUrl,
+      requestCode: requestCode
+    } as IRQ_RemoveImageRequestCustomerModel);
+    if(!res.isSuccess)
+    {
+      useAlert.getState().show("Xóa ảnh không thành công.", "warning");
+    }
     setImages((prev) => prev.filter((x) => x.publicUrl !== img.publicUrl));
   }
 
-  async function handleSubmit(e?: React.FormEvent) {
-    e?.preventDefault();
-    setMessage(null);
-    const err = validate();
-    if (err) {
-      useAlert.getState().showError(err);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // const data: { key: string; value: string }[] = [
-      //   { key: "fullname", value: form.fullname },
-      //   { key: "phone", value: form.phone },
-      //   { key: "address", value: form.address },
-      //   { key: "redBookAddress", value: form.redBookAddress },
-      // ];
-
-      // if (images.length > 0) {
-      //   // tuỳ BE, nếu muốn mỗi ảnh 1 item thì map; tạm gộp list key
-      //   data.push({
-      //     key: "imageKeys",
-      //     value: images.map((x) => x.keyUrl).join(","),
-      //   });
-      // }
-
-      // const payload = {
-      //   phone: form.phone,
-      //   productId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      //   data,
-      // };
-      const payload = new FormData();
-      payload.append("Phone", form.phone);
-      payload.append("ProductId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
-      payload.append("FullName", form.fullname);
-      
-      const dataJson = JSON.stringify([
-          { key: "fullname", value: form.fullname },
-          { key: "phone", value: form.phone },
-          { key: "address", value: form.address },
-          { key: "redbookaddress", value: form.redbookaddress },
-          { key: "birthday", value: form.birthday.toLocaleDateString("vi-VN") },
-          { key: "age", value: form.age.toString() },
-          { key: "gender", value: form.gender },
-          { key: "cccd", value: form.cccd },
-          { key: "cmnd", value: form.cmnd },
-          { key: "placeofissue", value: form.placeofissue },
-          { key: "dateofissue", value: form.dateofissue.toLocaleDateString("vi-VN") },
-          { key: "nationality", value: form.nationality },
-          { key: "marialstatus", value: form.marialstatus },
-          { key: "email", value: form.email },
-          { key: "companyname", value: form.companyname },
-          { key: "jobtitle", value: form.jobtitle },
-          { key: "department", value: form.department },
-          { key: "companyphone", value: form.companyphone },
-          { key: "salaryincome", value: form.salaryincome },
-          { key: "monthincome", value: form.monthincome },
-          { key: "loanpurpose", value: form.loanpurpose },
-          { key: "outstandingloansatotherbanks", value: form.outstandingloansatotherbanks },
-          { key: "loanamountrequested", value: form.loanamountrequested },
-          { key: "collateral", value: form.collateral },
-          { key: "loanproducttype", value: form.loanproducttype },
-          { key: "otherinfo", value: form.otherinfo },
-          { key: "otherincome", value: form.otherincome },
-        ]);
-      payload.append('dataJson', dataJson);
-
-      images.forEach((img, index) => {
-        if (!img.file) return;
-          payload.append(`DataImage[${index}].key`, img.keyUrl);
-          payload.append(`DataImage[${index}].imgFile`, img.file, img.file.name);
-      });
-
-      const res = await requestCustomerSave(payload);
-
+  const handleSendEmail = async () => {
+    try
+    {
+      const res = await SendEmailRequest(requestCode);
       if (!res.isSuccess) {
         throw new Error(res.message || `HTTP lỗi`);
       }
-      useAlert.getState().show("Gửi yêu cầu thành công.", "success");
-      setForm(defaultForm);
-      setImages([]);
+
+      useAlert.getState().show("Yêu cầu đã hoàn tất.", "success");
+      navigate(paths.SUCCESS)
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Unknown error";
@@ -302,7 +277,7 @@ export default function RequestCustomerPage(): JSX.Element {
       {/* form align left, không card wrapper */}
       <form onSubmit={handleSubmit} className="max-w-xl">
         <h2 className="text-xl font-semibold mb-4">
-          Đăng ký vay
+          Đăng ký tư vấn hỗ trợ
         </h2>
 
         {message && (
@@ -322,42 +297,44 @@ export default function RequestCustomerPage(): JSX.Element {
             </h4>
           </div>
           <div className="flex items-center">
-            <ProgressBar value={tab.percent}/>
+            <ProgressBar value={tab.percent} text={tab.text}/>
           </div>
-          <div className="text-end">          
-            <Button type="button" disabled={tab == tabRequest[0]} 
-              onClick={() => {
-                if(tab.code > tabRequest[0].code){
-                  const prevTab = tabRequest.find(x => x.code == (tab.code - 1));
-                  if(prevTab){setTab(prevTab)};
-                }
-              }} 
-              className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2">
-              <span className="flex">
-                  <ChevronLeft className="h-5 w-5"/>&nbsp;Trở lại                
-              </span>
-            </Button>
-            <Button type="button" disabled={tab == tabRequest[tabRequest.length-1]} 
-              onClick={() => {
-                if(tab.code < tabRequest[tabRequest.length-1].code){                
-                  const nextTab = tabRequest.find(x => x.code == (tab.code + 1));
-                  if(nextTab){setTab(nextTab)}
-                }
-              }} 
-              className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium">
-              <span className="flex">
-                  Tiếp tục&nbsp;<ChevronRight className="h-5 w-5"/>
-              </span>
-            </Button>
-          </div>
+          {
+            !requestCode &&
+              <div className="text-end">          
+                <Button type="button" disabled={tab == tabRequest[0]} 
+                  onClick={() => {
+                    if(tab.code > tabRequest[0].code){
+                      const prevTab = tabRequest.find(x => x.code == (tab.code - 1));
+                      if(prevTab){setTab(prevTab)};
+                    }
+                  }} 
+                  className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2">
+                  <span className="flex">
+                      <ChevronLeft className="h-5 w-5"/>&nbsp;Trở lại                
+                  </span>
+                </Button>
+                <Button type="button" disabled={tab == tabRequest[tabRequest.length-2]} 
+                  onClick={() => {
+                    if(tab.code < tabRequest[tabRequest.length-1].code){                
+                      const nextTab = tabRequest.find(x => x.code == (tab.code + 1));
+                      if(nextTab){setTab(nextTab)}
+                    }
+                  }} 
+                  className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium">
+                  <span className="flex">
+                      Tiếp tục&nbsp;<ChevronRight className="h-5 w-5"/>
+                  </span>
+                </Button>
+              </div>
+          }
         </div>
-
         {
           tabRequest[0].code == tab.code ?//Thông tin cá nhân
           <>
             <div className="grid grid-cols-1 gap-4">
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Họ &amp; Tên</span>
+                <span className="text-sm font-medium mb-1">Họ &amp; Tên <span style={{color: "red"}}>(*)</span></span>
                 <input
                   type="text"
                   value={form.fullname}
@@ -368,7 +345,7 @@ export default function RequestCustomerPage(): JSX.Element {
                 />
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Giới tính</span>
+                <span className="text-sm font-medium mb-1">Giới tính <span style={{color: "red"}}>(*)</span></span>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-2">
                     <input
@@ -395,14 +372,14 @@ export default function RequestCustomerPage(): JSX.Element {
                 </div>
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Ngày sinh (MM/DD/YYYY)</span>
+                <span className="text-sm font-medium mb-1">Ngày sinh (MM/DD/YYYY) <span style={{color: "red"}}>(*)</span></span>
                 <input type="date" onChange={(e) => {onChange("birthday", new Date(e.target.value))}}
                 className="border rounded-md px-3 py-2 w-full"
                 defaultValue={form.birthday.toISOString().split("T")[0]}
                 required/>
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Tuổi</span>
+                <span className="text-sm font-medium mb-1">Tuổi <span style={{color: "red"}}>(*)</span></span>
                 <input
                   type="number"
                   value={form.age}
@@ -413,7 +390,7 @@ export default function RequestCustomerPage(): JSX.Element {
                 />
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Căn cước công dân</span>
+                <span className="text-sm font-medium mb-1">Căn cước công dân <span style={{color: "red"}}>(*)</span></span>
                 <input
                   type="text"
                   value={form.cccd}
@@ -424,7 +401,7 @@ export default function RequestCustomerPage(): JSX.Element {
                 />
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Nơi cấp CCCD</span>
+                <span className="text-sm font-medium mb-1">Nơi cấp CCCD <span style={{color: "red"}}>(*)</span></span>
                 <input
                   type="text"
                   value={form.placeofissue}
@@ -435,7 +412,7 @@ export default function RequestCustomerPage(): JSX.Element {
                 />
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Ngày cấp CCCD (MM/DD/YYYY)</span>
+                <span className="text-sm font-medium mb-1">Ngày cấp CCCD (MM/DD/YYYY) <span style={{color: "red"}}>(*)</span></span>
                 <input type="date" onChange={(e) => {onChange("dateofissue", new Date(e.target.value))}}
                 className="border rounded-md px-3 py-2 w-full"
                 defaultValue={form.dateofissue.toISOString().split("T")[0]}
@@ -452,7 +429,7 @@ export default function RequestCustomerPage(): JSX.Element {
                 />
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Quốc tịch</span>
+                <span className="text-sm font-medium mb-1">Quốc tịch <span style={{color: "red"}}>(*)</span></span>
                 <input
                   type="text"
                   value={form.nationality}
@@ -465,8 +442,8 @@ export default function RequestCustomerPage(): JSX.Element {
               <label className="flex flex-col">
                 <span className="text-sm font-medium mb-1">Tình trạng hôn nhân</span>
                 <select className="w-full px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={form.marialstatus}
-                onChange={(e) => {onChange("marialstatus", e.target.value)}}>
+                defaultValue={form.maritalstatus}
+                onChange={(e) => {onChange("maritalstatus", e.target.value)}}>
                   {
                     matialStatus.map((matial) =>
                       <option value={matial.name}>{matial.name}</option>
@@ -481,7 +458,7 @@ export default function RequestCustomerPage(): JSX.Element {
           <>
             <div className="grid grid-cols-1 gap-4">
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Số điện thoại</span>
+                <span className="text-sm font-medium mb-1">Số điện thoại <span style={{color: "red"}}>(*)</span></span>
                 <input
                   type="tel"
                   value={form.phone}
@@ -499,11 +476,10 @@ export default function RequestCustomerPage(): JSX.Element {
                   onChange={(e) => onChange("email", e.target.value)}
                   className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Địa chỉ Email"
-                  required
                 />
               </label>
               <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Địa chỉ</span>
+                <span className="text-sm font-medium mb-1">Địa chỉ <span style={{color: "red"}}>(*)</span></span>
                 <input
                   type="text"
                   value={form.address}
@@ -667,6 +643,34 @@ export default function RequestCustomerPage(): JSX.Element {
                   placeholder="Thông tin khác"
                 />
               </label>
+            </div>
+            <div className="mt-6 text-end gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
+                  ? "bg-gray-200 text-gray-700"
+                  : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
+                  }`}
+              >
+                <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Lưu yêu cầu"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setForm(defaultForm);
+                  setImages([]);
+                }}
+                className="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+              >
+                <Recycle className="h-5 w-5"/>&nbsp;Làm lại
+              </button>
+            </div>
+          </>
+          :
+          tabRequest[4].code == tab.code ?//Tải ảnh lên
+          <>
+            <div className="grid grid-cols-1 gap-4">
               {/* Ảnh đính kèm */}
               <div className="flex flex-col">
                 <span className="text-sm font-medium mb-1">
@@ -707,38 +711,21 @@ export default function RequestCustomerPage(): JSX.Element {
                     </label>
                   )}
                 </div>
-                {/* {uploadError && (
-                  <p className="mt-1 text-xs text-red-600">{uploadError}</p>
-                )}
-                {uploading && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    Đang xử lý ảnh...
-                  </p>
-                )} */}
               </div>
-            </div>
-            <div className="mt-6 text-end gap-3">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
-                  }`}
-              >
-                <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Gửi yêu cầu"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setForm(defaultForm);
-                  setImages([]);
-                }}
-                className="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
-              >
-                <Recycle className="h-5 w-5"/>&nbsp;Làm lại
-              </button>
+              
+              <div className="mt-6 text-end gap-3">
+                <button
+                  type="button"
+                  disabled={loading}
+                  className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
+                    ? "bg-gray-200 text-gray-700"
+                    : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
+                    }`}
+                  onClick={handleSendEmail}
+                >
+                  <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Hoàn tất yêu cầu"}
+                </button>
+              </div>
             </div>
           </>
           :

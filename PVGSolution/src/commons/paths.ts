@@ -7,9 +7,10 @@ export const paths = {
   PRODUCT_DETAIL: `${BASE_URL}/product/:id`,
   NEWS: `${BASE_URL}/news`,
   NEWS_DETAIL: `${BASE_URL}/news/detail`,
-  REQUEST: `${BASE_URL}/request`,
+  REQUEST: `${BASE_URL}/request/:idproduct`,
   SUPPORT: `${BASE_URL}/supports`,
   INITWEB: `${BASE_URL}/initweb`,
+  SUCCESS: `${BASE_URL}/success`,
 };
 
 export const adminPaths = {

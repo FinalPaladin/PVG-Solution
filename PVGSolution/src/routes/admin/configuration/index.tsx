@@ -10,7 +10,20 @@ import { useEffect, useState, type JSX } from "react";
 
 export default function ConfigurationPage(): JSX.Element {
     const { auth } = useAuth();
-    const [config, setConfig] = useState<IObjConfigurationModel>({} as IObjConfigurationModel);
+    const [config, setConfig] = useState<IObjConfigurationModel>({
+        EmailFromName: "",
+        EmailPort: "",
+        EmailReceive: "",
+        EmailSend: "",
+        EmailSendPassword: "",
+        EmailSmtpHost: "",
+        ImgBackground: "",
+        ImgBanner: "",
+        ImgHome: "",
+        ImgLogo: "",
+        SDTSales: "",
+        WebName: "",
+    } as IObjConfigurationModel);
     const [message, setMessage] = useState<{
         type: "success" | "error";
         text: string;
@@ -33,7 +46,20 @@ export default function ConfigurationPage(): JSX.Element {
         }
 
         const objConfig = Object.fromEntries(res?.result?.data.map(item => [item.key, item.value]) ?? []) as unknown as IObjConfigurationModel;
-        setConfig(objConfig);
+        setConfig({
+            EmailFromName: objConfig.EmailFromName,
+            EmailPort: objConfig.EmailPort,
+            EmailReceive: objConfig.EmailReceive,
+            EmailSend: objConfig.EmailSend,
+            EmailSendPassword: objConfig.EmailSendPassword,
+            EmailSmtpHost: objConfig.EmailSmtpHost,
+            ImgBackground: objConfig.ImgBackground,
+            ImgBanner: objConfig.ImgBanner,
+            ImgHome: objConfig.ImgHome,
+            ImgLogo: objConfig.ImgLogo,
+            SDTSales: objConfig.SDTSales,
+            WebName: objConfig.WebName
+        } as IObjConfigurationModel);
     }
 
     const handleSave = async () => {
@@ -181,6 +207,10 @@ export default function ConfigurationPage(): JSX.Element {
                     <div className="grid grid-cols-1 mt-2">
                         <span className="text-sm font-medium mb-1">Ảnh nền trang chủ:</span>
                         <ImageControl imageKey="ImgBackground" img={config.ImgBackground} isUpload={true} onImageChange={(file) => { AddImg("ImgBackground", file!); }} />
+                    </div>
+                    <div className="grid grid-cols-1 mt-2">
+                        <span className="text-sm font-medium mb-1">Banner:</span>
+                        <ImageControl imageKey="ImgTopProduct" img={config.ImgBanner} isUpload={true} onImageChange={(file) => { AddImg("ImgBanner", file!); }} />
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
+import type { IRQ_InserRequestCustomerModel, IRQ_RemoveImageRequestCustomerModel, IRS_InserRequestCustomerModel, IRS_UploadImageRequestCustomerModel } from "@/models/admin/requestCustomer";
 import type { BaseResponse } from "@/models/baseReponse";
-import type { IResponseUpdateImage } from "@/models/requestCustomer";
+import type { IResponseUpdateImage, IRS_CloudflareUploadListImageModel } from "@/models/requestCustomer";
 import request from "@/utils/request";
 
 export function requestCustomerSave(payload: unknown) {
@@ -30,5 +31,49 @@ export function mediaImageDelete(key: string) {
     {
       params: { key }, // axios sẽ build ?key=...
     }
+  );
+}
+
+// Save (POST)
+export function insertRequestCustomer(_input: IRQ_InserRequestCustomerModel) {
+  return request.post<unknown, BaseResponse<IRS_InserRequestCustomerModel>>(
+    `/api/request/insert`,
+    _input
+  );
+}
+
+// Upload Images (POST)
+export function UploadImagesRequestCustomer(_input: unknown) {
+  return request.post<unknown, BaseResponse<IRS_CloudflareUploadListImageModel>>(
+    `/api/media/image/upload-images`,
+    _input,{
+        headers: { "Content-Type": "multipart/form-data" }
+    }
+  );
+}
+
+// Upload Images (POST)
+export function UploadImageRequestCustomer(_input: unknown) {
+  return request.post<unknown, BaseResponse<IRS_UploadImageRequestCustomerModel>>(
+    `/api/request/upload-img`,
+    _input,{
+        headers: { "Content-Type": "multipart/form-data" }
+    }
+  );
+}
+
+// Upload Images (POST)
+export function RemoveImageRequestCustomer(_input: IRQ_RemoveImageRequestCustomerModel) {
+  return request.post<unknown, BaseResponse>(
+    `/api/request/remove-img`,
+    _input
+  );
+}
+
+// Upload Images (POST)
+export function SendEmailRequest(requestCode: string) {
+  return request.post<unknown, BaseResponse>(
+    `/api/request/send-email`,
+    {requestCode: requestCode, key: ""} as IRQ_RemoveImageRequestCustomerModel
   );
 }

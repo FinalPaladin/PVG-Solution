@@ -1,4 +1,4 @@
-export function ProgressBar({ value }: { value: number }) {
+export function ProgressBar({ value, text }: { value: number, text: string }) {
     return (
         <div className="w-full">
         <div className="w-full bg-gray-200/70 rounded-full h-4 shadow-inner">
@@ -9,7 +9,7 @@ export function ProgressBar({ value }: { value: number }) {
         </div>
 
         <div className="mt-1 text-right text-sm font-medium text-gray-700">
-            {value}%
+            {text}
         </div>
         </div>
     );

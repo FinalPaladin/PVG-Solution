@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
-import bannerImg from "@/assets/images/product-banner.png";
+// import bannerImg from "@/assets/images/product-banner.png";
+import { useWebConfig } from "@/auth/webConfigContext";
 
 export function RedBookBanner() {
+  const {webConfig} = useWebConfig();
     return (
         <div className="mt-6">
             {/* Căn giữa giống phần danh sách sản phẩm */}
@@ -86,7 +88,7 @@ export function RedBookBanner() {
                         <div className="relative">
                             <div className="aspect-4/3 md:aspect-5/4 rounded-3xl bg-white shadow-sm overflow-hidden">
                                 <img
-                                    src={bannerImg}
+                                    src={webConfig.ImgBanner}//bannerImg
                                     alt="Khách hàng cầm sổ đỏ và ký hồ sơ vay"
                                     className="h-full w-full object-cover"
                                 />
