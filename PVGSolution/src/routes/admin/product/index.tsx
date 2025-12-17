@@ -1,7 +1,14 @@
 // src/pages/ProductList.tsx
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
-import { Plus, Search, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Pencil,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +26,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { adminPaths } from "@/commons/paths";
 import { productsSearch } from "@/api/admin/adProducts";
 import type { ProductResponseModel } from "@/models/admin/product.model";
+import { useAlert } from "@/stores/useAlertStore";
 
 interface SearchParams {
   keyword?: string;
@@ -41,7 +49,7 @@ async function searchProducts(
 
   return {
     items: res.result.items,
-    total: res.result.totalRecords,
+    total: res.result.totalItems,
   };
 }
 
@@ -96,8 +104,12 @@ export default function ProductList(): JSX.Element {
         });
         setProducts(items);
         setTotal(tot);
-      } catch (err) {
-        console.error("Failed to load products", err);
+      } catch (error) {
+        if (error instanceof Error) {
+          useAlert.getState().showError(error.message);
+        } else {
+          useAlert.getState().showError("Đã xảy ra lỗi không xác định");
+        }
         setProducts([]);
         setTotal(0);
       } finally {
@@ -174,201 +186,211 @@ export default function ProductList(): JSX.Element {
   const endItem = Math.min(total, page * pageSize);
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Danh sách sản phẩm</h1>
+    <>
+      <div className="flex h-full flex-col gap-4">
+        <h1 className="text-2xl font-semibold">Danh sách sản phẩm</h1>
 
-      {/* Header actions */}
-      <div className="flex items-center justify-between gap-4">
-        {/* left: search group */}
-        <div className="flex w-full items-center gap-3">
-          <div className="relative flex-1">
-            <Input
-              ref={inputRef}
-              placeholder="Nhập tên sản phẩm..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSearch();
-              }}
-              className="w-full pr-10"
-            />
+        {/* Header actions */}
+        <div className="flex items-center justify-between gap-4">
+          {/* left: search group */}
+          <div className="flex w-full items-center gap-3">
+            <div className="relative flex-1">
+              <Input
+                ref={inputRef}
+                placeholder="Nhập tên sản phẩm..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+                className="w-full pr-10"
+              />
 
-            {/* clear (transparent SVG) */}
-            {searchInput !== "" && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-800 transition bg-transparent"
-                aria-label="Clear input"
-                title="Clear"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              {/* clear (transparent SVG) */}
+              {searchInput !== "" && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-800 transition bg-transparent"
+                  aria-label="Clear input"
+                  title="Clear"
                 >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            <Button type="button" onClick={handleSearch} className="shrink-0">
+              <Search className="mr-2 h-4 w-4" />
+              Tìm kiếm
+            </Button>
           </div>
 
-          <Button type="button" onClick={handleSearch} className="shrink-0">
-            <Search className="mr-2 h-4 w-4" />
-            Tìm kiếm
+          {/* right: add product */}
+          <Button
+            type="button"
+            onClick={() => navigate(adminPaths.ADMIN_PRODUCT_NEW)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Thêm sản phẩm
           </Button>
         </div>
 
-        {/* right: add product */}
-        <Button
-          type="button"
-          onClick={() => navigate(adminPaths.ADMIN_PRODUCT_NEW)}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Thêm sản phẩm
-        </Button>
-      </div>
-
-      {/* Table */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border">
-        <ScrollArea className="h-full">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[60px] text-center">STT</TableHead>
-                <TableHead>Tên sản phẩm</TableHead>
-                <TableHead>Danh mục</TableHead>
-                <TableHead>Mức vay</TableHead>
-                <TableHead>Thời hạn vay</TableHead>
-                <TableHead className="w-[120px] text-center">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="w-[180px]">Ngày tạo</TableHead>
-                <TableHead className="w-[120px] text-center">
-                  Thao tác
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {listLoading ? (
+        {/* Table */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border">
+          <ScrollArea className="h-full">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center">
-                    Đang tải dữ liệu...
-                  </TableCell>
+                  <TableHead className="w-[60px] text-center">STT</TableHead>
+                  <TableHead>Tên sản phẩm</TableHead>
+                  <TableHead>Danh mục</TableHead>
+                  <TableHead>Mức vay</TableHead>
+                  <TableHead>Thời hạn vay</TableHead>
+                  <TableHead className="w-[120px] text-center">
+                    Trạng thái
+                  </TableHead>
+                  <TableHead className="w-[180px]">Ngày tạo</TableHead>
+                  <TableHead className="w-[120px] text-center">
+                    Thao tác
+                  </TableHead>
                 </TableRow>
-              ) : products.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center">
-                    Không có dữ liệu
-                  </TableCell>
-                </TableRow>
-              ) : (
-                products.map((p, index) => (
-                  <TableRow key={p.id}>
-                    <TableCell className="text-center">
-                      {(page - 1) * pageSize + index + 1}
-                    </TableCell>
-                    <TableCell>{p.name}</TableCell>
-                    <TableCell>{p.productCategory}</TableCell>
-                    <TableCell>{p.loanAmount}</TableCell>
-                    <TableCell>{p.loanTerm}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge
-                        variant={!p.inactive ? "default" : "outline"}
-                        className={
-                          !p.inactive
-                            ? "bg-emerald-500/90 hover:bg-emerald-500"
-                            : ""
-                        }
-                      >
-                        {!p.inactive ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{formatDate(p.createdDate)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-center">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          type="button"
-                          onClick={() =>
-                            navigate(
-                              adminPaths.ADMIN_PRODUCT_DETAIL.replace(
-                                ":id",
-                                p.id
-                              )
-                            )
-                          }
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {listLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-32 text-center">
+                      Đang tải dữ liệu...
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </ScrollArea>
-      </div>
-
-      {/* Pagination controls */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="text-sm text-muted-foreground">
-          {total === 0
-            ? "0 items"
-            : `Hiển thị ${startItem} - ${endItem} trên ${total} mục`}
+                ) : products.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-32 text-center">
+                      Không có dữ liệu
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  products.map((p, index) => (
+                    <TableRow key={p.id}>
+                      <TableCell className="text-center">
+                        {(page - 1) * pageSize + index + 1}
+                      </TableCell>
+                      <TableCell>{p.name}</TableCell>
+                      <TableCell>{p.productCategory}</TableCell>
+                      <TableCell>{p.loanAmount}</TableCell>
+                      <TableCell>{p.loanTerm}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={!p.inactive ? "default" : "outline"}
+                          className={
+                            !p.inactive
+                              ? "bg-emerald-500/90 hover:bg-emerald-500"
+                              : ""
+                          }
+                        >
+                          {!p.inactive ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{formatDate(p.createdDate)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-center">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                adminPaths.ADMIN_PRODUCT_DETAIL.replace(
+                                  ":id",
+                                  p.id
+                                )
+                              )
+                            }
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => goToPage(page - 1)}
-              disabled={page <= 1 || listLoading}
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <div className="px-2">
-              <span>{page}</span>
-              <span className="mx-1">/</span>
-              <span>{lastPage}</span>
-            </div>
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => goToPage(page + 1)}
-              disabled={page >= lastPage || listLoading}
-              aria-label="Next page"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+        {/* Pagination controls */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-sm text-muted-foreground">
+            {total === 0
+              ? "0 items"
+              : `Hiển thị ${startItem} - ${endItem} trên ${total} mục`}
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-sm">Kết quả / Trang</label>
-            <select
-              value={pageSize}
-              onChange={(e) => changePageSize(parseInt(e.target.value, 10))}
-              className="rounded border px-2 py-1"
-              disabled={listLoading}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
+            <div className="flex items-center gap-1">
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => goToPage(page - 1)}
+                disabled={page <= 1 || listLoading}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="px-2">
+                <span>{page}</span>
+                <span className="mx-1">/</span>
+                <span>{lastPage}</span>
+              </div>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => goToPage(page + 1)}
+                disabled={page >= lastPage || listLoading}
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-sm">Kết quả / Trang</label>
+              <select
+                value={pageSize}
+                onChange={(e) => changePageSize(parseInt(e.target.value, 10))}
+                className="rounded border px-2 py-1"
+                disabled={listLoading}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {listLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="flex items-center gap-2 rounded-md bg-white px-6 py-4 shadow">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>Đang xử lý, vui lòng chờ...</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

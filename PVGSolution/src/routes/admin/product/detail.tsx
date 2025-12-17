@@ -36,7 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { uploadImage } from "@/api/admin/adMediaUpload";
 import {
   productCreate,
@@ -130,9 +130,11 @@ export default function ProductForm(): JSX.Element {
           data.details.map(
             (d) =>
               ({
+                id: d.id,
                 productDetailCategoryId: d.productDetailCategoryId,
                 title: d.title,
                 content: d.content,
+                tempId: d.id,
               } as ProductDetailModel)
           )
         );
@@ -269,7 +271,7 @@ export default function ProductForm(): JSX.Element {
           inactive: inactive === "inactive",
           userName: auth.userName,
           details: details.map((d) => ({
-            id: isEdit ? d.id : undefined,
+            id: d.id,
             productDetailCategoryId: d.productDetailCategoryId,
             title: d.title,
             content: d.content,
@@ -286,17 +288,22 @@ export default function ProductForm(): JSX.Element {
           inactive: inactive === "inactive",
           userName: auth.userName,
           details: details.map((d) => ({
-            id: isEdit ? d.id : undefined,
+            id: undefined,
             productDetailCategoryId: d.productDetailCategoryId,
             title: d.title,
             content: d.content,
           })),
         } as ProductCreateRequest;
-
         res = await productCreate(payloadCreate);
       }
 
       if (res.isSuccess) {
+        useAlert
+          .getState()
+          .show(
+            isEdit ? "Cập nhật thành công" : "Tạo mới thành công",
+            "success"
+          );
         navigate(adminPaths.ADMIN_PRODUCT);
       } else {
         useAlert.getState().showError(res.message);
@@ -313,288 +320,317 @@ export default function ProductForm(): JSX.Element {
   };
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{pageTitle}</h1>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/products")}
-          >
-            Hủy
-          </Button>
-          <Button type="button" onClick={handleSubmit} disabled={loading}>
-            Lưu
-          </Button>
-        </div>
-      </div>
+    <>
+      <div className="flex h-full flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          {/* Breadcrumb */}
+          <nav className="text-sm text-muted-foreground">
+            <span
+              className="cursor-pointer hover:underline"
+              onClick={() => navigate(adminPaths.ADMIN_PRODUCT)}
+            >
+              Sản phẩm
+            </span>
+            <span className="mx-2">/</span>
+            <span className="font-medium text-foreground">{pageTitle}</span>
+          </nav>
 
-      {initialLoading ? (
-        <div className="mt-10 text-center">Đang tải dữ liệu...</div>
-      ) : (
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Thông tin cơ bản */}
-          <div className="space-y-4 rounded-md border p-4 lg:col-span-2">
-            <h2 className="text-lg font-semibold">Thông tin sản phẩm</h2>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">{pageTitle}</h1>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <SelectBox
-                label="Danh mục sản phẩm"
-                value={categoryId}
-                placeholder="-- Chọn danh mục --"
-                options={PRODUCT_CATEGORIES}
-                onChange={setCategoryId}
-              />
-            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(adminPaths.ADMIN_PRODUCT)}
+              >
+                Hủy
+              </Button>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Tên sản phẩm</label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nhập tên sản phẩm..."
-              />
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <SelectBox
-                label="Mức vay"
-                value={loanAmountId}
-                placeholder="-- Chọn mức vay --"
-                options={LOAN_AMOUNTS}
-                onChange={setLoanAmountId}
-              />
-
-              <SelectBox
-                label="Thời hạn vay"
-                value={loanTermId}
-                placeholder="-- Chọn thời hạn vay --"
-                options={LOAN_TERMS}
-                onChange={setLoanTermId}
-              />
-
-              <SelectBox
-                label="Trạng thái"
-                value={inactive === "inactive" ? "inactive" : "active"}
-                placeholder="-- Chọn trạng thái sản phẩm --"
-                options={[
-                  { id: "active", name: "Hiệu lực" },
-                  { id: "inactive", name: "Không hiệu lực" },
-                ]}
-                onChange={setInactive}
-              />
+              <Button type="button" onClick={handleSubmit} disabled={loading}>
+                Lưu
+              </Button>
             </div>
           </div>
+        </div>
 
-          {/* Hình ảnh */}
-          <div className="space-y-4 rounded-md border p-4">
-            <h2 className="text-lg font-semibold">Hình ảnh sản phẩm</h2>
+        {initialLoading ? (
+          <div className="mt-10 text-center">Đang tải dữ liệu...</div>
+        ) : (
+          <div className="grid gap-4 lg:grid-cols-3">
+            {/* Thông tin cơ bản */}
+            <div className="space-y-4 rounded-md border p-4 lg:col-span-2">
+              <h2 className="text-lg font-semibold">Thông tin sản phẩm</h2>
 
-            <div className="flex items-center gap-3">
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="max-w-sm"
-              />
-
-              {imagePreview && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setImageFile(null);
-                    setImagePreview(null);
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-
-            {imagePreview && (
-              <div className="relative overflow-hidden rounded-md border">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="h-40 w-full object-cover"
+              <div className="grid gap-4 md:grid-cols-2">
+                <SelectBox
+                  label="Danh mục sản phẩm"
+                  value={categoryId}
+                  placeholder="-- Chọn danh mục --"
+                  options={PRODUCT_CATEGORIES}
+                  onChange={setCategoryId}
                 />
               </div>
-            )}
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Tên sản phẩm</label>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nhập tên sản phẩm..."
+                />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <SelectBox
+                  label="Mức vay"
+                  value={loanAmountId}
+                  placeholder="-- Chọn mức vay --"
+                  options={LOAN_AMOUNTS}
+                  onChange={setLoanAmountId}
+                />
+
+                <SelectBox
+                  label="Thời hạn vay"
+                  value={loanTermId}
+                  placeholder="-- Chọn thời hạn vay --"
+                  options={LOAN_TERMS}
+                  onChange={setLoanTermId}
+                />
+
+                <SelectBox
+                  label="Trạng thái"
+                  value={inactive === "inactive" ? "inactive" : "active"}
+                  placeholder="-- Chọn trạng thái sản phẩm --"
+                  options={[
+                    { id: "active", name: "Hiệu lực" },
+                    { id: "inactive", name: "Không hiệu lực" },
+                  ]}
+                  onChange={setInactive}
+                />
+              </div>
+            </div>
+
+            {/* Hình ảnh */}
+            <div className="space-y-4 rounded-md border p-4">
+              <h2 className="text-lg font-semibold">Hình ảnh sản phẩm</h2>
+
+              <div className="flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="max-w-sm"
+                />
+
+                {imagePreview && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+
+              {imagePreview && (
+                <div className="relative overflow-hidden rounded-md border">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="h-40 w-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Thông tin sản phẩm (list) */}
+        <div className="flex min-h-0 flex-1 flex-col rounded-md border">
+          <div className="flex items-center justify-between border-b px-4 py-3">
+            <h2 className="text-lg font-semibold">Chi tiết</h2>
+            <Button type="button" onClick={openCreateDetailDialog}>
+              Thêm mới
+            </Button>
+          </div>
+          <ScrollArea className="h-[300px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[60px] text-center">STT</TableHead>
+                  <TableHead>Loại nội dung</TableHead>
+                  <TableHead>Tiêu đề</TableHead>
+                  <TableHead>Nội dung</TableHead>
+                  <TableHead className="w-40 text-center">Thao tác</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {details.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      Chưa có thông tin, nhấn "Thêm mới" để tạo.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  details.map((d, index) => (
+                    <TableRow key={d.id}>
+                      <TableCell className="text-center">{index + 1}</TableCell>
+
+                      <TableCell>
+                        {
+                          PRODUCT_DETAIL_CATEGORY.find(
+                            (c) => c.id === String(d.productDetailCategoryId)
+                          )?.name
+                        }
+                      </TableCell>
+
+                      <TableCell>{d.title}</TableCell>
+
+                      {/* CỘT NỘI DUNG */}
+                      <TableCell className="max-w-[300px]">
+                        <div className="line-clamp-2 text-sm text-muted-foreground">
+                          {Array.isArray(d.content)
+                            ? d.content.join(", ")
+                            : d.content}
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openEditDetailDialog(d)}
+                          >
+                            Sửa
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                              >
+                                Xóa
+                              </Button>
+                            </AlertDialogTrigger>
+
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Xác nhận xóa
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Hành động này không thể hoàn tác. Nội dung sẽ
+                                  bị xóa vĩnh viễn.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    handleDeleteDetail(d.tempId ?? "")
+                                  }
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Xóa
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+        </div>
+
+        {/* Dialog thêm / sửa detail */}
+        <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {detailEditMode === "create"
+                  ? "Thêm thông tin sản phẩm"
+                  : "Sửa thông tin sản phẩm"}
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <SelectBox
+                  label="Loại nội dung"
+                  value={detailCategory}
+                  placeholder="-- Chọn loại nội dung --"
+                  options={PRODUCT_DETAIL_CATEGORY}
+                  onChange={setDetailCategory}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium">
+                  Tiêu đề (cột bên trái)
+                </label>
+                <Input
+                  value={detailTitle}
+                  onChange={(e) => setDetailTitle(e.target.value)}
+                  placeholder="Ví dụ: Đối tượng khách hàng"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium">
+                  Nội dung (cột bên phải)
+                </label>
+                <Textarea
+                  rows={6}
+                  value={detailContent}
+                  onChange={(e) => setDetailContent(e.target.value)}
+                  placeholder="Nhập mô tả chi tiết..."
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDetailDialogOpen(false)}
+              >
+                Hủy
+              </Button>
+              <Button
+                type="button"
+                onClick={handleSaveDetail}
+                disabled={!detailTitle.trim() || !detailContent.trim()}
+              >
+                Lưu
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="flex items-center gap-2 rounded-md bg-white px-6 py-4 shadow">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>Đang xử lý, vui lòng chờ...</span>
           </div>
         </div>
       )}
-
-      {/* Thông tin sản phẩm (list) */}
-      <div className="mt-4 flex min-h-0 flex-1 flex-col rounded-md border">
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <h2 className="text-lg font-semibold">Chi tiết</h2>
-          <Button type="button" onClick={openCreateDetailDialog}>
-            Thêm mới
-          </Button>
-        </div>
-        <ScrollArea className="h-[300px]">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[60px] text-center">STT</TableHead>
-                <TableHead>Loại nội dung</TableHead>
-                <TableHead>Tiêu đề</TableHead>
-                <TableHead>Nội dung</TableHead>
-                <TableHead className="w-40 text-center">Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {details.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    Chưa có thông tin, nhấn "Thêm mới" để tạo.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                details.map((d, index) => (
-                  <TableRow key={d.id}>
-                    <TableCell className="text-center">{index + 1}</TableCell>
-
-                    <TableCell>
-                      {
-                        PRODUCT_DETAIL_CATEGORY.find(
-                          (c) => c.id === String(d.productDetailCategoryId)
-                        )?.name
-                      }
-                    </TableCell>
-
-                    <TableCell>{d.title}</TableCell>
-
-                    {/* CỘT NỘI DUNG */}
-                    <TableCell className="max-w-[300px]">
-                      <div className="line-clamp-2 text-sm text-muted-foreground">
-                        {Array.isArray(d.content)
-                          ? d.content.join(", ")
-                          : d.content}
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="flex items-center justify-center gap-2">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openEditDetailDialog(d)}
-                        >
-                          Sửa
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="destructive"
-                            >
-                              Xóa
-                            </Button>
-                          </AlertDialogTrigger>
-
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Hành động này không thể hoàn tác. Nội dung sẽ bị
-                                xóa vĩnh viễn.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Hủy</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() =>
-                                  handleDeleteDetail(d.tempId ?? "")
-                                }
-                                className="bg-red-600 hover:bg-red-700"
-                              >
-                                Xóa
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </ScrollArea>
-      </div>
-
-      {/* Dialog thêm / sửa detail */}
-      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {detailEditMode === "create"
-                ? "Thêm thông tin sản phẩm"
-                : "Sửa thông tin sản phẩm"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <SelectBox
-                label="Loại nội dung"
-                value={detailCategory}
-                placeholder="-- Chọn loại nội dung --"
-                options={PRODUCT_DETAIL_CATEGORY}
-                onChange={setDetailCategory}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-sm font-medium">
-                Tiêu đề (cột bên trái)
-              </label>
-              <Input
-                value={detailTitle}
-                onChange={(e) => setDetailTitle(e.target.value)}
-                placeholder="Ví dụ: Đối tượng khách hàng"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-sm font-medium">
-                Nội dung (cột bên phải)
-              </label>
-              <Textarea
-                rows={6}
-                value={detailContent}
-                onChange={(e) => setDetailContent(e.target.value)}
-                placeholder="Nhập mô tả chi tiết..."
-              />
-            </div>
-          </div>
-
-          <DialogFooter className="mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setDetailDialogOpen(false)}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="button"
-              onClick={handleSaveDetail}
-              disabled={!detailTitle.trim() || !detailContent.trim()}
-            >
-              Lưu
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+    </>
   );
 }

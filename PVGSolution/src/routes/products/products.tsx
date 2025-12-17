@@ -9,6 +9,7 @@ import { LoanBenefits } from "./loanBenefit";
 import { useEffect, useMemo, useState } from "react";
 import { initProductPage } from "@/api/product";
 import type { appCategories, appProducts } from "@/models/appProducts.model";
+import { useAlert } from "@/stores/useAlertStore";
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -29,8 +30,12 @@ export default function ProductsPage() {
           // default tab = first category (thường là "")
           setValue(res.result.categories?.[0]?.id ?? "");
         }
-      } catch (err) {
-        console.error("Init product page error:", err);
+      } catch (error) {
+        if (error instanceof Error) {
+          useAlert.getState().showError(error.message);
+        } else {
+          useAlert.getState().showError("Đã xảy ra lỗi không xác định");
+        }
       }
     };
 

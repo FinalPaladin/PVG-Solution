@@ -15,7 +15,11 @@ export function productsSearch(params: ProductSearchRequest) {
     unknown,
     BaseResponse<{
       items: ProductResponseModel[];
-      totalRecords: number;
+      isPaging: boolean;
+      totalItems: number;
+      totalPages: number;
+      perPage: number;
+      pageNumber: number;
     }>
   >("/api/products/search", { params });
 }

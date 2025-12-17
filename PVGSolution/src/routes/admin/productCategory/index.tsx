@@ -162,7 +162,7 @@ export default function ProductCategory(): JSX.Element {
         setCategories(items);
         setTotal(tot);
       } catch (err) {
-        console.error("Failed to load categories", err);
+        useAlert.getState().showError("Failed to load categories");
         setCategories([]);
         setTotal(0);
       } finally {

@@ -7,6 +7,7 @@ import type {
   ProductDetailResponseModel,
   ProductResponseModel,
 } from "@/models/admin/product.model";
+import { useAlert } from "@/stores/useAlertStore";
 
 // --- Types ---
 export type TabKey = "info" | "docs" | "process" | "fee";
@@ -58,8 +59,12 @@ export default function ProductInfoPage(): JSX.Element {
         if (res.isSuccess && res.result) {
           setProduct(res.result);
         }
-      } catch (err) {
-        console.error("Load product detail error:", err);
+      } catch (error) {
+        if (error instanceof Error) {
+          useAlert.getState().showError(error.message);
+        } else {
+          useAlert.getState().showError("Đã xảy ra lỗi không xác định");
+        }
       }
     };
 
