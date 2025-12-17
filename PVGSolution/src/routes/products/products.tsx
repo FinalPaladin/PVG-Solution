@@ -151,7 +151,15 @@ export default function ProductsPage() {
                   <CardFooter className="flex gap-3 px-6 pb-6">
                     <Button
                       className="bg-[#9cc31c] hover:bg-[#8bb019] text-white flex-1 rounded-md"
-                      onClick={() => navigate(paths.REQUEST)}
+                      onClick={() => {                        
+                        navigate(
+                          `${paths.REQUEST.replace(
+                            ":idproduct",
+                            // item.id
+                            ""
+                          )}`
+                        )
+                      }}
                     >
                       Đăng ký ngay
                     </Button>

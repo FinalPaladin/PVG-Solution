@@ -10,7 +10,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import type { IRQ_InserRequestCustomerModel, IRQ_RemoveImageRequestCustomerModel, IRS_InserRequestCustomerModel, IRS_UploadImageRequestCustomerModel } from "@/models/admin/requestCustomer";
 import { useNavigate } from "react-router-dom";
 import { paths } from "@/commons/paths";
-// import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const matialStatus = [
   {code: "", name: "Chọn"},
@@ -112,7 +112,7 @@ const defaultForm = {
   
 export default function RequestCustomerPage(): JSX.Element {
   const navigate = useNavigate();
-  // const { idproduct } = useParams<{ idproduct: string }>();
+  const { idproduct } = useParams<{ idproduct: string }>();
   const [form, setForm] = useState<FormState>(defaultForm);
 
   const [loading, setLoading] = useState(false);
@@ -175,7 +175,7 @@ export default function RequestCustomerPage(): JSX.Element {
         token: token,
         fullName: form.fullname,
         phone: form.phone,
-        productId: "3896fc82-ceab-41f8-996d-37f4f3b8ce92",//idproduct,
+        productId: idproduct,
         data: data,
       } as IRQ_InserRequestCustomerModel;
 
