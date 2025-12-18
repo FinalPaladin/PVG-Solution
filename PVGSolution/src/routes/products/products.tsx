@@ -10,6 +10,13 @@ import { useEffect, useMemo, useState } from "react";
 import { initProductPage } from "@/api/product";
 import type { appCategories, appProducts } from "@/models/appProducts.model";
 import { useAlert } from "@/stores/useAlertStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -52,7 +59,7 @@ export default function ProductsPage() {
     <>
       <RedBookBanner />
 
-      <h1 className="text-3xl font-bold mb-6 mt-6">Danh sách sản phẩm</h1>
+      <h1 className="text-3xl font-bold mb-6 mt-6">Danh sách sản phẩm cần tư vấn</h1>
 
       {/* ===== Mobile select ===== */}
       <div className="md:hidden mb-4">
@@ -60,18 +67,25 @@ export default function ProductsPage() {
           Chọn danh mục sản phẩm
         </label>
 
-        <select
-          id="productTabsSelect"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          className="w-full appearance-none rounded-md border border-gray-200 px-4 py-3 text-base font-medium bg-white focus:border-green-600 focus:ring-0"
+        <Select
+          value={value ?? "all"}
+          onValueChange={(v) => {
+            setValue(v === "all" ? "" : v);
+          }}
         >
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-full rounded-md border border-gray-200 px-4 py-3">
+            <SelectValue placeholder="Tất cả sản phẩm" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {categories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
       </div>
 
       {/* ===== Desktop / Tablet tabs ===== */}
@@ -138,9 +152,9 @@ export default function ProductsPage() {
                 <Button
                   className="bg-[#9cc31c] hover:bg-[#8bb019] text-white flex-1 rounded-md"
                   onClick={() => navigate(paths.REQUEST.replace(
-                                ":idproduct",
-                                item.id
-                              ))}
+                    ":idproduct",
+                    item.id
+                  ))}
                 >
                   Đăng ký ngay
                 </Button>

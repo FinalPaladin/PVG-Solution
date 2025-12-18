@@ -8,6 +8,13 @@ import type {
   ProductResponseModel,
 } from "@/models/admin/product.model";
 import { useAlert } from "@/stores/useAlertStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // --- Types ---
 export type TabKey = "info" | "docs" | "process" | "fee";
@@ -159,11 +166,10 @@ export default function ProductInfoPage(): JSX.Element {
               <button
                 key={t.key}
                 onClick={() => setActive(t.key)}
-                className={`relative pb-2 text-lg font-medium ${
-                  active === t.key
-                    ? "text-[#14532d]"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
+                className={`relative pb-2 text-lg font-medium ${active === t.key
+                  ? "text-[#14532d]"
+                  : "text-gray-600 hover:text-gray-800"
+                  }`}
               >
                 {t.label}
                 {active === t.key && (
@@ -175,17 +181,22 @@ export default function ProductInfoPage(): JSX.Element {
 
           {/* Mobile select */}
           <div className="sm:hidden">
-            <select
+            <Select
               value={active}
-              onChange={(e) => setActive(e.target.value as TabKey)}
-              className="w-full px-4 py-3 border border-[#e5e7eb] rounded-md"
+              onValueChange={(value) => setActive(value as TabKey)}
             >
-              {TABs.map((t) => (
-                <option key={t.key} value={t.key}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full px-4 py-3">
+                <SelectValue placeholder="Chọn nội dung" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {TABs.map((t) => (
+                  <SelectItem key={t.key} value={t.key}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
