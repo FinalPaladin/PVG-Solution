@@ -6,6 +6,7 @@ import {
 } from "@/api/admin/adRequestCustomer";
 import type {
   IRequestCustomerDetail,
+  IRequestCustomerItemDetails,
   IRQ_GetRequestCustomerModel,
   IRQ_ProcessedModel,
 } from "@/models/admin/requestCustomer";
@@ -27,6 +28,7 @@ export default function RequestDetail(): JSX.Element {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [request, setRequest] = useState<IRequestCustomerItemDetails>({} as IRequestCustomerItemDetails);
 
   // modal
   const [isOpen, setIsOpen] = useState(false);
@@ -45,6 +47,7 @@ export default function RequestDetail(): JSX.Element {
         } as IRQ_GetRequestCustomerModel);
         if (!res.isSuccess) throw new Error(`HTTP ${res.statusCode}`);
         const data = res.result?.details;
+        setRequest(res.result?.data as IRequestCustomerItemDetails);
         setIsProcessed(res.result?.data?.isProcessed || false);
         setIsRejected(res.result?.data?.isDeleled || false);
         if (!cancelled) setItem([...(data || [])]);
@@ -156,7 +159,7 @@ export default function RequestDetail(): JSX.Element {
   return (
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">Chi tiết yêu cầu</h1>
+        <h1 className="text-2xl font-semibold">Chi tiết yêu cầu / {request.productName}</h1>
       </div>
 
       <div className="flex items-center justify-between mb-4">

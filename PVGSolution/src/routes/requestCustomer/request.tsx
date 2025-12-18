@@ -4,7 +4,7 @@ import type { IResponseUpdateImage } from "@/models/requestCustomer";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Recycle, Send } from "lucide-react";
 import { useAlert } from "@/stores/useAlertStore";
-// import imageCompression from 'browser-image-compression';
+import imageCompression from 'browser-image-compression';
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import type { IRQ_InserRequestCustomerModel, IRQ_RemoveImageRequestCustomerModel, IRS_InserRequestCustomerModel, IRS_UploadImageRequestCustomerModel } from "@/models/admin/requestCustomer";
@@ -104,11 +104,13 @@ const defaultForm = {
     otherincome: "",
   } as FormState;
 
-// const optionsResizeImg = {
-//     maxSizeMB: 5, // tối đa 1MB sau khi nén
-//     maxWidthOrHeight: 1024, // Resize chiều to nhất còn 1024px
-//     useWebWorker: true
-//   };
+const optionsResizeImg = {
+    maxSizeMB: 1, // tối đa 1MB sau khi nén
+    maxWidthOrHeight: 1920,        // chỉ giới hạn cạnh lớn
+    useWebWorker: true,
+    initialQuality: 0.8,          // 🔑 quan trọng
+    fileType: "image/jpeg",
+  };
   
 export default function RequestCustomerPage(): JSX.Element {
   const navigate = useNavigate();
@@ -135,6 +137,10 @@ export default function RequestCustomerPage(): JSX.Element {
       behavior: "smooth"
     });
   }, []);
+
+  const compressImage = async (file: File) => {
+    return await imageCompression(file, optionsResizeImg);
+  }
 
   function onChange<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((s) => ({ ...s, [key]: value }));
@@ -217,10 +223,10 @@ export default function RequestCustomerPage(): JSX.Element {
     
     const listImg = [...images] as UploadedImage[];
     for (const file of toUpload) {
-      // const newFile = await imageCompression(file, optionsResizeImg);
-      // const url = URL.createObjectURL(newFile);
+      const newFile = await compressImage(file);
+
       const payload = new FormData();
-      payload.append("ImgFile", file);
+      payload.append("ImgFile", newFile);
       payload.append("RequestCode", requestCode);
       const res = await UploadImageRequestCustomer(payload);
       if(res.isSuccess)
