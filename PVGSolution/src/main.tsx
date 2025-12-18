@@ -128,7 +128,7 @@ const router = createBrowserRouter([
             element: <AdminNews />,
           },
           {
-            path: adminPaths.ADMIN_NEWS_DETAIL,
+            path: adminPaths.ADMIN_NEWS_UPDATE,
             element: <AdminNewsCreateOrUpdate />,
           },
           {

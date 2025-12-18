@@ -3,14 +3,14 @@ const BASE_ADMIN_URL = `${BASE_URL}/admin`;
 
 export const paths = {
   HOME: `${BASE_URL}`,
-  PRODUCTS: `${BASE_URL}/products`,
-  PRODUCT_DETAIL: `${BASE_URL}/product/:id`,
-  NEWS: `${BASE_URL}/news`,
-  NEWS_DETAIL: `${BASE_URL}/news/detail`,
-  REQUEST: `${BASE_URL}/request/:idproduct`,
-  SUPPORT: `${BASE_URL}/supports`,
+  PRODUCTS: `${BASE_URL}/san-pham`,
+  PRODUCT_DETAIL: `${BASE_URL}/san-pham/:id`,
+  NEWS: `${BASE_URL}/tin-tuc`,
+  NEWS_DETAIL: `${BASE_URL}/tin-tuc/:category/:slug`,
+  REQUEST: `${BASE_URL}/gui-yeu-cau`,
+  SUPPORT: `${BASE_URL}/ho-tro`,
   INITWEB: `${BASE_URL}/initweb`,
-  SUCCESS: `${BASE_URL}/success`,
+  SUCCESS: `${BASE_URL}/thanh-cong`,
 };
 
 export const adminPaths = {
@@ -25,7 +25,7 @@ export const adminPaths = {
   ADMIN_PRODUCT_NEW: `${BASE_ADMIN_URL}/products/create`,
   ADMIN_PRODUCTCATEGORY: `${BASE_ADMIN_URL}/product-category`,
   ADMIN_NEWS: `${BASE_ADMIN_URL}/news`,
-  ADMIN_NEWS_DETAIL: `${BASE_ADMIN_URL}/news/:id`,
+  ADMIN_NEWS_UPDATE: `${BASE_ADMIN_URL}/news/:id`,
   ADMIN_NEWS_CREATE: `${BASE_ADMIN_URL}/news/create`,
   ADMIN_NEWS_CATEGORY: `${BASE_ADMIN_URL}/news-category`,
 };

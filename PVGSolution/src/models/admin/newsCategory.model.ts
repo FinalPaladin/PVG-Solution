@@ -12,6 +12,7 @@ export type NewsTypeEnum = (typeof NewsTypeEnum)[keyof typeof NewsTypeEnum];
 export interface IPagingRequest {
   page: number;
   pageSize: number;
+  isPaging?: boolean;
 }
 
 // Search request
