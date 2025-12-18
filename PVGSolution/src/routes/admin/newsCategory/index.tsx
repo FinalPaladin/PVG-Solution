@@ -41,19 +41,20 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-import {
-  productCategorySearch,
-  productCategoryUpdate,
-  productCategoryDelete,
-  productCategorySave,
-} from "@/api/admin/adProductCategory";
-import type {
-  ISaveProductCategoryRequest,
-  IUpdateProductCategoryRequest,
-} from "@/models/admin/productCategory.model";
 import { useAuth } from "@/auth/authContext";
 import { useAlert } from "@/stores/useAlertStore";
+import {
+  newsCategoryDelete,
+  newsCategorySave,
+  newsCategorySearch,
+  newsCategoryUpdate,
+} from "@/api/admin/adNewsCategory";
+import {
+  NewsTypeEnum,
+  type ISaveNewsCategoryRequest,
+  type IUpdateNewsCategoryRequest,
+} from "@/models/admin/newsCategory.model";
+import { SelectBox } from "@/components/common/SelectBox";
 
 type CategoryStatus = "active" | "inactive";
 
@@ -63,6 +64,7 @@ interface ProductCategoryItem {
   status: CategoryStatus;
   createdDate: string;
   createdByName: string;
+  displayOrder: number;
 }
 
 interface FetchResult {
@@ -81,16 +83,18 @@ async function fetchCategoriesFromApi(
   params.set("pageSize", String(pageSize));
 
   const qs = `?${params.toString()}`;
-  const res = await productCategorySearch(qs);
+  const res = await newsCategorySearch(qs);
 
   // support multiple shapes for items and total count
-  const rawItems = res.result?.items ?? [];
+  const rawItems = Array.isArray(res.result)
+    ? res.result
+    : res.result?.items ?? [];
   const total = res.result?.totalItems ?? rawItems.length;
 
   const items = rawItems.map((it) => ({
     id: it.id,
     name: it.name,
-    status: it.inactive ? "inactive" : "active",
+    status: it.status ? "active" : "inactive",
     createdDate: new Date(it.createdDate).toLocaleString("vi-VN", {
       day: "2-digit",
       month: "2-digit",
@@ -100,12 +104,14 @@ async function fetchCategoriesFromApi(
       second: "2-digit",
     }),
     createdByName: it.createdByName ?? "",
+    displayOrder: it.displayOrder,
+    type: it.type,
   })) as ProductCategoryItem[];
 
   return { items, total };
 }
 
-export default function ProductCategory(): JSX.Element {
+export default function NewsCategoryPage(): JSX.Element {
   const { auth } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -122,7 +128,11 @@ export default function ProductCategory(): JSX.Element {
     useState<ProductCategoryItem | null>(null);
   const [editName, setEditName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isInactive, setIsInactive] = useState(false);
+  const [isInactive, setIsInactive] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log("isInactive");
+  }, [isInactive]);
 
   // pagination state stored in URL so back/forward/bookmark works
   const pageParam = parseInt(searchParams.get("page") ?? "1", 10);
@@ -135,6 +145,9 @@ export default function ProductCategory(): JSX.Element {
     isNaN(pageSizeParam) || pageSizeParam < 1 ? 10 : pageSizeParam
   );
   const [total, setTotal] = useState<number>(0);
+  const [displayOrder, setDisplayOrder] = useState<number | undefined>(
+    undefined
+  );
 
   // keep local state in sync when user presses back/forward or URL changed externally
   useEffect(() => {
@@ -242,6 +255,7 @@ export default function ProductCategory(): JSX.Element {
     setEditName("");
     setIsEditDialogOpen(true);
     setIsInactive(false);
+    setDisplayOrder(undefined);
   };
 
   const openEditDialog = (category: ProductCategoryItem) => {
@@ -250,7 +264,12 @@ export default function ProductCategory(): JSX.Element {
     setEditName(category.name);
     setIsEditDialogOpen(true);
     setIsInactive(category.status === "inactive");
+    setDisplayOrder(category.displayOrder);
   };
+
+  useEffect(() => {
+    console.log("isInactive", isInactive);
+  }, [isInactive]);
 
   const handleSaveEdit = async () => {
     const trimmed = editName.trim();
@@ -261,11 +280,13 @@ export default function ProductCategory(): JSX.Element {
       if (editMode === "create") {
         const payload = {
           name: trimmed,
-          inactive: isInactive,
-          createdBy: auth.userName ?? "",
-        } as ISaveProductCategoryRequest;
+          status: isInactive,
+          type: NewsTypeEnum.NEWS,
+          displayOrder: displayOrder,
+          userName: auth.userName ?? "",
+        } as ISaveNewsCategoryRequest;
 
-        const res = await productCategorySave(payload);
+        const res = await newsCategorySave(payload);
 
         if (!res.isSuccess) {
           useAlert.getState().showError(res.message || "Lưu thất bại");
@@ -276,9 +297,9 @@ export default function ProductCategory(): JSX.Element {
 
         // create local entity (note: server may return id in result)
         const newCat: ProductCategoryItem = {
-          id: res.result || String(Date.now()),
+          id: res.result?.id || String(Date.now()),
           name: trimmed,
-          status: payload.inactive ? "inactive" : "active",
+          status: payload.status ? "inactive" : "active",
           createdDate: new Date().toLocaleString("vi-VN", {
             day: "2-digit",
             month: "2-digit",
@@ -287,7 +308,8 @@ export default function ProductCategory(): JSX.Element {
             minute: "2-digit",
             second: "2-digit",
           }),
-          createdByName: payload.createdBy || "",
+          createdByName: payload.userName || "",
+          displayOrder: payload.displayOrder ?? 0,
         };
 
         // If we are on first page, prepend; otherwise navigate to first page to show it
@@ -302,10 +324,13 @@ export default function ProductCategory(): JSX.Element {
         const payload = {
           id: selectedCategory.id,
           name: trimmed,
-          inactive: isInactive,
-          createdBy: auth.userName ?? "",
-        } as IUpdateProductCategoryRequest;
-        const res = await productCategoryUpdate(payload);
+          status: isInactive ? false : true,
+          userName: auth.userName ?? "",
+          type: NewsTypeEnum.NEWS,
+          displayOrder: displayOrder,
+        } as IUpdateNewsCategoryRequest;
+
+        const res = await newsCategoryUpdate(selectedCategory.id, payload);
         if (!res.isSuccess) {
           useAlert.getState().showError(res.message || "Cập nhật thất bại");
           return;
@@ -320,6 +345,7 @@ export default function ProductCategory(): JSX.Element {
                   ...c,
                   name: trimmed,
                   status: isInactive ? "inactive" : "active",
+                  displayOrder: displayOrder ?? 0,
                 }
               : c
           )
@@ -347,7 +373,7 @@ export default function ProductCategory(): JSX.Element {
       const newStatus: CategoryStatus =
         selectedCategory.status === "active" ? "inactive" : "active";
 
-      const res = await productCategoryDelete(selectedCategory.id);
+      const res = await newsCategoryDelete(selectedCategory.id);
       if (!res.isSuccess) {
         useAlert.getState().showError(res.message || "Hủy thất bại");
       }
@@ -374,7 +400,7 @@ export default function ProductCategory(): JSX.Element {
   return (
     <>
       <div className="flex h-full flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Danh mục sản phẩm</h1>
+        <h1 className="text-2xl font-semibold">Danh mục tin tức</h1>
         {/* Header actions */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-2">
@@ -384,7 +410,7 @@ export default function ProductCategory(): JSX.Element {
                 <div className="relative flex-1">
                   <Input
                     ref={inputRef}
-                    placeholder="Nhập tên danh mục sản phẩm..."
+                    placeholder="Nhập tên danh mục tin tức..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -450,9 +476,10 @@ export default function ProductCategory(): JSX.Element {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[60px] text-center">STT</TableHead>
-                  <TableHead>Tên danh mục</TableHead>
-                  <TableHead className="w-[140px] text-center">
-                    Trạng thái
+                  <TableHead className="w-80">Tên danh mục</TableHead>
+                  <TableHead className="w-20 text-center">Trạng thái</TableHead>
+                  <TableHead className="w-20 text-center">
+                    Thứ tự hiển thị
                   </TableHead>
                   <TableHead className="w-[200px]">Ngày tạo</TableHead>
                   <TableHead className="w-40">Người tạo</TableHead>
@@ -492,6 +519,9 @@ export default function ProductCategory(): JSX.Element {
                         >
                           {c.status === "active" ? "Active" : "Inactive"}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {c.displayOrder}
                       </TableCell>
                       <TableCell>{c.createdDate}</TableCell>
                       <TableCell>{c.createdByName}</TableCell>
@@ -585,7 +615,7 @@ export default function ProductCategory(): JSX.Element {
             <DialogHeader>
               <DialogTitle>
                 {editMode === "create"
-                  ? "Thêm danh mục sản phẩm"
+                  ? "Thêm danh mục tin tức"
                   : "Sửa danh mục"}
               </DialogTitle>
             </DialogHeader>
@@ -598,15 +628,28 @@ export default function ProductCategory(): JSX.Element {
                 placeholder="Nhập tên danh mục..."
               />
               <div>
-                <label className="text-sm font-medium mr-2">Trạng thái</label>
-                <select
+                <SelectBox
+                  label="Trạng thái"
                   value={isInactive ? "inactive" : "active"}
-                  onChange={(e) => setIsInactive(e.target.value === "inactive")}
-                  className="ml-2 rounded border px-2 py-1"
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                  placeholder="-- Chọn trạng thái sản phẩm --"
+                  options={[
+                    { id: "active", name: "Hiệu lực" },
+                    { id: "inactive", name: "Không hiệu lực" },
+                  ]}
+                  onChange={(e) => setIsInactive(e === "inactive")}
+                />
+              </div>
+              <div>
+                <SelectBox
+                  label="Thứ tự hiển thị"
+                  value={displayOrder ? String(displayOrder) : ""}
+                  placeholder="-- Chọn thứ tự hiển thị --"
+                  options={Array.from({ length: 10 }, (_, i) => ({
+                    id: String(i + 1),
+                    name: String(i + 1),
+                  }))}
+                  onChange={(e) => setDisplayOrder(e ? Number(e) : undefined)}
+                />
               </div>
             </div>
             <DialogFooter className="mt-4">

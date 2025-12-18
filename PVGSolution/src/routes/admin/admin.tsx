@@ -12,6 +12,8 @@ import {
   SquareAsterisk,
   ChartBarStacked,
   SquareChartGantt,
+  NotebookText,
+  Newspaper,
 } from "lucide-react";
 import {
   Popover,
@@ -27,7 +29,7 @@ export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { auth, logout } = useAuth();
-  const {webConfig} = useWebConfig();
+  const { webConfig } = useWebConfig();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -162,6 +164,28 @@ export default function AdminLayout(): JSX.Element {
           >
             <SquareChartGantt className="h-5 w-5" />
             {!collapsed && <span>Sản phẩm</span>}
+          </Link>
+          <Link
+            to={adminPaths.ADMIN_NEWS_CATEGORY}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive(adminPaths.ADMIN_NEWS_CATEGORY)
+                ? "bg-emerald-50 text-emerald-700"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <NotebookText className="h-5 w-5" />
+            {!collapsed && <span>Danh mục tin tức</span>}
+          </Link>
+          <Link
+            to={adminPaths.ADMIN_NEWS}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive(adminPaths.ADMIN_NEWS)
+                ? "bg-emerald-50 text-emerald-700"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <Newspaper className="h-5 w-5" />
+            {!collapsed && <span>Tin tức</span>}
           </Link>
         </nav>
 

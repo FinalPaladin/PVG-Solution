@@ -3,7 +3,11 @@ import { Link } from "react-router-dom";
 import { paths } from "@/commons/paths";
 import type { IObjConfigurationModel } from "@/models/admin/config.model";
 
-export default function Header({ webConfig }: { webConfig: IObjConfigurationModel }) {
+export default function Header({
+  webConfig,
+}: {
+  webConfig: IObjConfigurationModel;
+}) {
   const [showSearch, setShowSearch] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
 
@@ -31,27 +35,17 @@ export default function Header({ webConfig }: { webConfig: IObjConfigurationMode
   }, [menuOpen]);
 
   return (
-    <header className={`sticky top-0 z-50 bg-white transition-shadow duration-300
+    <header
+      className={`sticky top-0 z-50 bg-white transition-shadow duration-300
     ${scrolled ? "shadow-md" : "shadow-none border-b"}
-  `}>
+  `}
+    >
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between py-3 lg:py-4 gap-4">
           {/* Left - Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <Link to={paths.PRODUCTS} className="flex items-center gap-3">
-              {/* <svg
-                width="32"
-                height="26"
-                viewBox="0 0 44 36"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden
-              >
-                <path d="M22 0L44 36H0L22 0Z" fill="#2B8A3E" />
-              </svg> */}
-              <img width={32} height={26}
-                alt=""
-                src={webConfig.ImgLogo} />
+              <img width={32} height={26} alt="" src={webConfig.ImgLogo} />
               <span className="text-base lg:text-lg font-semibold text-slate-900">
                 {webConfig.WebName}
               </span>
@@ -127,9 +121,10 @@ export default function Header({ webConfig }: { webConfig: IObjConfigurationMode
               aria-label="Tìm kiếm"
               onClick={() => setShowSearch((v) => !v)}
               className={`w-10 h-10 rounded-full border flex items-center justify-center transition
-                ${showSearch
-                  ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                  : "border-gray-200 hover:shadow-sm text-gray-600"
+                ${
+                  showSearch
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                    : "border-gray-200 hover:shadow-sm text-gray-600"
                 }`}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -162,7 +157,11 @@ export default function Header({ webConfig }: { webConfig: IObjConfigurationMode
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path
-                  d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M3 6h18M3 12h18M3 18h18"}
+                  d={
+                    menuOpen
+                      ? "M6 18L18 6M6 6l12 12"
+                      : "M3 6h18M3 12h18M3 18h18"
+                  }
                   stroke="#374151"
                   strokeWidth="1.5"
                   strokeLinecap="round"
@@ -176,13 +175,18 @@ export default function Header({ webConfig }: { webConfig: IObjConfigurationMode
 
       {/* Mobile menu overlay (small screens only) */}
       <div
-        className={`lg:hidden fixed inset-0 z-40 transition-opacity ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
+        className={`lg:hidden fixed inset-0 z-40 transition-opacity ${
+          menuOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
         aria-hidden={!menuOpen}
       >
         {/* backdrop */}
         <div
-          className={`absolute inset-0 bg-black/40 transition-opacity ${menuOpen ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-black/40 transition-opacity ${
+            menuOpen ? "opacity-100" : "opacity-0"
+          }`}
           onClick={() => setMenuOpen(false)}
         />
 
@@ -191,22 +195,16 @@ export default function Header({ webConfig }: { webConfig: IObjConfigurationMode
           role="dialog"
           aria-modal="true"
           aria-label="Mobile menu"
-          className={`absolute right-0 top-0 h-full w-[320px] max-w-full bg-white shadow-lg transform transition-transform duration-300 ${menuOpen ? "translate-x-0" : "translate-x-full"
-            }`}
+          className={`absolute right-0 top-0 h-full w-[320px] max-w-full bg-white shadow-lg transform transition-transform duration-300 ${
+            menuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
         >
           <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <svg
-                width="28"
-                height="22"
-                viewBox="0 0 44 36"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden
-              >
-                <path d="M22 0L44 36H0L22 0Z" fill="#2B8A3E" />
-              </svg>
-              <span className="font-semibold">PVG Solution</span>
+              <img width={32} height={26} alt="" src={webConfig.ImgLogo} />
+              <span className="text-base lg:text-lg font-semibold text-slate-900">
+                {webConfig.WebName}
+              </span>
             </div>
 
             <button
@@ -232,9 +230,17 @@ export default function Header({ webConfig }: { webConfig: IObjConfigurationMode
               onClick={() => setMenuOpen(false)}
               className="flex items-center justify-between w-full px-3 py-3 rounded-md hover:bg-gray-50"
             >
-              <div className="text-base font-medium">Sản phẩm &amp; Dịch vụ</div>
+              <div className="text-base font-medium">
+                Sản phẩm &amp; Dịch vụ
+              </div>
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </Link>
 
@@ -245,7 +251,13 @@ export default function Header({ webConfig }: { webConfig: IObjConfigurationMode
             >
               <div className="text-base font-medium">Tin tức</div>
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </Link>
 

@@ -51,12 +51,17 @@ const AdminProductDetail = React.lazy(
 const AdminProductCategory = React.lazy(
   () => import("./routes/admin/productCategory/index.tsx")
 );
-const InitWebPage = React.lazy(
-  () => import("./routes/initWeb/index.tsx")
+
+const AdminNews = React.lazy(() => import("./routes/admin/news/index.tsx"));
+const AdminNewsCreateOrUpdate = React.lazy(
+  () => import("./routes/admin/news/detail.tsx")
 );
-const SuccessPage = React.lazy(
-  () => import("./routes/successPage")
+const AdminNewsCategory = React.lazy(
+  () => import("./routes/admin/newsCategory/index.tsx")
 );
+
+const InitWebPage = React.lazy(() => import("./routes/initWeb/index.tsx"));
+const SuccessPage = React.lazy(() => import("./routes/successPage"));
 
 const router = createBrowserRouter([
   {
@@ -69,8 +74,8 @@ const router = createBrowserRouter([
       { path: paths.NEWS, element: <NewsPage /> },
       { path: paths.NEWS_DETAIL, element: <NewsDetailPage /> },
       { path: paths.REQUEST, element: <RequestCustomerPage /> },
-      { path: paths.INITWEB, element: <InitWebPage/>},
-      { path: paths.SUCCESS, element: <SuccessPage/>},
+      { path: paths.INITWEB, element: <InitWebPage /> },
+      { path: paths.SUCCESS, element: <SuccessPage /> },
     ],
   },
   {
@@ -118,6 +123,22 @@ const router = createBrowserRouter([
             path: adminPaths.ADMIN_PRODUCTCATEGORY,
             element: <AdminProductCategory />,
           },
+          {
+            path: adminPaths.ADMIN_NEWS,
+            element: <AdminNews />,
+          },
+          {
+            path: adminPaths.ADMIN_NEWS_DETAIL,
+            element: <AdminNewsCreateOrUpdate />,
+          },
+          {
+            path: adminPaths.ADMIN_NEWS_CREATE,
+            element: <AdminNewsCreateOrUpdate />,
+          },
+          {
+            path: adminPaths.ADMIN_NEWS_CATEGORY,
+            element: <AdminNewsCategory />,
+          },
         ],
       },
     ],
@@ -126,7 +147,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHAV3_KEY}>
+    <GoogleReCaptchaProvider
+      reCaptchaKey={import.meta.env.VITE_RECAPTCHAV3_KEY}
+    >
       <WebConfigProvider>
         <AuthProvider>
           <RouterProvider router={router} />

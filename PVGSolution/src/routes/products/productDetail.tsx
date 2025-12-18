@@ -1,7 +1,7 @@
 import FAQSection from "@/components/common/FAQSections";
 import React, { useEffect, useMemo, useState, type JSX } from "react";
 import { DollarSign, Shield, Zap, type LucideIcon } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { initProductDetailPage } from "@/api/product";
 import type {
   ProductDetailResponseModel,
@@ -15,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { paths } from "@/commons/paths";
 
 // --- Types ---
 export type TabKey = "info" | "docs" | "process" | "fee";
@@ -51,6 +53,7 @@ export default function ProductInfoPage(): JSX.Element {
 
   const [active, setActive] = useState<TabKey>("info");
   const [product, setProduct] = useState<ProductResponseModel | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -117,12 +120,16 @@ export default function ProductInfoPage(): JSX.Element {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
-                className="inline-block px-6 py-3 rounded-md bg-emerald-400 text-[#064e3b] font-medium shadow-sm hover:brightness-95"
+                size="lg"
+                className="bg-emerald-400 text-[#064e3b] hover:bg-emerald-500 shadow-sm"
+                onClick={() =>
+                  navigate(paths.REQUEST.replace(":idproduct", id ?? ""))
+                }
               >
                 Đăng ký ngay
-              </button>
+              </Button>
             </div>
 
             {/* Right image */}
@@ -166,10 +173,11 @@ export default function ProductInfoPage(): JSX.Element {
               <button
                 key={t.key}
                 onClick={() => setActive(t.key)}
-                className={`relative pb-2 text-lg font-medium ${active === t.key
-                  ? "text-[#14532d]"
-                  : "text-gray-600 hover:text-gray-800"
-                  }`}
+                className={`relative pb-2 text-lg font-medium ${
+                  active === t.key
+                    ? "text-[#14532d]"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
               >
                 {t.label}
                 {active === t.key && (

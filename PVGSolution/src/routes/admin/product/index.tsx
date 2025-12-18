@@ -255,7 +255,7 @@ export default function ProductList(): JSX.Element {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[60px] text-center">STT</TableHead>
-                  <TableHead>Tên sản phẩm</TableHead>
+                  <TableHead className="w-[320px]">Tên sản phẩm</TableHead>
                   <TableHead>Danh mục</TableHead>
                   <TableHead>Mức vay</TableHead>
                   <TableHead>Thời hạn vay</TableHead>
@@ -287,7 +287,11 @@ export default function ProductList(): JSX.Element {
                       <TableCell className="text-center">
                         {(page - 1) * pageSize + index + 1}
                       </TableCell>
-                      <TableCell>{p.name}</TableCell>
+                      <TableCell className="max-w-[320px]">
+                        <div className="ellipsis" title={p.name}>
+                          {p.name}
+                        </div>
+                      </TableCell>
                       <TableCell>{p.productCategory}</TableCell>
                       <TableCell>{p.loanAmount}</TableCell>
                       <TableCell>{p.loanTerm}</TableCell>

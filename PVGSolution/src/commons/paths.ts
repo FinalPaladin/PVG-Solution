@@ -22,6 +22,10 @@ export const adminPaths = {
   ADMIN_CHANGEPASSWORD: `${BASE_ADMIN_URL}/changepassword`,
   ADMIN_PRODUCT: `${BASE_ADMIN_URL}/products`,
   ADMIN_PRODUCT_DETAIL: `${BASE_ADMIN_URL}/products/:id`,
-  ADMIN_PRODUCT_NEW: `${BASE_ADMIN_URL}/products/new`,
+  ADMIN_PRODUCT_NEW: `${BASE_ADMIN_URL}/products/create`,
   ADMIN_PRODUCTCATEGORY: `${BASE_ADMIN_URL}/product-category`,
+  ADMIN_NEWS: `${BASE_ADMIN_URL}/news`,
+  ADMIN_NEWS_DETAIL: `${BASE_ADMIN_URL}/news/:id`,
+  ADMIN_NEWS_CREATE: `${BASE_ADMIN_URL}/news/create`,
+  ADMIN_NEWS_CATEGORY: `${BASE_ADMIN_URL}/news-category`,
 };
