@@ -33,7 +33,6 @@ export default function ProductsPage() {
         if (res.isSuccess && res.result) {
           setCategories(res.result.categories);
           setProducts(res.result.products);
-          
           // default tab = first category (thường là "")
           setValue(res.result.categories?.[0]?.id ?? "");
         }
@@ -51,7 +50,7 @@ export default function ProductsPage() {
 
   // ===== Filter products by category =====
   const filteredProducts = useMemo(() => {
-    if (!value) return products;
+    if (!value || value == "all") return products;
     return products.filter((p) => p.productCategoryId === value);
   }, [products, value]);
 

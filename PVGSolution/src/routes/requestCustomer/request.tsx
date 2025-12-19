@@ -386,13 +386,25 @@ export default function RequestCustomerPage(): JSX.Element {
                   <span className="text-red-500 ml-1">*</span>
                 </span>
                 <input
-                  type="date"
-                  defaultValue={form.birthday.toISOString().split("T")[0]}
-                  onChange={(e) => onChange("birthday", new Date(e.target.value))}
-                  required
-                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
-                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
-                />
+                    type="date"
+                    value={
+                      form.birthday
+                        ? form.birthday.toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (!value) {
+                        onChange("birthday", new Date());
+                        return;
+                      }
+
+                      const [y, m, d] = value.split("-").map(Number);
+                      onChange("birthday", new Date(y, m - 1, d));
+                    }}
+                    className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                              focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+                  />
               </label>
 
               {/* Tuổi */}
@@ -450,13 +462,25 @@ export default function RequestCustomerPage(): JSX.Element {
                   <span className="text-red-500 ml-1">*</span>
                 </span>
                 <input
-                  type="date"
-                  defaultValue={form.dateofissue.toISOString().split("T")[0]}
-                  onChange={(e) => onChange("dateofissue", new Date(e.target.value))}
-                  required
-                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
-                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
-                />
+                    type="date"
+                    value={
+                      form.dateofissue
+                        ? form.dateofissue.toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (!value) {
+                        onChange("dateofissue", new Date());
+                        return;
+                      }
+
+                      const [y, m, d] = value.split("-").map(Number);
+                      onChange("dateofissue", new Date(y, m - 1, d));
+                    }}
+                    className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                              focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+                  />
               </label>
 
               {/* CMND */}
