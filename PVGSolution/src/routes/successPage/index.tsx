@@ -6,16 +6,40 @@ export default function SuccessPage(): JSX.Element {
     const navigate = useNavigate();
 
     return(
-        <div className="flex min-h-screen items-start justify-center bg-gray-50 px-4 pt-24">
-            <div className="rounded-2xl bg-white p-8 shadow-lg md:p-12">
-                <h1 className="text-center text-lg font-semibold text-emerald-600 sm:text-xl md:text-3xl">
+        <div className="flex min-h-screen items-start justify-center bg-white px-4 pt-24">
+            <div className="w-full max-w-md text-center">
+                
+                {/* Icon */}
+                <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+                <svg
+                    className="h-8 w-8 text-emerald-600"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                </div>
+
+                {/* Title */}
+                <h1 className="text-xl font-semibold text-emerald-600 sm:text-2xl md:text-3xl">
                 Thao tác thành công
                 </h1>
 
-                <p className="mt-4 text-center text-sm text-gray-500 md:text-base">
+                {/* Description */}
+                <p className="mt-3 text-sm text-gray-500 sm:text-base">
                 Yêu cầu của bạn đã được xử lý thành công.
                 </p>
-                <p className="mt-4 text-center text-sm text-gray-500 md:text-base">Nhấn để chuyển về <b className="cursor-pointer" onClick={() => {navigate(paths.PRODUCTS);}}><u>TRANG CHỦ</u></b></p>
+
+                {/* Action */}
+                <button
+                onClick={() => navigate(paths.PRODUCTS)}
+                className="mt-8 inline-flex items-center justify-center rounded-lg border border-emerald-600 px-6 py-3 text-sm font-medium text-emerald-600 transition hover:bg-emerald-50 active:scale-95 sm:text-base"
+                >
+                Quay về trang chủ
+                </button>
+
             </div>
         </div>
     )

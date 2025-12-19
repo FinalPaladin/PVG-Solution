@@ -67,11 +67,11 @@ type FormState = {
 type UploadedImage = IResponseUpdateImage;
 
 const tabRequest = [
-  {code: 1, name: "THÔNG TIN CÁ NHÂN", percent: 0, text: "Bước 1"},
-  {code: 2, name: "THÔNG TIN LIÊN LẠC", percent: 25, text: "Bước 2"},
-  {code: 3, name: "THÔNG TIN VIỆC LÀM", percent: 50, text: "Bước 3"},
-  {code: 4, name: "THÔNG TIN TÍN DỤNG", percent: 75, text: "Bước 4"},
-  {code: 5, name: "TẢI HÌNH ẢNH", percent: 100, text: "Bước 5"},
+  {code: 1, name: "THÔNG TIN CÁ NHÂN", percent: 0, text: "Bước 1/5"},
+  {code: 2, name: "THÔNG TIN LIÊN LẠC", percent: 25, text: "Bước 2/5"},
+  {code: 3, name: "THÔNG TIN VIỆC LÀM", percent: 50, text: "Bước 3/5"},
+  {code: 4, name: "THÔNG TIN TÍN DỤNG", percent: 75, text: "Bước 4/5"},
+  {code: 5, name: "TẢI HÌNH ẢNH", percent: 99, text: "Bước 5/5"},
 ]
 
 const defaultForm = {
@@ -118,10 +118,6 @@ export default function RequestCustomerPage(): JSX.Element {
   const [form, setForm] = useState<FormState>(defaultForm);
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
 
   const [images, setImages] = useState<UploadedImage[]>([]);
 
@@ -156,7 +152,6 @@ export default function RequestCustomerPage(): JSX.Element {
 
   async function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
-    setMessage(null);
     const err = validate();
     if (err) {
       useAlert.getState().showError(err);
@@ -282,394 +277,534 @@ export default function RequestCustomerPage(): JSX.Element {
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-8">
       {/* form align left, không card wrapper */}
       <form onSubmit={handleSubmit} className="max-w-xl">
-        <h2 className="text-xl font-semibold mb-4">
-          Đăng ký tư vấn hỗ trợ
-        </h2>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Đăng ký tư vấn hỗ trợ
+          </h2>
+          <div className="mt-2 h-[2px] w-12 bg-[#92B83D] rounded-full"></div>
+        </div>
+        <div className="space-y-4">
 
-        {message && (
-          <div
-            className={`mb-4 px-4 py-2 rounded ${message.type === "success"
-              ? "bg-green-50 text-green-800"
-              : "bg-red-50 text-red-800"
-              }`}
-          >
-            {message.text}
+        {/* Step title */}
+        <div className="flex items-center justify-between">
+          <h4 className="text-base font-semibold text-gray-800">
+            {tab.name}
+          </h4>
+
+          {!requestCode && (
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                disabled={tab === tabRequest[0]}
+                onClick={() => {
+                  if (tab.code > tabRequest[0].code) {
+                    const prevTab = tabRequest.find(x => x.code === tab.code - 1);
+                    if (prevTab) setTab(prevTab);
+                  }
+                }}
+                className="h-9 px-3 rounded-md border border-gray-300
+                          text-gray-700 bg-white
+                          hover:bg-gray-50 disabled:opacity-50"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Trở lại
+              </Button>
+
+              <Button
+                type="button"
+                disabled={tab === tabRequest[tabRequest.length - 2]}
+                onClick={() => {
+                  if (tab.code < tabRequest[tabRequest.length - 1].code) {
+                    const nextTab = tabRequest.find(x => x.code === tab.code + 1);
+                    if (nextTab) setTab(nextTab);
+                  }
+                }}
+                className="h-9 px-4 rounded-md bg-[#4d588b] text-white
+                          hover:bg-[#3f4974] disabled:opacity-50"
+              >
+                Tiếp tục
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+            )}
           </div>
-        )}
-        <div className="grid grid-cols-1 gap-4">
+
+          {/* Progress */}
           <div className="flex items-center">
-            <h4 className="text-l font-semibold mb-4">
-              {tab.name}
-            </h4>
+            <ProgressBar value={tab.percent} text={tab.text} />
           </div>
-          <div className="flex items-center">
-            <ProgressBar value={tab.percent} text={tab.text}/>
-          </div>
-          {
-            !requestCode &&
-              <div className="text-end">          
-                <Button type="button" disabled={tab == tabRequest[0]} 
-                  onClick={() => {
-                    if(tab.code > tabRequest[0].code){
-                      const prevTab = tabRequest.find(x => x.code == (tab.code - 1));
-                      if(prevTab){setTab(prevTab)};
-                    }
-                  }} 
-                  className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2">
-                  <span className="flex">
-                      <ChevronLeft className="h-5 w-5"/>&nbsp;Trở lại                
-                  </span>
-                </Button>
-                <Button type="button" disabled={tab == tabRequest[tabRequest.length-2]} 
-                  onClick={() => {
-                    if(tab.code < tabRequest[tabRequest.length-1].code){                
-                      const nextTab = tabRequest.find(x => x.code == (tab.code + 1));
-                      if(nextTab){setTab(nextTab)}
-                    }
-                  }} 
-                  className="bg-[#4d588b] hover:bg-[white] hover:text-[black] inline-flex items-center justify-center px-4 py-2 rounded-md font-medium">
-                  <span className="flex">
-                      Tiếp tục&nbsp;<ChevronRight className="h-5 w-5"/>
-                  </span>
-                </Button>
-              </div>
-          }
+
         </div>
         {
           tabRequest[0].code == tab.code ?//Thông tin cá nhân
           <>
-            <div className="grid grid-cols-1 gap-4">
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Họ &amp; Tên <span style={{color: "red"}}>(*)</span></span>
+            <div className="grid grid-cols-1 gap-5">
+
+              {/* Họ & tên */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Họ &amp; Tên <span className="text-red-500">*</span>
+                </span>
                 <input
                   type="text"
                   value={form.fullname}
                   onChange={(e) => onChange("fullname", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Nhập họ và tên"
                   required
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100
+                            outline-none transition"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Giới tính <span style={{color: "red"}}>(*)</span></span>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Nam"
-                      checked={form.gender === "Nam"}
-                      onChange={(e) => {onChange("gender", e.target.value)}}
-                      className="cursor-pointer"
-                    />
-                    Nam
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Nữ"
-                      checked={form.gender === "Nữ"}
-                      onChange={(e) => {onChange("gender", e.target.value)}}
-                      className="cursor-pointer"
-                    />
-                    Nữ
-                  </label>
+
+              {/* Giới tính */}
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Giới tính <span className="text-red-500">*</span>
+                </span>
+                <div className="flex items-center gap-6 text-sm text-gray-700">
+                  {["Nam", "Nữ"].map((g) => (
+                    <label key={g} className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value={g}
+                        checked={form.gender === g}
+                        onChange={(e) => onChange("gender", e.target.value)}
+                        className="accent-green-600 cursor-pointer"
+                      />
+                      {g}
+                    </label>
+                  ))}
                 </div>
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Ngày sinh (MM/DD/YYYY) <span style={{color: "red"}}>(*)</span></span>
-                <input type="date" onChange={(e) => {onChange("birthday", new Date(e.target.value))}}
-                className="border rounded-md px-3 py-2 w-full"
-                defaultValue={form.birthday.toISOString().split("T")[0]}
-                required/>
+
+              {/* Ngày sinh */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Ngày sinh <span className="text-gray-400">(MM/DD/YYYY)</span>
+                  <span className="text-red-500 ml-1">*</span>
+                </span>
+                <input
+                  type="date"
+                  defaultValue={form.birthday.toISOString().split("T")[0]}
+                  onChange={(e) => onChange("birthday", new Date(e.target.value))}
+                  required
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+                />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Tuổi <span style={{color: "red"}}>(*)</span></span>
+
+              {/* Tuổi */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Tuổi <span className="text-red-500">*</span>
+                </span>
                 <input
                   type="number"
                   value={form.age}
                   onChange={(e) => onChange("age", parseInt(e.target.value))}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Tuổi"
                   required
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Căn cước công dân <span style={{color: "red"}}>(*)</span></span>
+
+              {/* CCCD */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Căn cước công dân <span className="text-red-500">*</span>
+                </span>
                 <input
                   type="text"
                   value={form.cccd}
                   onChange={(e) => onChange("cccd", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="CCCD"
                   required
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Nơi cấp CCCD <span style={{color: "red"}}>(*)</span></span>
+
+              {/* Nơi cấp CCCD */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Nơi cấp CCCD <span className="text-red-500">*</span>
+                </span>
                 <input
                   type="text"
                   value={form.placeofissue}
                   onChange={(e) => onChange("placeofissue", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Nơi cấp CCCD"
                   required
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Ngày cấp CCCD (MM/DD/YYYY) <span style={{color: "red"}}>(*)</span></span>
-                <input type="date" onChange={(e) => {onChange("dateofissue", new Date(e.target.value))}}
-                className="border rounded-md px-3 py-2 w-full"
-                defaultValue={form.dateofissue.toISOString().split("T")[0]}
-                  required/>
+
+              {/* Ngày cấp CCCD */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Ngày cấp CCCD <span className="text-gray-400">(MM/DD/YYYY)</span>
+                  <span className="text-red-500 ml-1">*</span>
+                </span>
+                <input
+                  type="date"
+                  defaultValue={form.dateofissue.toISOString().split("T")[0]}
+                  onChange={(e) => onChange("dateofissue", new Date(e.target.value))}
+                  required
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+                />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Chứng minh nhân nhân</span>
+
+              {/* CMND */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Chứng minh nhân dân
+                </span>
                 <input
                   type="text"
                   value={form.cmnd}
                   onChange={(e) => onChange("cmnd", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="CMND"
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Quốc tịch <span style={{color: "red"}}>(*)</span></span>
+
+              {/* Quốc tịch */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Quốc tịch <span className="text-red-500">*</span>
+                </span>
                 <input
                   type="text"
                   value={form.nationality}
                   onChange={(e) => onChange("nationality", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Quốc tịch"
                   required
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
                 />
-              </label>  
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Tình trạng hôn nhân</span>
-                <select className="w-full px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={form.maritalstatus}
-                onChange={(e) => {onChange("maritalstatus", e.target.value)}}>
-                  {
-                    matialStatus.map((matial) =>
-                      <option value={matial.name}>{matial.name}</option>
-                    )
-                  }
+              </label>
+
+              {/* Tình trạng hôn nhân */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Tình trạng hôn nhân
+                </span>
+                <select
+                  defaultValue={form.maritalstatus}
+                  onChange={(e) => onChange("maritalstatus", e.target.value)}
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                >
+                  {matialStatus.map((m) => (
+                    <option key={m.name} value={m.name}>
+                      {m.name}
+                    </option>
+                  ))}
                 </select>
-              </label>    
+              </label>
+
             </div>
           </>
           :
           tabRequest[1].code == tab.code ?//Thông tin liên lạc
           <>
-            <div className="grid grid-cols-1 gap-4">
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Số điện thoại <span style={{color: "red"}}>(*)</span></span>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {/* Số điện thoại */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Số điện thoại <span className="text-red-500">*</span>
+                </span>
                 <input
                   type="tel"
                   value={form.phone}
                   onChange={(e) => onChange("phone", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Nhập số điện thoại"
                   required
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Địa chỉ Email</span>
+
+              {/* Email */}
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Địa chỉ Email
+                </span>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => onChange("email", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                  placeholder="Địa chỉ Email"
+                  placeholder="example@email.com"
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Địa chỉ <span style={{color: "red"}}>(*)</span></span>
+
+              {/* Địa chỉ */}
+              <label className="flex flex-col gap-1 md:col-span-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Địa chỉ <span className="text-red-500">*</span>
+                </span>
                 <input
                   type="text"
                   value={form.address}
                   onChange={(e) => onChange("address", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                  placeholder="Số nhà, đường, quận, TP"
+                  placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
                   required
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
-              </label>        
+              </label>
             </div>
           </>
           :
           tabRequest[2].code == tab.code ?//Thông tin việc làm
           <>
-            <div className="grid grid-cols-1 gap-4">
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Thu nhập từ lương</span>
-                <select className="w-full px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={form.salaryincome}
-                onChange={(e) => {onChange("salaryincome", e.target.value)}}>
-                  {
-                    salaryIncom.map((salary) =>
-                      <option value={salary.code}>{salary.name}</option>
-                    )
-                  }
-                </select>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {/* Thu nhập từ lương */}
+            <label className="flex flex-col gap-1 md:col-span-2">
+              <span className="text-sm font-medium text-gray-700">
+                Thu nhập từ lương
+              </span>
+              <select
+                value={form.salaryincome}
+                onChange={(e) => onChange("salaryincome", e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                          focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+              >
+                {salaryIncom.map((salary) => (
+                  <option key={salary.code} value={salary.code}>
+                    {salary.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {/* KHÔNG có lương */}
+            {form?.salaryincome === salaryIncom[0].code ? (
+              <label className="flex flex-col gap-1 md:col-span-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Thu nhập khác
+                </span>
+                <input
+                  type="text"
+                  value={form.otherincome}
+                  onChange={(e) => onChange("otherincome", e.target.value)}
+                  placeholder="Nhập nguồn thu nhập khác"
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                />
               </label>
-              {
-                form?.salaryincome === salaryIncom[0].code ?
-                <>                  
-                  <label className="flex flex-col">
-                    <span className="text-sm font-medium mb-1">Thu nhập khác</span>
+            ) : (
+              <>
+                {/* Tên công ty */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Tên công ty
+                  </span>
                   <input
                     type="text"
-                    value={form.otherincome}
-                    onChange={(e) => onChange("otherincome", e.target.value)}
-                    className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                    placeholder="Thu nhập khác"
+                    value={form.companyname}
+                    onChange={(e) => onChange("companyname", e.target.value)}
+                    placeholder="Tên công ty"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                              focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
-                  </label> 
-                </>
-                :
-                <>
-                  <label className="flex flex-col">
-                    <span className="text-sm font-medium mb-1">Tên công ty</span>
-                    <input
-                      type="text"
-                      value={form.companyname}
-                      onChange={(e) => onChange("companyname", e.target.value)}
-                      className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="Tên công ty"
-                    />
-                  </label> 
-                  <label className="flex flex-col">
-                    <span className="text-sm font-medium mb-1">Vị trí</span>
-                    <input
-                      type="text"
-                      value={form.jobtitle}
-                      onChange={(e) => onChange("jobtitle", e.target.value)}
-                      className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="Vị trí"
-                    />
-                  </label> 
-                  <label className="flex flex-col">
-                    <span className="text-sm font-medium mb-1">Phòng ban</span>
-                    <input
-                      type="text"
-                      value={form.department}
-                      onChange={(e) => onChange("department", e.target.value)}
-                      className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="Phòng ban"
-                    />
-                  </label> 
-                  <label className="flex flex-col">
-                    <span className="text-sm font-medium mb-1">Số điện thoại công ty</span>
-                    <input
-                      type="text"
-                      value={form.companyphone}
-                      onChange={(e) => onChange("companyphone", e.target.value)}
-                      className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="Số điện thoại công ty"
-                    />
-                  </label> 
-                  <label className="flex flex-col">
-                    <span className="text-sm font-medium mb-1">Thu nhập hàng tháng</span>
-                    <select className="w-full px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                    defaultValue={form.monthincome}
-                    onChange={(e) => {onChange("monthincome", e.target.value)}}>
-                      {
-                        monthIncom.map((month) =>
-                          <option value={month.code}>{month.name}</option>
-                        )
-                      }
-                    </select>
-                  </label>
-                </>
-              }
-            </div>
+                </label>
+
+                {/* Vị trí */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Vị trí
+                  </span>
+                  <input
+                    type="text"
+                    value={form.jobtitle}
+                    onChange={(e) => onChange("jobtitle", e.target.value)}
+                    placeholder="Vị trí công tác"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                              focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  />
+                </label>
+
+                {/* Phòng ban */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Phòng ban
+                  </span>
+                  <input
+                    type="text"
+                    value={form.department}
+                    onChange={(e) => onChange("department", e.target.value)}
+                    placeholder="Phòng ban"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                              focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  />
+                </label>
+
+                {/* SĐT công ty */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Số điện thoại công ty
+                  </span>
+                  <input
+                    type="text"
+                    value={form.companyphone}
+                    onChange={(e) => onChange("companyphone", e.target.value)}
+                    placeholder="Số điện thoại công ty"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                              focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  />
+                </label>
+
+                {/* Thu nhập hàng tháng */}
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    Thu nhập hàng tháng
+                  </span>
+                  <select
+                    value={form.monthincome}
+                    onChange={(e) => onChange("monthincome", e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                              focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  >
+                    {monthIncom.map((month) => (
+                      <option key={month.code} value={month.code}>
+                        {month.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </>
+            )}
+          </div>
           </>
           :
           tabRequest[3].code == tab.code ?//Thông tin tín dụng
           <>
-            <div className="grid grid-cols-1 gap-4">
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Mục đích vay</span>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <label className="flex flex-col gap-1 md:col-span-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Mục đích vay
+                </span>
                 <input
                   type="text"
                   value={form.loanpurpose}
                   onChange={(e) => onChange("loanpurpose", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                   placeholder="Mục đích vay"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Dư nợ tại các ngân hàng khác</span>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Dư nợ tại các ngân hàng khác
+                </span>
                 <input
                   type="text"
                   value={form.outstandingloansatotherbanks}
-                  onChange={(e) => onChange("outstandingloansatotherbanks", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                  placeholder="Dư nợ tại các ngân hàng khác"
+                  onChange={(e) =>
+                    onChange("outstandingloansatotherbanks", e.target.value)
+                  }
+                  placeholder="Dư nợ hiện tại"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Số tiền muốn vay</span>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Số tiền muốn vay
+                </span>
                 <input
                   type="text"
                   value={form.loanamountrequested}
-                  onChange={(e) => onChange("loanamountrequested", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  onChange={(e) =>
+                    onChange("loanamountrequested", e.target.value)
+                  }
                   placeholder="Số tiền muốn vay"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Tài sản đảm bảo</span>
+
+              <label className="flex flex-col gap-1 md:col-span-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Tài sản đảm bảo
+                </span>
                 <input
                   type="text"
                   value={form.collateral}
                   onChange={(e) => onChange("collateral", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                  placeholder="Tài sản đảm bảo"
+                  placeholder="Nhà đất, ô tô, tài sản khác"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Địa chỉ sổ đỏ</span>
+
+              <label className="flex flex-col gap-1 md:col-span-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Địa chỉ sổ đỏ
+                </span>
                 <input
                   type="text"
                   value={form.redbookaddress}
                   onChange={(e) => onChange("redbookaddress", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                  placeholder="Số nhà, đường, quận, TP (Địa chỉ trên sổ đỏ)"
+                  placeholder="Địa chỉ ghi trên sổ đỏ"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
-              <label className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Thông tin khác</span>
+
+              <label className="flex flex-col gap-1 md:col-span-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Thông tin khác
+                </span>
                 <input
                   type="text"
                   value={form.otherinfo}
                   onChange={(e) => onChange("otherinfo", e.target.value)}
-                  className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                  placeholder="Thông tin khác"
+                  placeholder="Thông tin bổ sung (nếu có)"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                            focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
             </div>
-            <div className="mt-6 text-end gap-3">
+
+            {/* Action buttons */}
+            <div className="mt-8 flex justify-end gap-3">
               <button
                 type="submit"
                 disabled={loading}
-                className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
+                className={`inline-flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-medium
+                  ${
+                    loading
+                      ? "bg-gray-200 text-gray-600"
+                      : "bg-emerald-600 text-white hover:bg-emerald-700"
                   }`}
               >
-                <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Lưu yêu cầu"}
+                <Send className="h-4 w-4" />
+                {loading ? "Đang gửi..." : "Lưu yêu cầu"}
               </button>
+
               <button
                 type="button"
                 onClick={() => {
                   setForm(defaultForm);
                   setImages([]);
                 }}
-                className="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-5 py-2 text-sm
+                          text-gray-700 hover:bg-gray-50"
               >
-                <Recycle className="h-5 w-5"/>&nbsp;Làm lại
+                <Recycle className="h-4 w-4" />
+                Làm lại
               </button>
             </div>
           </>
@@ -719,17 +854,20 @@ export default function RequestCustomerPage(): JSX.Element {
                 </div>
               </div>
               
-              <div className="mt-6 text-end gap-3">
+              <div className="mt-8 flex justify-end gap-3">
                 <button
                   type="button"
                   disabled={loading}
-                  className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-medium mr-2 ${loading
-                    ? "bg-gray-200 text-gray-700"
-                    : "bg-[#92B83D] text-white hover:bg-[#7DA22F]"
-                    }`}
                   onClick={handleSendEmail}
+                  className={`inline-flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-medium
+                    ${
+                      loading
+                        ? "bg-gray-200 text-gray-600 cursor-not-allowed"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700"
+                    }`}
                 >
-                  <Send className="h-5 w-5"/>&nbsp;{loading ? "Đang gửi..." : "Hoàn tất yêu cầu"}
+                  <Send className="h-4 w-4" />
+                  {loading ? "Đang gửi..." : "Hoàn tất yêu cầu"}
                 </button>
               </div>
             </div>
