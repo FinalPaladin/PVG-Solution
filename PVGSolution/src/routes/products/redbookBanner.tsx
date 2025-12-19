@@ -7,6 +7,7 @@ import { paths } from "@/commons/paths";
 export function RedBookBanner() {
   const { webConfig } = useWebConfig();
   const navigate = useNavigate();
+  
   return (
     <div className="mt-6">
       {/* Căn giữa giống phần danh sách sản phẩm */}
@@ -40,7 +41,7 @@ export function RedBookBanner() {
                     ✓
                   </span>
                   <span>
-                    Hạn mức vay đến <b>5 tỷ</b>
+                    Hạn mức vay đến <b>100% giá trị tài sản</b>
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -79,7 +80,7 @@ export function RedBookBanner() {
                 <div>
                   <p className="text-lg font-semibold text-slate-900">1.500+</p>
                   <p className="text-xs text-slate-500">
-                    Khách hàng đã được hỗ trợ tại TP HCM &amp; Bình Dương
+                    Khách hàng đã được hỗ trợ trên toàn quốc
                   </p>
                 </div>
                 <div>

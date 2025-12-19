@@ -59,7 +59,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <RedBookBanner />
+      <RedBookBanner idproduct={products && products.length > 0 ? products[0].id : ""}/>
 
       <h1 className="text-3xl font-bold mb-6 mt-6">
         Danh sách sản phẩm cần tư vấn
