@@ -1,12 +1,6 @@
 import { type JSX, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import {
-  Menu,
-  ChevronLeft,
-  User2,
-  LogOut,
-  Info,
-} from "lucide-react";
+import { Menu, ChevronLeft, User2, LogOut, Info } from "lucide-react";
 import {
   Popover,
   PopoverTrigger,
@@ -17,6 +11,7 @@ import { useWebConfig } from "@/auth/webConfigContext";
 import { useAlert } from "@/stores/useAlertStore";
 import type { IPageModel } from "@/models/admin/page.model";
 import { useGetMenu } from "@/commons/permission";
+import "@/styles/tiptap.css";
 
 export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
@@ -56,7 +51,7 @@ export default function AdminLayout(): JSX.Element {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <aside
-        className={`relative h-screen border-r border-gray-200 bg-white flex flex-col transition-all duration-300 ${
+        className={`relative min-h-screen border-r bg-white flex flex-col transition-all duration-300 ${
           collapsed ? "w-20" : "w-72"
         }`}
       >
@@ -91,21 +86,19 @@ export default function AdminLayout(): JSX.Element {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {
-            useGetMenu().map((page: IPageModel) => 
-              <Link
-                to={page.path}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive(page.path)
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                {page.pathIcon}
-                {!collapsed && <span>{page.pathName}</span>}
-              </Link>
-            )
-          }
+          {useGetMenu().map((page: IPageModel) => (
+            <Link
+              to={page.path}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                isActive(page.path)
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {page.pathIcon}
+              {!collapsed && <span>{page.pathName}</span>}
+            </Link>
+          ))}
         </nav>
 
         {/* User box bottom-left + Popover */}

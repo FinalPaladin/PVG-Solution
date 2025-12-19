@@ -44,3 +44,11 @@ export function newsCategoryUpdate(
 export function newsCategoryDelete(id: string) {
   return requestAdmin.delete<unknown, BaseResponse>(`/api/news/category/${id}`);
 }
+
+// Get All (GET)
+export function newsCategoryGetAll() {
+  return requestAdmin.get<
+    unknown,
+    BaseResponse<{ id: string; name: string }[]>
+  >(`/api/news/category/all`);
+}
