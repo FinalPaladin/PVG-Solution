@@ -12,13 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { newsCreate, newsUpdate } from "@/api/admin/adNews.api";
+import { newsCreate, newsGetById, newsUpdate } from "@/api/admin/adNews.api";
 import type { NewsCreateRequest } from "@/models/admin/news.model";
 import { newsCategoryGetAll } from "@/api/admin/adNewsCategory";
 import { mediaImageUpload } from "@/api/requestCustomer";
 import NewsEditor from "@/components/Controls/Editor/editor";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/Controls/DatePicker/datePicker";
+import { useAlert } from "@/stores/useAlertStore";
 
 type Category = {
   id: string;
@@ -27,12 +28,12 @@ type Category = {
 
 export default function NewsFormPage() {
   const navigate = useNavigate();
-  const { newsId, categoryId: categoryFromUrl } = useParams();
+  const { id: newsId } = useParams<{ id?: string }>();
   const isEdit = !!newsId;
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryId, setCategoryId] = useState(categoryFromUrl || "");
-  const [slug] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [slug, setSlug] = useState("");
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
 
@@ -48,14 +49,49 @@ export default function NewsFormPage() {
   });
 
   useEffect(() => {
-    newsCategoryGetAll().then((res) => {
-      if (res.isSuccess && res.result) setCategories(res.result);
-    });
+    const init = async () => {
+      try {
+        // load categories
+        const cateRes = await newsCategoryGetAll();
+        if (cateRes.isSuccess && cateRes.result) {
+          setCategories(cateRes.result);
+        }
 
-    if (isEdit) {
-      // TODO: load detail
-    }
-  }, [isEdit]);
+        // load detail khi edit
+        if (isEdit && newsId) {
+          const res = await newsGetById(newsId);
+          if (!res.isSuccess || !res.result) return;
+
+          const data = res.result;
+
+          setForm({
+            title: data.title || "",
+            description: data.description || "",
+            content: data.content || "",
+            publishDate: data.publishDate || "",
+            expireDate: data.expireDate || "",
+            active: data.active,
+            displayOrder: data.displayOrder ?? 0,
+            isApproved: data.isApproved ?? false,
+          });
+
+          if (data.categoryId) {
+            setCategoryId(data.categoryId);
+          }
+
+          setSlug(data.slug || "");
+
+          if (data.thumbnail) {
+            setImagePreview(data.thumbnail);
+          }
+        }
+      } catch {
+        useAlert.getState().showError("Đã xảy ra lỗi khi tải dữ liệu");
+      }
+    };
+
+    init();
+  }, [isEdit, newsId]);
 
   const setValue = (key: keyof NewsCreateRequest, value: unknown) => {
     setForm((prev) => ({ ...prev, [key]: value }));
