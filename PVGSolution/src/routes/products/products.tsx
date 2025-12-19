@@ -33,7 +33,7 @@ export default function ProductsPage() {
         if (res.isSuccess && res.result) {
           setCategories(res.result.categories);
           setProducts(res.result.products);
-
+          
           // default tab = first category (thường là "")
           setValue(res.result.categories?.[0]?.id ?? "");
         }
