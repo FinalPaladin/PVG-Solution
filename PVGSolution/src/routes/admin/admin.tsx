@@ -1,17 +1,11 @@
 import { type JSX, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
-  ClipboardList,
   Menu,
   ChevronLeft,
   User2,
   LogOut,
   Info,
-  Cog,
-  SquareAsterisk,
-  ChartBarStacked,
-  SquareChartGantt,
 } from "lucide-react";
 import {
   Popover,
@@ -19,9 +13,10 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { useAuth } from "../../auth/authContext";
-import { adminPaths } from "@/commons/paths";
 import { useWebConfig } from "@/auth/webConfigContext";
 import { useAlert } from "@/stores/useAlertStore";
+import type { IPageModel } from "@/models/admin/page.model";
+import { useGetMenu } from "@/commons/permission";
 
 export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
@@ -96,73 +91,21 @@ export default function AdminLayout(): JSX.Element {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          <Link
-            to={adminPaths.ADMIN}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive(adminPaths.ADMIN)
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <LayoutDashboard className="h-5 w-5" />
-            {!collapsed && <span>Dashboard</span>}
-          </Link>
-
-          <Link
-            to={adminPaths.ADMIN_REQUESTS}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive(adminPaths.ADMIN_REQUESTS)
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <ClipboardList className="h-5 w-5" />
-            {!collapsed && <span>Quản lý Yêu cầu khách</span>}
-          </Link>
-          <Link
-            to={adminPaths.ADMIN_CONFIG}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive(adminPaths.ADMIN_CONFIG)
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <Cog className="h-5 w-5" />
-            {!collapsed && <span>Cài đặt</span>}
-          </Link>
-          <Link
-            to={adminPaths.ADMIN_CHANGEPASSWORD}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive(adminPaths.ADMIN_CHANGEPASSWORD)
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <SquareAsterisk className="h-5 w-5" />
-            {!collapsed && <span>Đổi mật khẩu</span>}
-          </Link>
-          <Link
-            to={adminPaths.ADMIN_PRODUCTCATEGORY}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive(adminPaths.ADMIN_PRODUCTCATEGORY)
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <ChartBarStacked className="h-5 w-5" />
-            {!collapsed && <span>Danh mục sản phẩm</span>}
-          </Link>
-          <Link
-            to={adminPaths.ADMIN_PRODUCT}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive(adminPaths.ADMIN_PRODUCT)
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <SquareChartGantt className="h-5 w-5" />
-            {!collapsed && <span>Sản phẩm</span>}
-          </Link>
+          {
+            useGetMenu().map((page: IPageModel) => 
+              <Link
+                to={page.path}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  isActive(page.path)
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {page.pathIcon}
+                {!collapsed && <span>{page.pathName}</span>}
+              </Link>
+            )
+          }
         </nav>
 
         {/* User box bottom-left + Popover */}

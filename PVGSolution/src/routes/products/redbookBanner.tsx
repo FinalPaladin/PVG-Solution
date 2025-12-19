@@ -1,9 +1,22 @@
 import { Button } from "@/components/ui/button";
 // import bannerImg from "@/assets/images/product-banner.png";
 import { useWebConfig } from "@/auth/webConfigContext";
+import { useNavigate } from "react-router-dom";
+import { paths } from "@/commons/paths";
 
-export function RedBookBanner() {
-  const {webConfig} = useWebConfig();
+export function RedBookBanner({idproduct}: {idproduct: string}) {
+    const {webConfig} = useWebConfig();
+    const navigate = useNavigate();
+
+    const requestCus = () => {
+        if(idproduct){
+            navigate(paths.REQUEST.replace(
+                                ":idproduct",
+                                idproduct
+                            ));
+        }
+    }
+
     return (
         <div className="mt-6">
             {/* Căn giữa giống phần danh sách sản phẩm */}
@@ -34,7 +47,7 @@ export function RedBookBanner() {
                                         ✓
                                     </span>
                                     <span>
-                                        Hạn mức vay đến <b>5 tỷ</b>
+                                        Hạn mức vay đến <b>100% giá trị tài sản</b>
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-2">
@@ -53,7 +66,7 @@ export function RedBookBanner() {
 
                             {/* CTA */}
                             <div className="flex flex-wrap items-center gap-4 pt-2">
-                                <Button size="lg" className="rounded-full px-7 shadow-sm">
+                                <Button size="lg" className="rounded-full px-7 shadow-sm" type="button" onClick={requestCus}>
                                     Đăng ký nhận tư vấn miễn phí
                                 </Button>
                                 <p className="text-xs md:text-sm text-slate-500">
@@ -66,7 +79,7 @@ export function RedBookBanner() {
                                 <div>
                                     <p className="text-lg font-semibold text-slate-900">1.500+</p>
                                     <p className="text-xs text-slate-500">
-                                        Khách hàng đã được hỗ trợ tại TP HCM &amp; Bình Dương
+                                        Khách hàng đã được hỗ trợ <b>trên toàn quốc</b>
                                     </p>
                                 </div>
                                 <div>
