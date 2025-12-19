@@ -2,7 +2,7 @@ import type { IPageModel } from "@/models/admin/page.model";
 import { adminPaths } from "./paths";
 import { hashpermission } from "./const";
 import { useAuth } from "@/auth/authContext";
-import { ChartBarStacked, ClipboardList, Cog, LayoutDashboard, SquareAsterisk, SquareChartGantt } from "lucide-react";
+import { ChartBarStacked, ClipboardList, Cog, LayoutDashboard, Newspaper, SquareAsterisk, SquareChartGantt } from "lucide-react";
 
 const permissionPages = [
     {
@@ -60,6 +60,13 @@ const permissionPages = [
         pathName: "Sản phẩm chi tiết",
         permissions: [hashpermission.admin_system],
         isMenu: false
+    },
+    {
+        path: adminPaths.ADMIN_NEWS,
+        pathIcon: <Newspaper className="h-5 w-5" />,
+        pathName: "Tin tức",
+        permissions: [hashpermission.admin_system],
+        isMenu: true
     },
 ] as IPageModel[];
 
