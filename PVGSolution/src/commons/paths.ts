@@ -7,7 +7,7 @@ export const paths = {
   PRODUCT_DETAIL: `${BASE_URL}/san-pham/:id`,
   NEWS: `${BASE_URL}/tin-tuc`,
   NEWS_DETAIL: `${BASE_URL}/tin-tuc/:category/:slug`,
-  REQUEST: `${BASE_URL}/gui-yeu-cau`,
+  REQUEST: `${BASE_URL}/gui-yeu-cau/:idproduct`,
   SUPPORT: `${BASE_URL}/ho-tro`,
   INITWEB: `${BASE_URL}/initweb`,
   SUCCESS: `${BASE_URL}/thanh-cong`,

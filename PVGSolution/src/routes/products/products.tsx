@@ -52,18 +52,14 @@ export default function ProductsPage() {
   // ===== Filter products by category =====
   const filteredProducts = useMemo(() => {
     if (!value) return products;
-    return products.filter(
-      (p) => value === "all" || p.productCategoryId === value
-    );
+    return products.filter((p) => p.productCategoryId === value);
   }, [products, value]);
 
   return (
     <>
-      <RedBookBanner/>
+      <RedBookBanner idproduct={products && products.length > 0 ? products[0].id : ""}/>
 
-      <h1 className="text-3xl font-bold mb-6 mt-6">
-        Danh sách sản phẩm cần tư vấn
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 mt-6">Danh sách sản phẩm cần tư vấn</h1>
 
       {/* ===== Mobile select ===== */}
       <div className="md:hidden mb-4">
@@ -74,7 +70,7 @@ export default function ProductsPage() {
         <Select
           value={value ?? "all"}
           onValueChange={(v) => {
-            setValue(v);
+            setValue(v === "all" ? "" : v);
           }}
         >
           <SelectTrigger className="w-full rounded-md border border-gray-200 px-4 py-3">
@@ -89,6 +85,7 @@ export default function ProductsPage() {
             ))}
           </SelectContent>
         </Select>
+
       </div>
 
       {/* ===== Desktop / Tablet tabs ===== */}
@@ -154,9 +151,10 @@ export default function ProductsPage() {
               <CardFooter className="flex gap-3 px-6 pb-6">
                 <Button
                   className="bg-[#9cc31c] hover:bg-[#8bb019] text-white flex-1 rounded-md"
-                  onClick={() =>
-                    navigate(paths.REQUEST.replace(":idproduct", item.id))
-                  }
+                  onClick={() => navigate(paths.REQUEST.replace(
+                    ":idproduct",
+                    item.id
+                  ))}
                 >
                   Đăng ký ngay
                 </Button>
