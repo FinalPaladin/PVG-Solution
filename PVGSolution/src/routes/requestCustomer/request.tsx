@@ -39,13 +39,13 @@ type FormState = {
   phone: string;
   address: string;
   redbookaddress: string;
-  birthday: Date;
+  birthday: string;
   age: number;
   gender: string;
   cccd: string;
   cmnd: string;
   placeofissue: string;
-  dateofissue: Date;
+  dateofissue: string;
   nationality: string;
   maritalstatus: string;
   email: string;
@@ -74,18 +74,25 @@ const tabRequest = [
   {code: 5, name: "TẢI HÌNH ẢNH", percent: 99, text: "Bước 5/5"},
 ]
 
+const today = new Date();
+const todayString =
+  today.getFullYear() +
+  "-" +
+  String(today.getMonth() + 1).padStart(2, "0") +
+  "-" +
+  String(today.getDate()).padStart(2, "0");
 const defaultForm = {
     fullname: "",
     phone: "",
     address: "",
     redbookaddress: "",
     age: 0,
-    birthday: new Date(),
+    birthday: todayString,
     gender: "Nam",
     cccd: "",
     cmnd: "",
     placeofissue: "",
-    dateofissue: new Date(),
+    dateofissue: todayString,
     nationality: "Việt Nam",
     email: "",
     maritalstatus: matialStatus[0].code,
@@ -163,13 +170,23 @@ export default function RequestCustomerPage(): JSX.Element {
       if (!executeRecaptcha) return;
       const token = await executeRecaptcha("request");
 
-      const birthDayStr = form.birthday.toISOString().split("T")[0];
-      const dateCCCDStr = form.birthday.toISOString().split("T")[0];
+      if(!form.birthday)
+      {
+        useAlert.getState().show("Ngày sinh chưa nhập hoàn tất.", "warning");
+        return;
+      }
+
+      if(!form.dateofissue)
+      {
+        useAlert.getState().show("Ngày cấp CCCD chưa nhập hoàn tất.", "warning");
+        return;
+      }
+
       const ageStr = form.age.toString();
 
       const data = Object.entries(form).map(([key, value]) => ({
         key: key,
-        value: (key == "birthday") ? birthDayStr : (key == "dateofissue") ? dateCCCDStr : (key === 'age') ? ageStr : value
+        value: (key === 'age') ? ageStr : value
       }));
 
       const payload = {
@@ -386,25 +403,12 @@ export default function RequestCustomerPage(): JSX.Element {
                   <span className="text-red-500 ml-1">*</span>
                 </span>
                 <input
-                    type="date"
-                    value={
-                      form.birthday
-                        ? form.birthday.toISOString().split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (!value) {
-                        onChange("birthday", new Date());
-                        return;
-                      }
-
-                      const [y, m, d] = value.split("-").map(Number);
-                      onChange("birthday", new Date(y, m - 1, d));
-                    }}
-                    className="h-10 rounded-md border border-gray-300 px-3 text-sm
-                              focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
-                  />
+                  type="date"
+                  value={form.birthday ?? ""}
+                  onChange={(e) => onChange("birthday", e.target.value)}
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+                />
               </label>
 
               {/* Tuổi */}
@@ -462,25 +466,12 @@ export default function RequestCustomerPage(): JSX.Element {
                   <span className="text-red-500 ml-1">*</span>
                 </span>
                 <input
-                    type="date"
-                    value={
-                      form.dateofissue
-                        ? form.dateofissue.toISOString().split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (!value) {
-                        onChange("dateofissue", new Date());
-                        return;
-                      }
-
-                      const [y, m, d] = value.split("-").map(Number);
-                      onChange("dateofissue", new Date(y, m - 1, d));
-                    }}
-                    className="h-10 rounded-md border border-gray-300 px-3 text-sm
-                              focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
-                  />
+                  type="date"
+                  value={form.dateofissue ?? ""}
+                  onChange={(e) => onChange("dateofissue", e.target.value)}
+                  className="h-10 rounded-md border border-gray-300 px-3 text-sm
+                            focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+                />
               </label>
 
               {/* CMND */}

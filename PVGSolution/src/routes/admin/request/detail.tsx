@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useAuth } from "@/auth/authContext";
 import { useAlert } from "@/stores/useAlertStore";
+import { adminPaths } from "@/commons/paths";
 
 export default function RequestDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
@@ -158,32 +159,60 @@ export default function RequestDetail(): JSX.Element {
 
   return (
     <div className="max-w-3xl">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">Chi tiết yêu cầu / {request.productName}</h1>
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-lg font-semibold sm:text-2xl leading-snug">
+          Chi tiết yêu cầu
+          <span className="block text-sm font-normal text-gray-500 sm:inline sm:text-base">
+            {" / "}{request.productName}
+          </span>
+        </h1>
       </div>
-
-      <div className="flex items-center justify-between mb-4">
-        <Link to="/admin/requests" className="text-sm text-gray-600">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Back */}
+        <Link
+          to={adminPaths.ADMIN_REQUESTS}
+          className="inline-flex items-center gap-2
+                    rounded-md border border-green-300
+                    px-3 py-1.5
+                    text-sm font-medium
+                    text-green-700
+                    bg-gradient-to-r from-green-50 to-green-100
+                    hover:from-green-100 hover:to-green-200
+                    transition-all">
+          <span className="text-base">←</span>
           Quay lại
         </Link>
+
+        {/* Action */}
         {isProcessed ? (
           <Button
             type="button"
-            className="bg-[#388700]  hover:bg-[white] hover:text-[black]"
+            disabled
+            className="inline-flex items-center justify-center
+                      w-full sm:w-auto
+                      px-4 py-2 rounded-md font-medium
+                      bg-[#388700] text-white
+                      cursor-default"
           >
-            Đã duyệt
+            Đã hoàn tất
           </Button>
         ) : (
           <Button
             type="button"
             onClick={handleProcessed}
-            className="bg-[#8FA3FF] hover:bg-[white] hover:text-[black]"
-          >
-            <span className="flex">
+            className="inline-flex items-center justify-center gap-2
+                      w-full sm:w-auto
+                      px-4 py-2 rounded-md font-medium
+                      text-white
+                      bg-gradient-to-r from-blue-500 to-indigo-600
+                      hover:from-blue-600 hover:to-indigo-700
+                      focus:outline-none focus:ring-2 focus:ring-indigo-200
+                        transition-all"
+            >
               <Check className="h-5 w-5" />
-              &nbsp;Duyệt
-            </span>
-          </Button>
+              Xác nhận
+            </Button>
+
         )}
       </div>
       <div>

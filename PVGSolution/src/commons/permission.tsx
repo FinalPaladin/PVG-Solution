@@ -75,9 +75,3 @@ export const useGetMenu = () => {
     const data = permissionPages.filter(x => x.permissions.includes(auth?.permission ? auth?.permission : "") && x.isMenu)
     return data;
 }
-
-export const useGetPath = () => {
-    const { auth } = useAuth();
-    const data = permissionPages.filter(x => x.permissions.includes(auth?.permission ? auth?.permission : ""))
-    return data;
-}
