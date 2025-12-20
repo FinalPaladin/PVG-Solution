@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import { useEffect } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -24,12 +25,12 @@ export default function NewsEditor({ value, onChange }: Props) {
         placeholder: "Nhập nội dung tin tức...",
       }),
     ],
-    content: value,
+    content: value || "", // initial
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
     editorProps: {
-      handlePaste(view, event) {
+      handlePaste(_, event) {
         const items = event.clipboardData?.items;
         if (!items) return false;
 
@@ -43,7 +44,7 @@ export default function NewsEditor({ value, onChange }: Props) {
         return false;
       },
 
-      handleDrop(view, event) {
+      handleDrop(_, event) {
         const files = event.dataTransfer?.files;
         if (!files || files.length === 0) return false;
 
@@ -56,6 +57,16 @@ export default function NewsEditor({ value, onChange }: Props) {
       },
     },
   });
+
+  // ✅ SYNC value -> editor (QUAN TRỌNG)
+  useEffect(() => {
+    if (!editor) return;
+
+    const current = editor.getHTML();
+    if (value !== current) {
+      editor.commands.setContent(value || "");
+    }
+  }, [value, editor]);
 
   const uploadImage = async (file: File) => {
     if (file.size > MAX_IMAGE_SIZE) {
@@ -75,77 +86,35 @@ export default function NewsEditor({ value, onChange }: Props) {
     <div className="space-y-2">
       {/* Toolbar */}
       <div className="flex flex-wrap gap-1 border rounded-md p-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleBold().run()}>
           B
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleItalic().run()}>
           I
         </Button>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
           H1
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
           H2
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run()
-          }
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
           H3
         </Button>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleBulletList().run()}>
           • List
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleOrderedList().run()}>
           1. List
         </Button>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        >
+        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleBlockquote().run()}>
           Quote
         </Button>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => document.getElementById("editorUpload")?.click()}
-        >
+        <Button size="sm" variant="outline" onClick={() => document.getElementById("editorUpload")?.click()}>
           Ảnh
         </Button>
 
@@ -159,7 +128,7 @@ export default function NewsEditor({ value, onChange }: Props) {
       </div>
 
       {/* Editor */}
-      <div className="rounded-md border p-3">
+      <div className="rounded-md border p-3 min-h-[300px]">
         <EditorContent editor={editor} />
       </div>
     </div>
