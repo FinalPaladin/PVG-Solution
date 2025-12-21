@@ -7,6 +7,15 @@ import type { IImageConfigurationModel, IObjConfigurationModel } from "@/models/
 import { useAlert } from "@/stores/useAlertStore";
 import { Save } from "lucide-react";
 import { useEffect, useState, type JSX } from "react";
+import imageCompression from 'browser-image-compression';
+
+const optionsResizeImg = {
+    maxSizeMB: 1, // tối đa 1MB sau khi nén
+    maxWidthOrHeight: 1920,        // chỉ giới hạn cạnh lớn
+    useWebWorker: true,
+    initialQuality: 0.8,          // 🔑 quan trọng
+    fileType: "image/jpeg",
+};
 
 export default function ConfigurationPage(): JSX.Element {
     const { auth } = useAuth();
@@ -91,18 +100,24 @@ export default function ConfigurationPage(): JSX.Element {
         }
     }
 
-    const AddImg = (_key: string, _img: File) => {
+    const compressImage = async (file: File) => {
+        return await imageCompression(file, optionsResizeImg);
+    }
+
+    const AddImg = async (_key: string, _img: File) => {
         if (!_img || !_key) {
             useAlert.getState().showError(`Thêm hình ảnh thất bại`);
             return;
         }
 
+        const newFile = await compressImage(_img);
+        
         const imgItem = [...dataImg].find(x => x.key === _key);
         if (imgItem) {
-            imgItem.imgFile = _img;
+            imgItem.imgFile = newFile;
         }
         else {
-            setDataImg([...dataImg, { imgFile: _img, key: _key } as IImageConfigurationModel]);
+            setDataImg([...dataImg, { imgFile: newFile, key: _key } as IImageConfigurationModel]);
         }
     }
     

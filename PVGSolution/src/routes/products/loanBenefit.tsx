@@ -1,11 +1,14 @@
+import { useWebConfig } from "@/auth/webConfigContext";
+
 export function LoanBenefits() {
+    const { webConfig } = useWebConfig();
     return (
         <section className="w-full mt-6">
             <div className="max-w-7xl mx-auto">
 
                 {/* Title */}
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">
-                    Lợi ích khi lựa chọn sản phẩm vay tại PVG Solution
+                    Lợi ích khi lựa chọn sản phẩm vay tại {webConfig.WebName}
                 </h2>
 
                 {/* Benefit cards */}
