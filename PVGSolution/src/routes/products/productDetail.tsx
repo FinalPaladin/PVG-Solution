@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { paths } from "@/commons/paths";
+import { useIsMobile } from "@/components/hooks/isMobileHook";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 // --- Types ---
 export type TabKey = "info" | "docs" | "process" | "fee";
@@ -54,6 +57,7 @@ export default function ProductInfoPage(): JSX.Element {
   const [active, setActive] = useState<TabKey>("info");
   const [product, setProduct] = useState<ProductResponseModel | null>(null);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -80,6 +84,39 @@ export default function ProductInfoPage(): JSX.Element {
 
     fetchDetail();
   }, [id]);
+
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setSelectedIndex(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setSelectedIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  const infoItems = [
+    {
+      Icon: DollarSign,
+      title: "Mức vay",
+      body: product?.loanAmount ?? "Linh hoạt",
+    },
+    {
+      Icon: Shield,
+      title: "Lãi suất",
+      body: "Cạnh tranh theo chính sách hiện hành",
+    },
+    {
+      Icon: Zap,
+      title: "Thời hạn vay",
+      body: product?.loanTerm ?? "Linh hoạt",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-white text-gray-800">
@@ -148,23 +185,43 @@ export default function ProductInfoPage(): JSX.Element {
         </section>
 
         {/* --- Info cards --- */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <InfoCard
-            Icon={DollarSign}
-            title="Mức vay"
-            body={product?.loanAmount ?? "Linh hoạt"}
-          />
-          <InfoCard
-            Icon={Shield}
-            title="Lãi suất"
-            body="Cạnh tranh theo chính sách hiện hành"
-          />
-          <InfoCard
-            Icon={Zap}
-            title="Thời hạn vay"
-            body={product?.loanTerm ?? "Linh hoạt"}
-          />
-        </section>
+        {/* MOBILE */}
+        {isMobile && (
+          <div className="mb-10">
+            <Carousel
+              setApi={setApi}
+              plugins={[
+                Autoplay({
+                  delay: 3000,
+                  stopOnInteraction: false,
+                }),
+              ]}
+            >
+              <CarouselContent>
+                {infoItems.map((item, idx) => (
+                  <CarouselItem key={idx} className="px-1">
+                    <InfoCard {...item} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+
+            {/* DOTS */}
+            <div className="mt-4 flex justify-center gap-2">
+              {Array.from({ length: count }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => api?.scrollTo(index)}
+                  className={`h-2 w-2 rounded-full transition-all ${index === selectedIndex
+                    ? "bg-green-600"
+                    : "bg-gray-300"
+                    }`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
 
         {/* Tabs */}
         <div className="mb-6">
@@ -173,11 +230,10 @@ export default function ProductInfoPage(): JSX.Element {
               <button
                 key={t.key}
                 onClick={() => setActive(t.key)}
-                className={`relative pb-2 text-lg font-medium ${
-                  active === t.key
-                    ? "text-[#14532d]"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
+                className={`relative pb-2 text-lg font-medium ${active === t.key
+                  ? "text-[#14532d]"
+                  : "text-gray-600 hover:text-gray-800"
+                  }`}
               >
                 {t.label}
                 {active === t.key && (
