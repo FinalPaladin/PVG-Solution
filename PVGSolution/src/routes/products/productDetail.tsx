@@ -186,7 +186,7 @@ export default function ProductInfoPage(): JSX.Element {
 
         {/* --- Info cards --- */}
         {/* MOBILE */}
-        {isMobile && (
+        {isMobile ? (
           <div className="mb-10">
             <Carousel
               setApi={setApi}
@@ -220,6 +220,12 @@ export default function ProductInfoPage(): JSX.Element {
               ))}
             </div>
           </div>
+        ) : (
+          <section className="hidden md:grid grid-cols-3 gap-6 mb-10">
+            {infoItems.map((item, idx) => (
+              <InfoCard key={idx} {...item} />
+            ))}
+          </section>
         )}
 
 
@@ -269,7 +275,7 @@ export default function ProductInfoPage(): JSX.Element {
 
         <FAQSection />
       </div>
-    </div>
+    </div >
   );
 }
 
