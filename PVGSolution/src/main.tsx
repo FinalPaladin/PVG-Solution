@@ -11,6 +11,7 @@ import { GlobalErrorAlert } from "./components/common/errorDialog.tsx";
 import { WebConfigProvider } from "./auth/webConfigContext.ts";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { hashpermission } from "./commons/const.ts";
+import { HelmetProvider } from "react-helmet-async";
 
 // user site
 const HomePage = React.lazy(() => import("./routes/index.tsx"));
@@ -91,69 +92,69 @@ const router = createBrowserRouter([
         path: "",
         element: <Admin />, // layout admin
         children: [
-          { 
+          {
             index: true, element: <AdminDashboard />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_mkt, hashpermission.admin_sales]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt, hashpermission.admin_sales] }
           },
           {
             path: adminPaths.ADMIN_REQUESTS,
             element: <RequestCustomerAdmin />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_sales]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_sales] }
           },
           {
             path: adminPaths.ADMIN_REQUEST_DETAIL,
             element: <RequestCustomerDetail />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_sales]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_sales] }
           },
           {
             path: adminPaths.ADMIN_CONFIG,
             element: <AdminConfiguration />,
-            handle: {permissions: [hashpermission.admin_system]}
+            handle: { permissions: [hashpermission.admin_system] }
           },
           {
             path: adminPaths.ADMIN_CHANGEPASSWORD,
             element: <AdminChangePassword />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_mkt, hashpermission.admin_sales]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt, hashpermission.admin_sales] }
           },
           {
             path: adminPaths.ADMIN_PRODUCT,
             element: <AdminProduct />,
-            handle: {permissions: [hashpermission.admin_system]}
+            handle: { permissions: [hashpermission.admin_system] }
           },
           {
             path: adminPaths.ADMIN_PRODUCT_NEW,
             element: <AdminProductDetail />,
-            handle: {permissions: [hashpermission.admin_system]}
+            handle: { permissions: [hashpermission.admin_system] }
           },
           {
             path: adminPaths.ADMIN_PRODUCT_DETAIL,
             element: <AdminProductDetail />,
-            handle: {permissions: [hashpermission.admin_system]}
+            handle: { permissions: [hashpermission.admin_system] }
           },
           {
             path: adminPaths.ADMIN_PRODUCTCATEGORY,
             element: <AdminProductCategory />,
-            handle: {permissions: [hashpermission.admin_system]}
+            handle: { permissions: [hashpermission.admin_system] }
           },
           {
             path: adminPaths.ADMIN_NEWS,
             element: <AdminNews />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_mkt]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
           },
           {
             path: adminPaths.ADMIN_NEWS_UPDATE,
             element: <AdminNewsCreateOrUpdate />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_mkt]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
           },
           {
             path: adminPaths.ADMIN_NEWS_CREATE,
             element: <AdminNewsCreateOrUpdate />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_mkt]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
           },
           {
             path: adminPaths.ADMIN_NEWS_CATEGORY,
             element: <AdminNewsCategory />,
-            handle: {permissions: [hashpermission.admin_system, hashpermission.admin_mkt]}
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
           },
         ],
       },
@@ -163,15 +164,17 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <GoogleReCaptchaProvider
-      reCaptchaKey={import.meta.env.VITE_RECAPTCHAV3_KEY}
-    >
-      <WebConfigProvider>
-        <AuthProvider>
-          <RouterProvider router={router} />
-          <GlobalErrorAlert />
-        </AuthProvider>
-      </WebConfigProvider>
-    </GoogleReCaptchaProvider>
+    <HelmetProvider>
+      <GoogleReCaptchaProvider
+        reCaptchaKey={import.meta.env.VITE_RECAPTCHAV3_KEY}
+      >
+        <WebConfigProvider>
+          <AuthProvider>
+            <RouterProvider router={router} />
+            <GlobalErrorAlert />
+          </AuthProvider>
+        </WebConfigProvider>
+      </GoogleReCaptchaProvider>
+    </HelmetProvider>
   </StrictMode>
 );
