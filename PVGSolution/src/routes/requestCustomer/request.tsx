@@ -271,6 +271,7 @@ export default function RequestCustomerPage(): JSX.Element {
   }
 
   const handleSendEmail = async () => {
+    setLoading(true);
     try
     {
       const res = await SendEmailRequest(requestCode);
