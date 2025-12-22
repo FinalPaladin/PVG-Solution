@@ -4,6 +4,6 @@ import requestAdmin from "@/utils/requestAdmin";
 
 export function initDashboard() {
     return requestAdmin.get<unknown, BaseResponse<IRS_DashboardInitPageModel>>(
-        `/api/initpage/getall`
+        `/api/initpage/dashboard`
     );
 }
