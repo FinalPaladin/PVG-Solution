@@ -87,7 +87,7 @@ export default function AdminDashboard(): JSX.Element {
             Đã xử lý: <span className="font-semibold text-green-700">{data.requestYesterdayProcessed}</span>
           </p>
           <p className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestThisMonth - data.requestYesterdayProcessed}</span>
+            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestYesterday - data.requestYesterdayProcessed}</span>
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export default function AdminDashboard(): JSX.Element {
             Đã xử lý: <span className="font-semibold text-green-700">{data.requestThisWeekProcessed}</span>
           </p>
           <p className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestThisMonth - data.requestThisWeekProcessed}</span>
+            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestThisWeek - data.requestThisWeekProcessed}</span>
           </p>
         </div>
 

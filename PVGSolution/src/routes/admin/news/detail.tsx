@@ -148,18 +148,29 @@ export default function NewsFormPage() {
             <Button variant="outline" onClick={() => navigate(-1)}>
               Hủy
             </Button>
-
-            {isEdit && !form.isApproved && auth.permission === hashpermission.admin_system && (
-              <Button
-                variant="secondary"
-                disabled={loading}
-                onClick={() => handleSubmit(true)}
-              >
-                Duyệt
-              </Button>
-            )}
-
-            <Button onClick={() => handleSubmit(false)}>Lưu</Button>
+            {
+              auth.permission === hashpermission.admin_system && isEdit &&
+              <>
+                {!form.isApproved ? (
+                  <Button
+                    variant="secondary"
+                    disabled={loading}
+                    onClick={() => handleSubmit(true)}
+                  >
+                    Duyệt
+                  </Button>              
+                )
+                :
+                (<Button
+                    variant="secondary"
+                    disabled={loading}
+                    onClick={() => {}}
+                  >
+                    Hủy duyệt
+                  </Button>)}
+              </>
+            }
+            {!form.isApproved && <Button onClick={() => handleSubmit(false)}>Lưu</Button>}
           </div>
         </div>
 
