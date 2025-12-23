@@ -21,6 +21,8 @@ import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/Controls/DatePicker/datePicker";
 import { useAlert } from "@/stores/useAlertStore";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/auth/authContext";
+import { hashpermission } from "@/commons/const";
 
 type Category = {
   id: string;
@@ -30,6 +32,7 @@ type Category = {
 export default function NewsFormPage() {
   const navigate = useNavigate();
   const { id: newsId } = useParams<{ id?: string }>();
+  const {auth} = useAuth();
   const isEdit = !!newsId;
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -146,7 +149,7 @@ export default function NewsFormPage() {
               Hủy
             </Button>
 
-            {isEdit && !form.isApproved && (
+            {isEdit && !form.isApproved && auth.permission === hashpermission.admin_system && (
               <Button
                 variant="secondary"
                 disabled={loading}
