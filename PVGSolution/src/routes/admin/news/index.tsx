@@ -260,13 +260,21 @@ export default function NewsListPage(): JSX.Element {
 
                   <TableHead className="w-40">Danh mục</TableHead>
 
-                  <TableHead className="w-[120px]">Trạng thái</TableHead>
+                  <TableHead className="w-[120px] text-center">
+                    Trạng thái
+                  </TableHead>
 
-                  <TableHead className="w-[140px]">Trạng thái duyệt</TableHead>
+                  <TableHead className="w-[140px] text-center">
+                    Trạng thái duyệt
+                  </TableHead>
 
-                  <TableHead className="w-[140px]">Ngày xuất bản</TableHead>
+                  <TableHead className="w-[140px] text-center">
+                    Ngày xuất bản
+                  </TableHead>
 
-                  <TableHead className="w-[140px]">Ngày tạo</TableHead>
+                  <TableHead className="w-[140px] text-center">
+                    Ngày tạo
+                  </TableHead>
 
                   <TableHead className="w-40">Người tạo</TableHead>
 
@@ -328,7 +336,7 @@ export default function NewsListPage(): JSX.Element {
                       <TableCell>{n.categoryName || "-"}</TableCell>
 
                       {/* Status */}
-                      <TableCell>
+                      <TableCell className="text-center">
                         <Badge
                           variant={n.active ? "default" : "outline"}
                           className={
@@ -342,7 +350,7 @@ export default function NewsListPage(): JSX.Element {
                       </TableCell>
 
                       {/* Approval status */}
-                      <TableCell>
+                      <TableCell className="text-center">
                         <Badge
                           variant={n.isApproved ? "default" : "outline"}
                           className={
@@ -356,8 +364,16 @@ export default function NewsListPage(): JSX.Element {
                       </TableCell>
 
                       {/* Publish date */}
-                      <TableCell>
-                        {n.publishDate ? formatDate(n.publishDate) : "-"}
+                      <TableCell className="text-center">
+                        {n.publishDate
+                          ? new Date(n.publishDate)
+                              .toLocaleDateString("vi-VN", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              })
+                              .replace(/\//g, "-")
+                          : "-"}
                       </TableCell>
 
                       {/* Created date */}
