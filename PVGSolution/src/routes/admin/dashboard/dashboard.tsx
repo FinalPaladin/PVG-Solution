@@ -127,7 +127,7 @@ export default function AdminDashboard(): JSX.Element {
       {/* Tổng quan */}
       <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
         <h4 className="text-sm font-medium text-gray-600 mb-4">
-          Tất cả các lượt truy cấp
+          Tất cả các lượt truy cập
         </h4>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
