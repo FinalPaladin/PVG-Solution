@@ -29,6 +29,7 @@ import { useAlert } from "@/stores/useAlertStore";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/auth/authContext";
 import { hashpermission } from "@/commons/const";
+import { adminPaths } from "@/commons/paths";
 
 type Category = {
   id: string;
@@ -152,7 +153,7 @@ export default function NewsFormPage() {
       setLoading(true);
       if (!newsId) return;
 
-      if(isApprove)
+      if (isApprove)
         await approveNews(newsId, auth.userName ?? "");
       else
         await unApproveNews(newsId, auth.userName ?? "");
@@ -165,6 +166,8 @@ export default function NewsFormPage() {
       setLoading(false);
     }
   };
+
+  // const pageTitle = isEdit ? "Cập nhật tin tức" : "Tạo tin tức"
 
   return (
     <>
@@ -188,18 +191,18 @@ export default function NewsFormPage() {
               <>
                 {!form.isApproved ? (
                   <Button
-                  variant="outline"
-                  disabled={loading}
-                  onClick={() => handleApprove(true)}
-                  >
-                    Duyệt
-                  </Button>              
-                )
-                :
-                (<Button
                     variant="outline"
                     disabled={loading}
-                    onClick={() => {handleApprove(false)}}
+                    onClick={() => handleApprove(true)}
+                  >
+                    Duyệt
+                  </Button>
+                )
+                  :
+                  (<Button
+                    variant="outline"
+                    disabled={loading}
+                    onClick={() => { handleApprove(false) }}
                   >
                     Hủy duyệt
                   </Button>)}

@@ -98,7 +98,7 @@ export default function Header({
                   to={paths.PRODUCTS}
                   className="flex items-center gap-1 hover:text-black"
                 >
-                  Sản phẩm &amp; Dịch vụ <span className="text-xs">▾</span>
+                  Sản phẩm &amp; Dịch vụ
                 </Link>
                 <Link
                   to={paths.NEWS}
@@ -110,7 +110,7 @@ export default function Header({
                   to={paths.SUPPORT}
                   className="flex items-center gap-1 hover:text-black"
                 >
-                  Liên hệ &amp; Hỗ trợ <span className="text-xs">▾</span>
+                  Liên hệ &amp; Hỗ trợ
                 </Link>
               </nav>
             )}
@@ -121,10 +121,9 @@ export default function Header({
               aria-label="Tìm kiếm"
               onClick={() => setShowSearch((v) => !v)}
               className={`w-10 h-10 rounded-full border flex items-center justify-center transition
-                ${
-                  showSearch
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                    : "border-gray-200 hover:shadow-sm text-gray-600"
+                ${showSearch
+                  ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                  : "border-gray-200 hover:shadow-sm text-gray-600"
                 }`}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -175,18 +174,16 @@ export default function Header({
 
       {/* Mobile menu overlay (small screens only) */}
       <div
-        className={`lg:hidden fixed inset-0 z-40 transition-opacity ${
-          menuOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
+        className={`lg:hidden fixed inset-0 z-40 transition-opacity ${menuOpen
+          ? "opacity-100 pointer-events-auto"
+          : "opacity-0 pointer-events-none"
+          }`}
         aria-hidden={!menuOpen}
       >
         {/* backdrop */}
         <div
-          className={`absolute inset-0 bg-black/40 transition-opacity ${
-            menuOpen ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute inset-0 bg-black/40 transition-opacity ${menuOpen ? "opacity-100" : "opacity-0"
+            }`}
           onClick={() => setMenuOpen(false)}
         />
 
@@ -195,9 +192,8 @@ export default function Header({
           role="dialog"
           aria-modal="true"
           aria-label="Mobile menu"
-          className={`absolute right-0 top-0 h-full w-[320px] max-w-full bg-white shadow-lg transform transition-transform duration-300 ${
-            menuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`absolute right-0 top-0 h-full w-[320px] max-w-full bg-white shadow-lg transform transition-transform duration-300 ${menuOpen ? "translate-x-0" : "translate-x-full"
+            }`}
         >
           <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
