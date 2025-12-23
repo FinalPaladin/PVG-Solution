@@ -342,7 +342,7 @@ export default function ProductForm(): JSX.Element {
             <div className="flex gap-2">
               <Button
                 type="button"
-                variant="outline"
+                variant="destructive"
                 onClick={() => navigate(adminPaths.ADMIN_PRODUCT)}
               >
                 Hủy

@@ -333,7 +333,9 @@ export default function NewsListPage(): JSX.Element {
                       </TableCell>
 
                       {/* Category */}
-                      <TableCell>{n.categoryName || "-"}</TableCell>
+                      <TableCell className="ellipsis">
+                        {n.categoryName || "-"}
+                      </TableCell>
 
                       {/* Status */}
                       <TableCell className="text-center">
@@ -380,7 +382,7 @@ export default function NewsListPage(): JSX.Element {
                       <TableCell>{formatDate(n.createdDate)}</TableCell>
 
                       {/* Created by */}
-                      <TableCell>{n.createdBy || "-"}</TableCell>
+                      <TableCell>{n.createdByName || "-"}</TableCell>
 
                       {/* Action */}
                       <TableCell className="text-center">
