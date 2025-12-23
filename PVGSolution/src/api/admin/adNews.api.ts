@@ -83,3 +83,13 @@ export function approveNews(id: string, userName: string) {
     }
   );
 }
+
+export function unApproveNews(id: string, userName: string) {
+  return requestAdmin.post<unknown, BaseResponse<boolean>>(
+    `/api/news/unapprove`,
+    {
+      id,
+      userName,
+    }
+  );
+}

@@ -64,11 +64,14 @@ export default function AdminDashboard(): JSX.Element {
         </h4>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
+          <p className="text-sm text-gray-700">
+            Tất cả: <span className="font-semibold text-gray-600">{data.total}</span>
+          </p>
           <div className="text-sm text-gray-700">
-            Đã xử lý: <span className="font-semibold text-green-700">0</span>
+            Đã xử lý: <span className="font-semibold text-green-700">{data.totalProcessed}</span>
           </div>
           <div className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">0</span>
+            Chưa xử lý: <span className="font-semibold text-orange-600">{data.total - data.totalProcessed}</span>
           </div>
         </div>
       </div>
@@ -138,7 +141,10 @@ export default function AdminDashboard(): JSX.Element {
             Sản phẩm: <span className="font-semibold text-green-700">{data.viewProducts}</span>
           </div>
           <div className="text-sm text-gray-700">
-            Tin tức: <span className="font-semibold text-green-700">{data.viewNews}</span>
+            Sản phẩm chi tiết: <span className="font-semibold text-green-700">{data.viewProduct}</span>
+          </div>
+          <div className="text-sm text-gray-700">
+            Tin tức chi tiết: <span className="font-semibold text-green-700">{data.viewNews}</span>
           </div>
         </div>
       </div>

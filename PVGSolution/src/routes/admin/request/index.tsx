@@ -52,6 +52,7 @@ const RequestsListTable = () => {
 
   const [total, setTotal] = useState<number>(0);
   const [listLoading, setListLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // ---- HÀM LOAD DATA TÁCH RIÊNG RA ----
   const loadData = useCallback(async (params: IRequestSearchParams) => {
@@ -95,6 +96,7 @@ const RequestsListTable = () => {
   };
 
   const handleExport = async () => {
+    setIsLoading(true);
     const query = buildRequestQuery(requestSearchParams);
     const res = await exportDataCustomerRequest(query);
 
@@ -111,6 +113,7 @@ const RequestsListTable = () => {
     link.click();
     link.remove();
     window.URL.revokeObjectURL(url);
+    setIsLoading(false);
   };
 
   const lastPage = Math.max(1, Math.ceil(total / requestSearchParams.pageSize));
@@ -132,10 +135,10 @@ const RequestsListTable = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Quản lý Yêu cầu khách</h1>
 
-        <Button type="button" onClick={handleExport} className="bg-[#388700]">
+        <Button disabled={isLoading} type="button" onClick={handleExport} className="bg-[#388700]">
           <span className="flex">
             <Download className="h-5 w-5" />
-            &nbsp;Tải báo cáo
+            &nbsp;{isLoading ? "Đang tải..." : "Tải báo cáo"}
           </span>
         </Button>
         {/* Nếu muốn nút tạo mới thì thêm bên này hoặc chuyển vào form */}

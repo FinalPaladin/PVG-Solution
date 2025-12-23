@@ -17,6 +17,7 @@ import {
   newsCreate,
   newsGetById,
   newsUpdate,
+  unApproveNews,
 } from "@/api/admin/adNews.api";
 import type { NewsCreateRequest } from "@/models/admin/news.model";
 import { newsCategoryGetAll } from "@/api/admin/adNewsCategory";
@@ -146,12 +147,16 @@ export default function NewsFormPage() {
     }
   };
 
-  const handleApprove = async () => {
+  const handleApprove = async (isApprove: boolean) => {
     try {
       setLoading(true);
       if (!newsId) return;
 
-      await approveNews(newsId, auth.userName ?? "");
+      if(isApprove)
+        await approveNews(newsId, auth.userName ?? "");
+      else
+        await unApproveNews(newsId, auth.userName ?? "");
+
       setLoading(false);
       navigate(-1);
     } catch {
@@ -185,7 +190,7 @@ export default function NewsFormPage() {
                   <Button
                   variant="outline"
                   disabled={loading}
-                  onClick={() => handleApprove()}
+                  onClick={() => handleApprove(true)}
                   >
                     Duyệt
                   </Button>              
@@ -194,7 +199,7 @@ export default function NewsFormPage() {
                 (<Button
                     variant="outline"
                     disabled={loading}
-                    onClick={() => {}}
+                    onClick={() => {handleApprove(false)}}
                   >
                     Hủy duyệt
                   </Button>)}
