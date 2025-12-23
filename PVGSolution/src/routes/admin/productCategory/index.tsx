@@ -612,7 +612,7 @@ export default function ProductCategory(): JSX.Element {
             <DialogFooter className="mt-4">
               <Button
                 type="button"
-                variant="outline"
+                variant="destructive"
                 onClick={() => setIsEditDialogOpen(false)}
                 disabled={loading}
               >

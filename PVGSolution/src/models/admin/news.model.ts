@@ -46,6 +46,7 @@ export interface NewsResponseModel {
   categoryName?: string;
   createdBy?: string;
   createdDate: string;
+  createdByName?: string;
   modifiedBy?: string;
   modifiedDate?: string;
 }

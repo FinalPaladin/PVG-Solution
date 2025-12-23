@@ -12,7 +12,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { newsCreate, newsGetById, newsUpdate } from "@/api/admin/adNews.api";
+import {
+  approveNews,
+  newsCreate,
+  newsGetById,
+  newsUpdate,
+} from "@/api/admin/adNews.api";
 import type { NewsCreateRequest } from "@/models/admin/news.model";
 import { newsCategoryGetAll } from "@/api/admin/adNewsCategory";
 import { mediaImageUpload } from "@/api/requestCustomer";
@@ -32,7 +37,7 @@ type Category = {
 export default function NewsFormPage() {
   const navigate = useNavigate();
   const { id: newsId } = useParams<{ id?: string }>();
-  const {auth} = useAuth();
+  const { auth } = useAuth();
   const isEdit = !!newsId;
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -118,21 +123,42 @@ export default function NewsFormPage() {
   const handleSubmit = async (approve = false) => {
     if (!categoryId) return;
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const payload: NewsCreateRequest = {
-      ...form,
-      isApproved: approve ? true : form.isApproved,
-    };
+      const payload: NewsCreateRequest = {
+        ...form,
+        isApproved: approve ? true : form.isApproved,
+      };
 
-    if (isEdit && newsId) {
-      await newsUpdate(newsId, categoryId, payload);
-    } else {
-      await newsCreate(categoryId, payload);
+      if (isEdit && newsId) {
+        await newsUpdate(newsId, categoryId, payload);
+      } else {
+        await newsCreate(categoryId, payload);
+      }
+
+      setLoading(false);
+      navigate(-1);
+    } catch {
+      useAlert.getState().showError("Đã xảy ra lỗi khi lưu dữ liệu");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setLoading(false);
-    navigate(-1);
+  const handleApprove = async () => {
+    try {
+      setLoading(true);
+      if (!newsId) return;
+
+      await approveNews(newsId, auth.userName ?? "");
+      setLoading(false);
+      navigate(-1);
+    } catch {
+      useAlert.getState().showError("Đã xảy ra lỗi khi duyệt tin tức");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -145,7 +171,11 @@ export default function NewsFormPage() {
           </h1>
 
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate(-1)}>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => navigate(-1)}
+            >
               Hủy
             </Button>
             {
@@ -153,16 +183,16 @@ export default function NewsFormPage() {
               <>
                 {!form.isApproved ? (
                   <Button
-                    variant="secondary"
-                    disabled={loading}
-                    onClick={() => handleSubmit(true)}
+                  variant="outline"
+                  disabled={loading}
+                  onClick={() => handleApprove()}
                   >
                     Duyệt
                   </Button>              
                 )
                 :
                 (<Button
-                    variant="secondary"
+                    variant="outline"
                     disabled={loading}
                     onClick={() => {}}
                   >
