@@ -3,8 +3,14 @@ import { useAuth } from "@/auth/authContext";
 import { Button } from "@/components/ui/button";
 import type { IRQ_ChangePasswordModel } from "@/models/admin/user.model";
 import { useAlert } from "@/stores/useAlertStore";
-import { RotateCcwKey } from "lucide-react";
-import { useEffect, useState, type JSX } from "react";
+import { Eye, EyeOff, RotateCcwKey } from "lucide-react";
+import { useState, type JSX } from "react";
+
+const eyePw = {
+  old: false,
+  new: false,
+  confirm: false
+}
 
 export default function ChangePassword(): JSX.Element {
   const { auth } = useAuth();
@@ -14,53 +20,30 @@ export default function ChangePassword(): JSX.Element {
     newPassword: "",
   } as IRQ_ChangePasswordModel);
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
-  const [isValid, setIsValid] = useState(false);
-
-  useEffect(() => {
-    validateForm();
-  }, [payload, confirmNewPassword]);
+  const [eye, setEye] = useState(eyePw);
 
   const validateForm = () => {
-    // if(!payload.userName)
-    // {
-    //     setMessage({
-    //         type: "error",
-    //         text: `Chưa nhập tài khoản`,
-    //     });
-    //     setIsValid(false);
-    //     return;
-    // }
     if (!payload.currentPassword) {
-      useAlert.getState().show(`Chưa nhập mật khẩu cũ`, "warning");
-      setIsValid(false);
-      return;
+      useAlert.getState().show(`Chưa nhập mật khẩu cũ`, "warning");      
+      return false;
     }
     if (!payload.newPassword) {
-      useAlert.getState().show(`Chưa nhập mật khẩu mới`, "warning");
-      setIsValid(false);
-      return;
+      useAlert.getState().show(`Chưa nhập mật khẩu mới`, "warning"); 
+      return false;
     }
     if (!confirmNewPassword) {
-      useAlert.getState().show(`Chưa nhập xác nhận mật khẩu`, "warning");
-      setIsValid(false);
-      return;
+      useAlert.getState().show(`Chưa nhập xác nhận mật khẩu`, "warning"); 
+      return false;
     }
     if (confirmNewPassword !== payload.newPassword) {
-      useAlert.getState().show(`Xác nhận mật khẩu không khớp`, "warning");
-      setIsValid(false);
-      return;
-    }
-    setMessage(null);
-    setIsValid(true);
+      useAlert.getState().show(`Xác nhận mật khẩu không khớp`, "warning"); 
+      return false;
+    } 
+    return true;
   };
 
   const handleChange = async () => {
-    if (!isValid) {
-      useAlert.getState().show(`Chưa hoàn tất nhập thông tin đổi mật khẩu`, "warning");
+    if (!validateForm()) {
       return;
     }
     try {
@@ -73,86 +56,107 @@ export default function ChangePassword(): JSX.Element {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
 
-      setMessage({
-        type: "error",
-        text: `Thay đổi mật khẩu thất bại: ${errorMessage}`,
-      });
+      useAlert.getState().showError(`Thay đổi mật khẩu thất bại: ${errorMessage}`);
     }
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-4">Đổi mật khẩu</h1>
-      <div>
-        {message && (
-          <div
-            className={`mb-4 px-4 py-2 rounded ${
-              message.type === "success"
-                ? "bg-green-50 text-green-800"
-                : "bg-red-50 text-red-800"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
-      </div>
-      {/* <div className="grid grid-cols-1">
-                <span className="text-sm font-medium mb-1">Tài khoản:</span>
-                <input type="text" className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-                defaultValue={payload.userName}
-                onChange={(e) => {setPayload({...payload, userName: e.target.value});}}/>
-            </div> */}
-      <div className="bg-white justify-content-center p-6 rounded shadow-sm grid grid-cols-1">
-        <div className="grid grid-cols-1">
-          <span className="text-sm font-medium mb-1">Mật khẩu cũ:</span>
-          <input
-            type="password"
-            className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-            defaultValue={payload.currentPassword}
-            onChange={(e) => {
-              setPayload({ ...payload, currentPassword: e.target.value });
-            }}
-          />
-        </div>
-        <div className="grid grid-cols-1 mt-2">
-          <span className="text-sm font-medium mb-1">Mật khẩu mới:</span>
-          <input
-            type="password"
-            className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-            defaultValue={payload.newPassword}
-            onChange={(e) => {
-              setPayload({ ...payload, newPassword: e.target.value });
-            }}
-          />
-        </div>
-        <div className="grid grid-cols-1 mt-2">
-          <span className="text-sm font-medium mb-1">
-            Xác nhận mật khẩu mới:
-          </span>
-          <input
-            type="password"
-            className="border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
-            defaultValue={confirmNewPassword}
-            onChange={(e) => {
-              setConfirmNewPassword(e.target.value);
-            }}
-          />
-        </div>
-        <div className="grid grid-cols-1 mt-2">
-          <div className="text-end">
-            <Button
+    <div className="max-w-md mx-auto">
+      {/* Title */}
+      <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <span className="inline-block h-6 w-1 rounded-full bg-gradient-to-b from-green-500 to-green-700" />
+        Đổi mật khẩu
+      </h1>
+      {/* Card */}
+      <div className="bg-white p-5 sm:p-6 rounded-lg shadow-sm space-y-4">
+        {/* Old password */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Mật khẩu cũ
+          </label>
+          <div className="relative">
+            <input
+              type={eye.old ? "text" : "password"}
+              value={payload.currentPassword}
+              onChange={(e) =>
+                setPayload({ ...payload, currentPassword: e.target.value })
+              }
+              className="w-full h-10 rounded-md border border-gray-300 px-3 pr-10 text-sm
+                        focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+            />
+            <button
               type="button"
-              hidden={!isValid}
-              disabled={!isValid}
-              className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 bg-[#92B83D] hover:bg-[#7DA22F] cursor-pointer"
-              onClick={handleChange}
+              onClick={() => setEye({ ...eye, old: !eye.old })}
+              className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-600"
             >
-              <span className="flex">
-                <RotateCcwKey className="h-5 w-5" />
-                &nbsp;Đổi mật khẩu
-              </span>
-            </Button>
+              {eye.old ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
+        </div>
+
+        {/* New password */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Mật khẩu mới
+          </label>
+          <div className="relative">
+            <input
+              type={eye.new ? "text" : "password"}
+              value={payload.newPassword}
+              onChange={(e) =>
+                setPayload({ ...payload, newPassword: e.target.value })
+              }
+              className="w-full h-10 rounded-md border border-gray-300 px-3 pr-10 text-sm
+                        focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setEye({ ...eye, new: !eye.new })}
+              className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              {eye.new ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Confirm password */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Xác nhận mật khẩu mới
+          </label>
+          <div className="relative">
+            <input
+              type={eye.confirm ? "text" : "password"}
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              className="w-full h-10 rounded-md border border-gray-300 px-3 pr-10 text-sm
+                        focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setEye({ ...eye, confirm: !eye.confirm })}
+              className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              {eye.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Action */}
+        <div className="pt-2">
+          <Button
+            type="button"
+            onClick={handleChange}
+            className="inline-flex items-center justify-center gap-2
+                      w-full sm:w-auto
+                      px-4 py-2 rounded-md font-medium
+                      bg-[#92B83D] text-white
+                      hover:bg-[#7DA22F]
+                      disabled:bg-gray-200 disabled:text-gray-500"
+          >
+            <RotateCcwKey className="h-5 w-5" />
+            Đổi mật khẩu
+          </Button>
         </div>
       </div>
     </div>

@@ -134,11 +134,14 @@ export default function AdminDashboard(): JSX.Element {
         </h4>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
-          <div className="text-sm text-gray-700">
+          {/* <div className="text-sm text-gray-700">
             Trang chủ: <span className="font-semibold text-green-700">{data.viewHome}</span>
           </div>
           <div className="text-sm text-gray-700">
             Sản phẩm: <span className="font-semibold text-green-700">{data.viewProducts}</span>
+          </div> */}
+          <div className="text-sm text-gray-700">
+            Trang chủ: <span className="font-semibold text-green-700">{data.viewProducts}</span>
           </div>
           <div className="text-sm text-gray-700">
             Sản phẩm chi tiết: <span className="font-semibold text-green-700">{data.viewProduct}</span>
