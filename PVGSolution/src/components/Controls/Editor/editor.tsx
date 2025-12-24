@@ -86,35 +86,77 @@ export default function NewsEditor({ value, onChange }: Props) {
     <div className="space-y-2">
       {/* Toolbar */}
       <div className="flex flex-wrap gap-1 border rounded-md p-2">
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleBold().run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        >
           B
         </Button>
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleItalic().run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        >
           I
         </Button>
 
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+        >
           H1
         </Button>
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+        >
           H2
         </Button>
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 3 }).run()
+          }
+        >
           H3
         </Button>
 
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        >
           • List
         </Button>
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        >
           1. List
         </Button>
 
-        <Button size="sm" variant="outline" onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        >
           Quote
         </Button>
 
-        <Button size="sm" variant="outline" onClick={() => document.getElementById("editorUpload")?.click()}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => document.getElementById("editorUpload")?.click()}
+        >
           Ảnh
         </Button>
 

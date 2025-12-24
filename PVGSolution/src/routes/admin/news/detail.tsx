@@ -29,7 +29,6 @@ import { useAlert } from "@/stores/useAlertStore";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/auth/authContext";
 import { hashpermission } from "@/commons/const";
-import { adminPaths } from "@/commons/paths";
 
 type Category = {
   id: string;
@@ -153,10 +152,8 @@ export default function NewsFormPage() {
       setLoading(true);
       if (!newsId) return;
 
-      if (isApprove)
-        await approveNews(newsId, auth.userName ?? "");
-      else
-        await unApproveNews(newsId, auth.userName ?? "");
+      if (isApprove) await approveNews(newsId, auth.userName ?? "");
+      else await unApproveNews(newsId, auth.userName ?? "");
 
       setLoading(false);
       navigate(-1);
@@ -186,8 +183,7 @@ export default function NewsFormPage() {
             >
               Hủy
             </Button>
-            {
-              auth.permission === hashpermission.admin_system && isEdit &&
+            {auth.permission === hashpermission.admin_system && isEdit && (
               <>
                 {!form.isApproved ? (
                   <Button
@@ -197,18 +193,22 @@ export default function NewsFormPage() {
                   >
                     Duyệt
                   </Button>
-                )
-                  :
-                  (<Button
+                ) : (
+                  <Button
                     variant="outline"
                     disabled={loading}
-                    onClick={() => { handleApprove(false) }}
+                    onClick={() => {
+                      handleApprove(false);
+                    }}
                   >
                     Hủy duyệt
-                  </Button>)}
+                  </Button>
+                )}
               </>
-            }
-            {!form.isApproved && <Button onClick={() => handleSubmit(false)}>Lưu</Button>}
+            )}
+            {!form.isApproved && (
+              <Button onClick={() => handleSubmit(false)}>Lưu</Button>
+            )}
           </div>
         </div>
 

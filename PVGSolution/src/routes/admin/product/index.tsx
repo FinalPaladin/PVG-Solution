@@ -118,7 +118,6 @@ export default function ProductList(): JSX.Element {
     };
 
     run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, page, pageSize]);
 
   // helper to update searchParams -> include _ts to force change even if same keyword
