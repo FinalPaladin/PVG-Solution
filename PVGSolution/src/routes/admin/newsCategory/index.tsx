@@ -375,7 +375,7 @@ export default function NewsCategoryPage(): JSX.Element {
 
       const res = await newsCategoryDelete(selectedCategory.id);
       if (!res.isSuccess) {
-        useAlert.getState().showError(res.message || "Hủy thất bại");
+        useAlert.getState().showError(res.message || "Lỗi hệ thống.");
       }
 
       useAlert.getState().show("Cập nhật thành công", "success");
@@ -659,7 +659,7 @@ export default function NewsCategoryPage(): JSX.Element {
                 onClick={() => setIsEditDialogOpen(false)}
                 disabled={loading}
               >
-                Hủy
+                Đóng
               </Button>
               <Button
                 type="button"

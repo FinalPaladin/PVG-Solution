@@ -182,7 +182,7 @@ export default function NewsFormPage() {
               variant="destructive"
               onClick={() => navigate(-1)}
             >
-              Hủy
+              Đóng
             </Button>
             {auth.permission === hashpermission.admin_system && isEdit && (
               <>

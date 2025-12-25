@@ -90,11 +90,13 @@ function NewsDetailPageInner() {
         .share({
           title: data.title,
           text: data.description,
-          url: window.location.href,
+          url: `${window.location.origin}/${paths.NEWS_SHARE}/${data.slug}`,
         })
         .catch(() => {});
     } else {
-      navigator.clipboard?.writeText(window.location.href);
+      navigator.clipboard?.writeText(
+        `${window.location.origin}/${paths.NEWS_SHARE}/${data.slug}`
+      );
     }
   }, [data]);
 

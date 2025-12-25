@@ -152,7 +152,7 @@ export default function ProductForm(): JSX.Element {
     );
 
     if (!res.isSuccess) {
-      useAlert.getState().showError(res.message || "Hủy thất bại");
+      useAlert.getState().showError(res.message || "Lỗi hệ thống.");
       return;
     }
 
@@ -345,7 +345,7 @@ export default function ProductForm(): JSX.Element {
                 variant="destructive"
                 onClick={() => navigate(adminPaths.ADMIN_PRODUCT)}
               >
-                Hủy
+                Đóng
               </Button>
 
               <Button type="button" onClick={handleSubmit} disabled={loading}>
@@ -610,7 +610,7 @@ export default function ProductForm(): JSX.Element {
                 variant="outline"
                 onClick={() => setDetailDialogOpen(false)}
               >
-                Hủy
+                Đóng
               </Button>
               <Button
                 type="button"

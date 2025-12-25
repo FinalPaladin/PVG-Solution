@@ -349,7 +349,7 @@ export default function ProductCategory(): JSX.Element {
 
       const res = await productCategoryDelete(selectedCategory.id);
       if (!res.isSuccess) {
-        useAlert.getState().showError(res.message || "Hủy thất bại");
+        useAlert.getState().showError(res.message || "Lỗi hệ thống.");
       }
 
       useAlert.getState().show("Cập nhật thành công", "success");
@@ -616,7 +616,7 @@ export default function ProductCategory(): JSX.Element {
                 onClick={() => setIsEditDialogOpen(false)}
                 disabled={loading}
               >
-                Hủy
+                Đóng
               </Button>
               <Button
                 type="button"
