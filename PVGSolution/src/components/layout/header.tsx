@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { paths } from "@/commons/paths";
 import type { IObjConfigurationModel } from "@/models/admin/config.model";
+import { PhoneCall } from "lucide-react";
 
 export default function Header({
   webConfig,
@@ -107,11 +108,18 @@ export default function Header({
                   Tin tức
                 </Link>
                 <Link
-                  to={paths.SUPPORT}
+                  to={paths.REQUEST.replace(":idproduct", "new")}
                   className="flex items-center gap-1 hover:text-black"
                 >
                   Liên hệ &amp; Hỗ trợ
                 </Link>
+                {
+                  webConfig.SDTSales && 
+                  <div className="flex items-center gap-1 hover:text-black"
+                  >
+                    <PhoneCall/> {webConfig.SDTSales}
+                  </div>
+                }
               </nav>
             )}
 
@@ -264,7 +272,12 @@ export default function Header({
             >
               Liên hệ &amp; Hỗ trợ
             </Link>
-
+            {webConfig.SDTSales &&
+              <div className="flex items-center gap-1 hover:text-black"
+              >
+                <PhoneCall/> {webConfig.SDTSales}
+              </div>
+            }
             {/* <div className="mt-6 px-3">
               <button
                 onClick={() => {

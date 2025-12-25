@@ -193,7 +193,7 @@ export default function RequestCustomerPage(): JSX.Element {
         token: token,
         fullName: form.fullname,
         phone: form.phone,
-        productId: idproduct ? idproduct : "",
+        productId: (idproduct == "new" || !idproduct) ? "" : idproduct,
         data: data,
       } as IRQ_InserRequestCustomerModel;
 
