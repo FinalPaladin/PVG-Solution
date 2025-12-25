@@ -5,6 +5,8 @@ export interface IRS_DashboardInitPageModel{
     viewNews: number;
     total: number;
     totalProcessed: number;
+    requestToday: number;
+    requestTodayProcessed: number;
     requestYesterday: number;
     requestYesterdayProcessed: number;
     requestThisWeek: number;

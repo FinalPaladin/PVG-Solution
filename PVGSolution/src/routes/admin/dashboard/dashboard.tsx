@@ -77,7 +77,23 @@ export default function AdminDashboard(): JSX.Element {
       </div>
 
       {/* Thống kê theo thời gian */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Hôm nay */}
+        <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-green-50 to-white p-5">
+          <h5 className="mb-2 text-sm font-medium text-gray-600">
+            Hôm qua
+          </h5>
+          <p className="text-sm text-gray-700">
+            Tất cả: <span className="font-semibold text-gray-600">{data.requestToday}</span>
+          </p>
+          <p className="text-sm text-gray-700">
+            Đã xử lý: <span className="font-semibold text-green-700">{data.requestTodayProcessed}</span>
+          </p>
+          <p className="text-sm text-gray-700">
+            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestToday - data.requestTodayProcessed}</span>
+          </p>
+        </div>
+
         {/* Hôm qua */}
         <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-green-50 to-white p-5">
           <h5 className="mb-2 text-sm font-medium text-gray-600">

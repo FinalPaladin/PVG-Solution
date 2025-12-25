@@ -166,8 +166,8 @@ const RequestsListTable = () => {
           <select className="w-full px-3 py-2 border rounded-md"
           defaultValue={"false"}
           onChange={(e) => {setSearch({...search, isProcessed: e.target.value === "true" ? true : false});}}>
-              <option value={"false"}>Chưa duyệt</option>
-              <option value={"true"}>Đã duyệt</option>
+              <option value={"false"}>Chưa xử lý</option>
+              <option value={"true"}>Đã xử lý</option>
           </select>
         </div>
         <div className="grid-cols-1">
