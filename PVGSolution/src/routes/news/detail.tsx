@@ -232,7 +232,10 @@ function NewsDetailPageInner() {
         )}
 
         <div className="mt-12">
-          <Link to="/news" className="text-sm text-green-600 hover:underline">
+          <Link
+            to={paths.NEWS}
+            className="text-sm text-green-600 hover:underline"
+          >
             ← Quay lại danh sách tin
           </Link>
         </div>
