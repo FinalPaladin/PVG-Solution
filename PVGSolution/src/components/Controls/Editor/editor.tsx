@@ -4,9 +4,13 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import TextAlign from "@tiptap/extension-text-align";
 
 import { Button } from "@/components/ui/button";
 import { mediaImageUpload } from "@/api/requestCustomer";
+import "./editor.css";
 
 type Props = {
   value: string;
@@ -18,17 +22,39 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 export default function NewsEditor({ value, onChange }: Props) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3, 4, 5, 6],
+        },
+      }),
+
       Link,
-      Image.configure({ inline: false }),
+
+      TextStyle,
+
+      Color.configure({
+        types: ["textStyle"],
+      }),
+
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+
+      Image.configure({
+        inline: false,
+      }),
+
       Placeholder.configure({
         placeholder: "Nhập nội dung tin tức...",
       }),
     ],
-    content: value || "", // initial
+
+    content: value || "",
+
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+
     editorProps: {
       handlePaste(_, event) {
         const items = event.clipboardData?.items;
@@ -58,7 +84,7 @@ export default function NewsEditor({ value, onChange }: Props) {
     },
   });
 
-  // ✅ SYNC value -> editor (QUAN TRỌNG)
+  // Sync value -> editor
   useEffect(() => {
     if (!editor) return;
 
@@ -80,7 +106,32 @@ export default function NewsEditor({ value, onChange }: Props) {
     }
   };
 
+  // ✅ GIỮ SCROLL KHI CHẠY COMMAND
+  const withPreserveScroll = (fn: () => void) => {
+    const container = document.querySelector(
+      ".editor-scroll"
+    ) as HTMLElement | null;
+
+    if (!container) {
+      fn();
+      return;
+    }
+
+    const scrollTop = container.scrollTop;
+    fn();
+
+    requestAnimationFrame(() => {
+      container.scrollTop = scrollTop;
+    });
+  };
+
   if (!editor) return null;
+
+  const runCommand = (command: () => void) => {
+    withPreserveScroll(() => {
+      command();
+    });
+  };
 
   return (
     <div className="space-y-2">
@@ -89,57 +140,60 @@ export default function NewsEditor({ value, onChange }: Props) {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onClick={() =>
+            runCommand(() => editor.chain().focus().toggleBold().run())
+          }
         >
           B
         </Button>
+
         <Button
           size="sm"
           variant="outline"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={() =>
+            runCommand(() => editor.chain().focus().toggleItalic().run())
+          }
         >
           I
         </Button>
 
+        {[1, 2, 3, 4, 5, 6].map((level) => (
+          <Button
+            key={level}
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              runCommand(() =>
+                editor
+                  .chain()
+                  .focus()
+                  .toggleHeading({
+                    level: level as 1 | 2 | 3 | 4 | 5 | 6,
+                  })
+                  .run()
+              )
+            }
+          >
+            H{level}
+          </Button>
+        ))}
+
         <Button
           size="sm"
           variant="outline"
           onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
+            runCommand(() => editor.chain().focus().toggleBulletList().run())
           }
         >
-          H1
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-        >
-          H2
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run()
-          }
-        >
-          H3
+          • List
         </Button>
 
         <Button
           size="sm"
           variant="outline"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        >
-          • List
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          onClick={() =>
+            runCommand(() => editor.chain().focus().toggleOrderedList().run())
+          }
         >
           1. List
         </Button>
@@ -147,11 +201,59 @@ export default function NewsEditor({ value, onChange }: Props) {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          onClick={() =>
+            runCommand(() => editor.chain().focus().toggleBlockquote().run())
+          }
         >
           Quote
         </Button>
 
+        {/* Text Align */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            runCommand(() => editor.chain().focus().setTextAlign("left").run())
+          }
+        >
+          Left
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            runCommand(() =>
+              editor.chain().focus().setTextAlign("center").run()
+            )
+          }
+        >
+          Center
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            runCommand(() => editor.chain().focus().setTextAlign("right").run())
+          }
+        >
+          Right
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            runCommand(() =>
+              editor.chain().focus().setTextAlign("justify").run()
+            )
+          }
+        >
+          Justify
+        </Button>
+
+        {/* Image */}
         <Button
           size="sm"
           variant="outline"
@@ -167,11 +269,34 @@ export default function NewsEditor({ value, onChange }: Props) {
           hidden
           onChange={(e) => e.target.files && uploadImage(e.target.files[0])}
         />
+
+        {/* Color */}
+        <input
+          type="color"
+          className="h-8 w-8 cursor-pointer rounded border"
+          onChange={(e) =>
+            runCommand(() =>
+              editor.chain().focus().setColor(e.target.value).run()
+            )
+          }
+        />
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            runCommand(() => editor.chain().focus().unsetColor().run())
+          }
+        >
+          Clear color
+        </Button>
       </div>
 
       {/* Editor */}
-      <div className="rounded-md border p-3 min-h-[300px]">
-        <EditorContent editor={editor} />
+      <div className="editor-scroll rounded-md border h-[400px] overflow-y-auto p-3">
+        <div className="max-w-none">
+          <EditorContent editor={editor} className="tiptap" />
+        </div>
       </div>
     </div>
   );

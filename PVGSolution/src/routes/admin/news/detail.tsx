@@ -29,6 +29,7 @@ import { useAlert } from "@/stores/useAlertStore";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/auth/authContext";
 import { hashpermission } from "@/commons/const";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 type Category = {
   id: string;
@@ -129,6 +130,7 @@ export default function NewsFormPage() {
 
       const payload: NewsCreateRequest = {
         ...form,
+        content: sanitizeHtml(form.content),
         isApproved: approve ? true : form.isApproved,
       };
 
@@ -138,7 +140,6 @@ export default function NewsFormPage() {
         await newsCreate(categoryId, payload);
       }
 
-      setLoading(false);
       navigate(-1);
     } catch {
       useAlert.getState().showError("Đã xảy ra lỗi khi lưu dữ liệu");

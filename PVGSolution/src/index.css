@@ -122,3 +122,87 @@
 .ellipsis {
   @apply overflow-hidden whitespace-nowrap text-ellipsis;
 }
+
+/* =========================
+   PUBLIC ARTICLE CONTENT
+   ========================= */
+
+.article-content {
+  font-size: 16px;
+  line-height: 1.75;
+  color: #374151;
+}
+
+/* Paragraph */
+.article-content p {
+  margin: 1em 0;
+}
+
+/* HEADINGS */
+.article-content h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 1.2em 0 0.6em;
+}
+.article-content h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 1.1em 0 0.5em;
+}
+.article-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1em 0 0.4em;
+}
+.article-content h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+.article-content h5 {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.article-content h6 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* LISTS – FIX CHẮC CHẮN HIỆN 1. 2. */
+.article-content ol {
+  list-style-type: decimal !important;
+  padding-left: 1.75rem;
+  margin: 1em 0;
+}
+
+.article-content ul {
+  list-style-type: disc !important;
+  padding-left: 1.75rem;
+  margin: 1em 0;
+}
+
+.article-content li {
+  margin: 0.5em 0;
+}
+
+/* BLOCKQUOTE */
+.article-content blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 1.25em 0;
+  color: #374151;
+  background: #f9fafb;
+}
+
+/* IMAGES */
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.25em 0;
+  border-radius: 8px;
+}
+
+/* LINKS */
+.article-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}

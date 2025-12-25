@@ -4,10 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Calendar, Printer, Share2, ArrowRight } from "lucide-react";
 import { getNewsBySlug, initNewsPage } from "@/api/news.api";
-import type {
-  NewsDetailResponse,
-  NewsListItem,
-} from "@/models/appNews.model";
+import type { NewsDetailResponse, NewsListItem } from "@/models/appNews.model";
 import clsx from "clsx";
 
 /* =======================
@@ -73,9 +70,7 @@ function NewsDetailPageInner() {
       if (!res.result) return;
 
       const sameCategory = res.result.news.filter(
-        (n) =>
-          n.categoryId === data.categoryId &&
-          n.slug !== data.slug
+        (n) => n.categoryId === data.categoryId && n.slug !== data.slug
       );
 
       setRelated(sameCategory.slice(0, 4));
@@ -90,11 +85,13 @@ function NewsDetailPageInner() {
     if (!data) return;
 
     if (navigator.share) {
-      navigator.share({
-        title: data.title,
-        text: data.description,
-        url: window.location.href,
-      }).catch(() => { });
+      navigator
+        .share({
+          title: data.title,
+          text: data.description,
+          url: window.location.href,
+        })
+        .catch(() => {});
     } else {
       navigator.clipboard?.writeText(window.location.href);
     }
@@ -190,27 +187,11 @@ function NewsDetailPageInner() {
         </header>
 
         {/* Content */}
-        <main className="prose max-w-none">
-          {data.description && (
-            <p className="lead text-lg md:text-xl font-medium">
-              {data.description}
-            </p>
-          )}
-
-          {/* {imgSrc && (
-            <figure className="my-6 rounded-xl overflow-hidden shadow-sm">
-              <img
-                src={imgSrc}
-                alt={data.title}
-                className="w-full object-cover"
-                onError={handleImgError}
-                draggable={false}
-              />
-            </figure>
-          )} */}
+        <main>
+          <p className="text-lg md:text-xl font-medium">{data.description}</p>
 
           <div
-            className="text-gray-700 mt-6"
+            className="article-content mt-6"
             dangerouslySetInnerHTML={{ __html: data.content }}
           />
         </main>
@@ -218,9 +199,7 @@ function NewsDetailPageInner() {
         {/* Related news */}
         {related.length > 0 && (
           <section className="mt-14">
-            <h2 className="text-xl font-bold mb-6">
-              Tin liên quan
-            </h2>
+            <h2 className="text-xl font-bold mb-6">Tin liên quan</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {related.map((n) => (
@@ -229,9 +208,7 @@ function NewsDetailPageInner() {
                   className="p-4 border rounded-xl hover:shadow-sm transition cursor-pointer"
                   onClick={() => navigate(`/news/${n.slug}`)}
                 >
-                  <div className="font-semibold line-clamp-2">
-                    {n.title}
-                  </div>
+                  <div className="font-semibold line-clamp-2">{n.title}</div>
                   <div className="mt-2 text-sm text-gray-400 flex items-center gap-2">
                     <Calendar size={14} />
                     {formatDate(n.createdDate)}
