@@ -22,7 +22,7 @@ import { ChevronLeft, ChevronRight, Download, ReceiptText, Search } from "lucide
 interface IRequestSearchParams {
   phone: string;
   fullName: string;
-  isProcessed: boolean;
+  isProcessed: string;
   page: number;
   pageSize: number;
 }
@@ -30,7 +30,7 @@ interface IRequestSearchParams {
 const searchObj = {
   phone: "",
   fullName: "",
-  isProcessed: false,
+  isProcessed: "",
 }
 
 const RequestsListTable = () => {
@@ -42,7 +42,7 @@ const RequestsListTable = () => {
     useState<IRequestSearchParams>({
       phone: "",
       fullName: "",
-      isProcessed: false,
+      isProcessed: "",
       page: 1,
       pageSize: 10,
     });
@@ -87,7 +87,7 @@ const RequestsListTable = () => {
       ...requestSearchParams,
       phone: search.phone.trim(),
       fullName: search.fullName,
-      isProcessed: search.isProcessed,
+      isProcessed: search.isProcessed ? search.isProcessed : "",
       page: 1
     };
     setRequestSearchParams(params);
@@ -164,8 +164,9 @@ const RequestsListTable = () => {
         </div>
         <div className="grid-cols-1">
           <select className="w-full px-3 py-2 border rounded-md"
-          defaultValue={"false"}
-          onChange={(e) => {setSearch({...search, isProcessed: e.target.value === "true" ? true : false});}}>
+          defaultValue={""}
+          onChange={(e) => {setSearch({...search, isProcessed: e.target.value});}}>
+              <option value={""}>Tất cả</option>
               <option value={"false"}>Chưa xử lý</option>
               <option value={"true"}>Đã xử lý</option>
           </select>
