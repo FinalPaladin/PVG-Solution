@@ -11,11 +11,16 @@ import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { paths } from "@/commons/paths";
 import { initNewsPage } from "@/api/news.api";
-import type {
-  NewsCategory,
-  NewsListItem,
-} from "@/models/appNews.model";
+import type { NewsCategory, NewsListItem } from "@/models/appNews.model";
 import clsx from "clsx";
+import { useIsMobile } from "@/components/hooks/isMobileHook";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 /* =======================
    Helpers
@@ -40,12 +45,36 @@ interface CategoryTabsProps {
 
 const CategoryTabs = memo(
   ({ categories, activeId, onChange }: CategoryTabsProps) => {
+    const isMobile = useIsMobile();
+
+    // ===== MOBILE =====
+    if (isMobile) {
+      return (
+        <div className="mb-6">
+          <Select value={String(activeId)} onValueChange={onChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Chọn danh mục" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    // ===== DESKTOP =====
     return (
       <div className="flex flex-wrap gap-3 mb-8">
         {categories.map((c) => (
           <button
             key={c.id}
-            onClick={() => onChange(c.id)}
+            onClick={() => onChange(String(c.id))}
             className={clsx(
               "px-5 py-2 rounded-full text-sm font-medium transition",
               activeId === c.id
@@ -111,7 +140,12 @@ const NewsCard = memo(({ item }: NewsCardProps) => {
             size="sm"
             className="flex items-center gap-2"
             onClick={() => {
-              navigate(`${paths.NEWS_DETAIL.replace(":category", item.slugCategory).replace(":slug", item.slug)}`)
+              navigate(
+                `${paths.NEWS_DETAIL.replace(
+                  ":category",
+                  item.slugCategory
+                ).replace(":slug", item.slug)}`
+              );
             }}
           >
             Xem chi tiết <ArrowRight size={16} />
@@ -177,9 +211,7 @@ const NewsPage: React.FC = () => {
       </div>
 
       {filteredNews.length === 0 && (
-        <div className="text-center text-gray-400 mt-10">
-          Không có tin tức
-        </div>
+        <div className="text-center text-gray-400 mt-10">Không có tin tức</div>
       )}
     </div>
   );

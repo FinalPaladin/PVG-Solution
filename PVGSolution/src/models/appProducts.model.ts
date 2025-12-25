@@ -10,6 +10,7 @@ export interface appProducts {
   imageUrl: string;
   loanAmount: string;
   loanTerm: string;
+  slug?: string;
 }
 
 export interface IInitProductPage {

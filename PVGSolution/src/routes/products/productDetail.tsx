@@ -1,8 +1,8 @@
 import FAQSection from "@/components/common/FAQSections";
 import React, { useEffect, useMemo, useState, type JSX } from "react";
 import { DollarSign, Shield, Zap, type LucideIcon } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-import { initProductDetailPage } from "@/api/product";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { getProductBySlug } from "@/api/product";
 import type {
   ProductDetailResponseModel,
   ProductResponseModel,
@@ -18,8 +18,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { paths } from "@/commons/paths";
 import { useIsMobile } from "@/components/hooks/isMobileHook";
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import clsx from "clsx";
 
 // --- Types ---
 export type TabKey = "info" | "docs" | "process" | "fee";
@@ -52,7 +58,7 @@ const DETAIL_CATEGORY_MAP: Record<number, TabKey> = {
 
 // --- Component ---
 export default function ProductInfoPage(): JSX.Element {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
 
   const [active, setActive] = useState<TabKey>("info");
   const [product, setProduct] = useState<ProductResponseModel | null>(null);
@@ -65,11 +71,11 @@ export default function ProductInfoPage(): JSX.Element {
 
   // ===== Load product detail =====
   useEffect(() => {
-    if (!id) return;
+    if (!slug) return;
 
     const fetchDetail = async () => {
       try {
-        const res = await initProductDetailPage(id);
+        const res = await getProductBySlug(slug);
         if (res.isSuccess && res.result) {
           setProduct(res.result);
         }
@@ -83,7 +89,7 @@ export default function ProductInfoPage(): JSX.Element {
     };
 
     fetchDetail();
-  }, [id]);
+  }, [slug]);
 
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -120,10 +126,27 @@ export default function ProductInfoPage(): JSX.Element {
 
   return (
     <div className="min-h-screen bg-white text-gray-800">
-      {/* separator */}
-      <div className="w-full h-px bg-[#e5e7eb]" />
-
       <div className="max-w-7xl mx-auto px-6 py-10">
+        {/* Breadcrumb */}
+        <nav className="text-sm text-gray-400 mb-4 px-6 md:px-0">
+          <Link to="/" className="hover:underline">
+            Trang chủ
+          </Link>
+          <span className="mx-2">/</span>
+          <Link to={paths.PRODUCTS} className="hover:underline">
+            Sản phẩm
+          </Link>
+          <span className="mx-2">/</span>
+          <span
+            className={clsx(
+              "inline-block px-4 py-1 rounded-full text-sm font-medium",
+              "bg-green-100 text-green-700"
+            )}
+          >
+            {product?.name}
+          </span>
+        </nav>
+
         <h1 className="text-3xl font-semibold mb-6">Thông tin sản phẩm</h1>
 
         {/* --- HERO / Banner --- */}
@@ -162,7 +185,9 @@ export default function ProductInfoPage(): JSX.Element {
                 size="lg"
                 className="bg-emerald-400 text-[#064e3b] hover:bg-emerald-500 shadow-sm"
                 onClick={() =>
-                  navigate(paths.REQUEST.replace(":idproduct", id ?? ""))
+                  navigate(
+                    paths.REQUEST.replace(":idproduct", product?.id ?? "")
+                  )
                 }
               >
                 Đăng ký ngay
@@ -212,10 +237,9 @@ export default function ProductInfoPage(): JSX.Element {
                 <button
                   key={index}
                   onClick={() => api?.scrollTo(index)}
-                  className={`h-2 w-2 rounded-full transition-all ${index === selectedIndex
-                    ? "bg-green-600"
-                    : "bg-gray-300"
-                    }`}
+                  className={`h-2 w-2 rounded-full transition-all ${
+                    index === selectedIndex ? "bg-green-600" : "bg-gray-300"
+                  }`}
                 />
               ))}
             </div>
@@ -228,7 +252,6 @@ export default function ProductInfoPage(): JSX.Element {
           </section>
         )}
 
-
         {/* Tabs */}
         <div className="mb-6">
           <nav className="hidden sm:flex items-end gap-6 border-b border-[#e5e7eb] pb-3">
@@ -236,10 +259,11 @@ export default function ProductInfoPage(): JSX.Element {
               <button
                 key={t.key}
                 onClick={() => setActive(t.key)}
-                className={`relative pb-2 text-lg font-medium ${active === t.key
-                  ? "text-[#14532d]"
-                  : "text-gray-600 hover:text-gray-800"
-                  }`}
+                className={`relative pb-2 text-lg font-medium ${
+                  active === t.key
+                    ? "text-[#14532d]"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
               >
                 {t.label}
                 {active === t.key && (
@@ -275,7 +299,7 @@ export default function ProductInfoPage(): JSX.Element {
 
         <FAQSection />
       </div>
-    </div >
+    </div>
   );
 }
 
