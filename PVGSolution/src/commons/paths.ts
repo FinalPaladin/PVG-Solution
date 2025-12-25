@@ -4,7 +4,7 @@ const BASE_ADMIN_URL = `${BASE_URL}/admin`;
 export const paths = {
   HOME: `${BASE_URL}`,
   PRODUCTS: `${BASE_URL}/san-pham`,
-  PRODUCT_DETAIL: `${BASE_URL}/san-pham/:id`,
+  PRODUCT_DETAIL: `${BASE_URL}/san-pham/:slug`,
   NEWS: `${BASE_URL}/tin-tuc`,
   NEWS_DETAIL: `${BASE_URL}/tin-tuc/:category/:slug`,
   REQUEST: `${BASE_URL}/gui-yeu-cau/:idproduct`,

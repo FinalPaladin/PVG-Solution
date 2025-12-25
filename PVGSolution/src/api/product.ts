@@ -14,3 +14,9 @@ export function initProductDetailPage(id: string) {
     `/api/products/app/${id}`
   );
 }
+
+export function getProductBySlug(slug: string) {
+  return request.get<unknown, BaseResponse<ProductResponseModel>>(
+    `/api/products/app/slug/${slug}`
+  );
+}

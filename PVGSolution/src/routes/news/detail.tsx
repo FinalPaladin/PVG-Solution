@@ -6,6 +6,7 @@ import { Calendar, Printer, Share2, ArrowRight } from "lucide-react";
 import { getNewsBySlug, initNewsPage } from "@/api/news.api";
 import type { NewsDetailResponse, NewsListItem } from "@/models/appNews.model";
 import clsx from "clsx";
+import { paths } from "@/commons/paths";
 
 /* =======================
    Helpers
@@ -133,18 +134,13 @@ function NewsDetailPageInner() {
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-400 mb-4">
           <Link to="/" className="hover:underline">
-            Trang thông tin điện tử
+            Trang chủ
           </Link>
           <span className="mx-2">/</span>
-          <Link to="/news" className="hover:underline">
+          <Link to={paths.NEWS} className="hover:underline">
             Tin tức & Sự kiện
           </Link>
           <span className="mx-2">/</span>
-          <span className="text-gray-500">{data.categoryName}</span>
-        </nav>
-
-        {/* Category pill */}
-        <div className="mb-6">
           <span
             className={clsx(
               "inline-block px-4 py-1 rounded-full text-sm font-medium",
@@ -153,7 +149,19 @@ function NewsDetailPageInner() {
           >
             {data.categoryName}
           </span>
-        </div>
+        </nav>
+
+        {/* Category pill */}
+        {/* <div className="mb-6">
+          <span
+            className={clsx(
+              "inline-block px-4 py-1 rounded-full text-sm font-medium",
+              "bg-green-100 text-green-700"
+            )}
+          >
+            {data.categoryName}
+          </span>
+        </div> */}
 
         {/* Header */}
         <header className="mb-8">
