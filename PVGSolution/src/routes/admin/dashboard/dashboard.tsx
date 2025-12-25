@@ -81,7 +81,7 @@ export default function AdminDashboard(): JSX.Element {
         {/* Hôm nay */}
         <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-green-50 to-white p-5">
           <h5 className="mb-2 text-sm font-medium text-gray-600">
-            Hôm qua
+            Hôm nay
           </h5>
           <p className="text-sm text-gray-700">
             Tất cả: <span className="font-semibold text-gray-600">{data.requestToday}</span>

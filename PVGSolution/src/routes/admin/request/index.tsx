@@ -244,7 +244,7 @@ const RequestsListTable = () => {
                   }
                 );
 
-                const status: string = it.isProcessed == true ? "Đã duyệt" : "Chờ duyệt";
+                const status: string = it.isProcessed == true ? "Đã xử lý" : "Chưa xử lý";
 
                 return (
                   <TableRow key={it.requestCode}>
