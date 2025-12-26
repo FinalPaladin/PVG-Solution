@@ -54,6 +54,24 @@ export default function ProductsPage() {
     return products.filter((p) => p.productCategoryId === value);
   }, [products, value]);
 
+  const WORDS_PER_LINE = 9;
+
+  const calcLinesByWords = (text: string) => {
+    if (!text) return 1;
+    const words = text.trim().split(/\s+/).length;
+    return Math.ceil(words / WORDS_PER_LINE);
+  };
+
+  const maxTitleLines = useMemo(() => {
+    if (!filteredProducts.length) return 1;
+
+    return Math.max(
+      ...filteredProducts.map((p) =>
+        calcLinesByWords(p.name)
+      )
+    ) + 1; // +1 buffer cho an toàn
+  }, [filteredProducts]);
+
   return (
     <>
       <RedBookBanner/>
@@ -129,7 +147,14 @@ export default function ProductsPage() {
               />
 
               <CardContent className="p-6 space-y-3">
-                <h3 className="text-lg font-semibold">{item.name}</h3>
+                <h3
+                  className="text-lg font-semibold leading-7 overflow-hidden"
+                  style={{
+                    minHeight: `${maxTitleLines * 1.75}rem`,
+                  }}
+                >
+                  {item.name}
+                </h3>
 
                 <div className="flex justify-between text-sm text-gray-700">
                   <div>
