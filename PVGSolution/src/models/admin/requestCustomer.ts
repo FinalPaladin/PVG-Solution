@@ -37,6 +37,7 @@ export interface IRequestCustomerDetail {
 
 export interface IRQ_GetRequestCustomerModel{
   requestCode: string;
+  productName: string;
 }
 
 export interface IRS_GetRequestCustomerModel{

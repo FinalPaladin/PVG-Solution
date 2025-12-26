@@ -266,7 +266,7 @@ export default function Header({
             </Link>
 
             <Link
-              to={paths.SUPPORT}
+              to={paths.REQUEST.replace(":idproduct", "new")}
               onClick={() => setMenuOpen(false)}
               className="block px-3 py-3 rounded-md hover:bg-gray-50 text-gray-600"
             >

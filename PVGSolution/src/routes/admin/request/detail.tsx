@@ -233,6 +233,9 @@ export default function RequestDetail(): JSX.Element {
           <b>Mã đơn:</b> {id}
         </div>
         <div>
+          <b>Loại sản phẩm:</b> {request.productName}
+        </div>
+        <div>
           <b>Số điện thoại:</b> {item.find((c) => c.key === "phone")?.value}
         </div>
         <div>
