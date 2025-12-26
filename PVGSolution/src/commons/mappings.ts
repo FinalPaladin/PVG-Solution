@@ -32,5 +32,7 @@ export const RequestCustomerLabels: Record<string, string> = {
   birthday: "Ngày sinh",
   loanpurpose: "Mục đích vay",
   outstandingloansatotherbanks: "Dư Nợ Tại Các Ngân Hàng Khác",
-  cccd: "Căn cước công dân"
+  cccd: "Căn cước công dân",
+  loanamountrequested: "Số tiền muốn vay",
+  maritalstatus: "Tình trạng hôn nhân"
 };

@@ -1,3 +1,4 @@
+import { useAlert } from "@/stores/useAlertStore";
 import axios from "axios";
 
 const request = axios.create({
@@ -27,14 +28,14 @@ request.interceptors.response.use(
   (error) => {
     // Lỗi không có response (lỗi mạng, server chết)
     if (!error.response) {
-      alert("Không thể kết nối server. Vui lòng thử lại sau!");
+      useAlert.getState().showError("Không thể kết nối server. Vui lòng thử lại sau!");
       return Promise.reject(error);
     }
 
     const msg = error.response.data?.message || error.message;
 
     // Các lỗi khác
-    alert("Lỗi: " + msg);
+    useAlert.getState().showError("Lỗi: " + msg);
 
     return Promise.reject(error);
   }

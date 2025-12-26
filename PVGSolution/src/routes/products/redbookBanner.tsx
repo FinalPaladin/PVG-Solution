@@ -4,7 +4,7 @@ import { useWebConfig } from "@/auth/webConfigContext";
 import { useNavigate } from "react-router-dom";
 import { paths } from "@/commons/paths";
 
-export function RedBookBanner({idproduct}: {idproduct: string}) {
+export function RedBookBanner() {
   const { webConfig } = useWebConfig();
   const navigate = useNavigate();
   
@@ -64,7 +64,7 @@ export function RedBookBanner({idproduct}: {idproduct: string}) {
                   size="lg"
                   className="rounded-full px-7 shadow-sm"
                   onClick={() =>
-                    navigate(paths.REQUEST.replace(":idproduct", idproduct))
+                    navigate(paths.REQUEST.replace(":idproduct", "new"))
                   }
                 >
                   Đăng ký nhận tư vấn miễn phí
