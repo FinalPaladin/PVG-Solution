@@ -132,6 +132,7 @@ export default function NewsFormPage() {
         ...form,
         content: sanitizeHtml(form.content),
         isApproved: approve ? true : form.isApproved,
+        userName: auth.userName ?? "",
       };
 
       if (isEdit && newsId) {

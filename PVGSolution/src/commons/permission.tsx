@@ -3,6 +3,7 @@ import { adminPaths } from "./paths";
 import { hashpermission } from "./const";
 import { useAuth } from "@/auth/authContext";
 import {
+  Album,
   ChartBarStacked,
   ClipboardList,
   Cog,
@@ -79,7 +80,7 @@ const permissionPages = [
   },
   {
     path: adminPaths.ADMIN_NEWS_CATEGORY,
-    pathIcon: <Newspaper className="h-5 w-5" />,
+    pathIcon: <Album className="h-5 w-5" />,
     pathName: "Danh mục tin tức",
     permissions: [hashpermission.admin_system, hashpermission.admin_mkt],
     isMenu: true,

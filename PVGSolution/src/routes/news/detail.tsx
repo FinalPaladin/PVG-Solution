@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
-import { Calendar, Printer, Share2, ArrowRight } from "lucide-react";
+import { Calendar, Printer, Share2 } from "lucide-react";
 import { getNewsBySlug, initNewsPage } from "@/api/news.api";
 import type { NewsDetailResponse, NewsListItem } from "@/models/appNews.model";
 import clsx from "clsx";
@@ -206,27 +206,39 @@ function NewsDetailPageInner() {
           />
         </main>
 
-        {/* Related news */}
+        {/* Related news - compact */}
         {related.length > 0 && (
           <section className="mt-14">
             <h2 className="text-xl font-bold mb-6">Tin liên quan</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
               {related.map((n) => (
                 <div
                   key={n.id}
-                  className="p-4 border rounded-xl hover:shadow-sm transition cursor-pointer"
-                  onClick={() => navigate(`/news/${n.slug}`)}
+                  onClick={() =>
+                    navigate(
+                      paths.NEWS_DETAIL.replace(
+                        ":category",
+                        String(n.categoryId)
+                      ).replace(":slug", n.slug)
+                    )
+                  }
+                  className="group cursor-pointer"
                 >
-                  <div className="font-semibold line-clamp-2">{n.title}</div>
-                  <div className="mt-2 text-sm text-gray-400 flex items-center gap-2">
-                    <Calendar size={14} />
-                    {formatDate(n.createdDate)}
+                  {/* Thumbnail */}
+                  <div className="aspect-video overflow-hidden rounded-lg bg-gray-100">
+                    <img
+                      src={n.thumbnail}
+                      alt={n.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
                   </div>
 
-                  <div className="mt-3 text-sm text-green-600 flex items-center gap-1">
-                    Xem chi tiết <ArrowRight size={14} />
-                  </div>
+                  {/* Title */}
+                  <h3 className="mt-3 text-sm font-medium line-clamp-2 group-hover:text-green-600 transition">
+                    {n.title}
+                  </h3>
                 </div>
               ))}
             </div>

@@ -65,6 +65,7 @@ export interface NewsCreateRequest {
   thumbnailFile?: NewsThumbnailRequest;
   displayOrder?: number;
   isApproved?: boolean;
+  userName?: string;
 }
 
 export interface NewsThumbnailRequest {
