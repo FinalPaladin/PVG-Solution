@@ -342,22 +342,23 @@ export default function RequestCustomerPage(): JSX.Element {
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Trở lại
                 </Button>
-
-                <Button
-                  type="button"
-                  disabled={tab === tabRequest[tabRequest.length - 2]}
-                  onClick={() => {
-                    if (tab.code < tabRequest[tabRequest.length - 1].code) {
-                      const nextTab = tabRequest.find(x => x.code === tab.code + 1);
-                      if (nextTab) setTab(nextTab);
-                    }
-                  }}
-                  className="h-9 px-4 rounded-md bg-[#4d588b] text-white
-                            hover:bg-[#3f4974] disabled:opacity-50"
-                >
-                  Tiếp tục
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
+                {                  
+                  tab !== tabRequest[tabRequest.length - 2] &&
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (tab.code < tabRequest[tabRequest.length - 1].code) {
+                        const nextTab = tabRequest.find(x => x.code === tab.code + 1);
+                        if (nextTab) setTab(nextTab);
+                      }
+                    }}
+                    className="h-9 px-4 rounded-md bg-[#4d588b] text-white
+                              hover:bg-[#3f4974] disabled:opacity-50"
+                  >
+                    Tiếp tục
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                }
               </div>
               )}
             </div>
@@ -380,10 +381,10 @@ export default function RequestCustomerPage(): JSX.Element {
                   </span>
                   <input
                     type="text"
-                    title="(Họ và tên)"
+                    title="Họ và tên"
                     value={form.fullname}
                     onChange={(e) => onChange("fullname", e.target.value)}
-                    placeholder="(Họ và tên)"
+                    placeholder="Họ và tên"
                     required
                     className="h-10 rounded-md border border-gray-300 px-3 text-sm
                               focus:border-green-500 focus:ring-2 focus:ring-green-100
@@ -556,10 +557,10 @@ export default function RequestCustomerPage(): JSX.Element {
                   </span>
                   <input
                     type="tel"
-                    title="(Hãy nhập số điện thoại của bạn bắt đầu bằng số 0 và không có khoảng trắng)"
+                    title="Hãy nhập số điện thoại của bạn bắt đầu bằng số 0 và không có khoảng trắng"
                     value={form.phone}
                     onChange={(e) => onChange("phone", e.target.value)}
-                    placeholder="(Hãy nhập số điện thoại của bạn bắt đầu bằng số 0 và không có khoảng trắng)"
+                    placeholder="Số điện thoại"
                     required
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm
                               focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
@@ -591,7 +592,7 @@ export default function RequestCustomerPage(): JSX.Element {
                     type="text"
                     value={form.address}
                     onChange={(e) => onChange("address", e.target.value)}
-                    placeholder="(Địa chỉ sinh sống) Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                    placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
                     title="(Địa chỉ sinh sống) Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
                     required
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm
@@ -739,7 +740,7 @@ export default function RequestCustomerPage(): JSX.Element {
                     type="text"
                     value={form.loanpurpose}
                     onChange={(e) => onChange("loanpurpose", e.target.value)}
-                    placeholder="Hãy cho chúng tôi biết bạn sẽ sử dụng số tiền vay cho mục đích gì"
+                    placeholder="Mục đích vay"
                     title="Hãy cho chúng tôi biết bạn sẽ sử dụng số tiền vay cho mục đích gì"
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
                               focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
@@ -818,7 +819,7 @@ export default function RequestCustomerPage(): JSX.Element {
                     value={form.otherinfo}
                     title="Hãy để lại lời nhắn mà bạn cần chúng tôi lưu ý (nếu có) để hỗ trợ tư vấn hồ sơ vay cho bạn"
                     onChange={(e) => onChange("otherinfo", e.target.value)}
-                    placeholder="Hãy để lại lời nhắn mà bạn cần chúng tôi lưu ý (nếu có) để hỗ trợ tư vấn hồ sơ vay cho bạn"
+                    placeholder="Hãy để lại lời nhắn (nếu có)"
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
                               focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
@@ -893,7 +894,7 @@ export default function RequestCustomerPage(): JSX.Element {
             :
             <></>
           }
-          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:justify-end sm:items-center">
+          <div className="mt-6 flex flex-col gap-4 justify-end items-end">
             {/* STEP NAVIGATION */}
             {!requestCode && tab.code < tabRequest[tabRequest.length - 1].code && (
               <div className="flex gap-2">
@@ -911,24 +912,26 @@ export default function RequestCustomerPage(): JSX.Element {
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Trở lại
                 </Button>
-
-                <Button
-                  type="button"
-                  disabled={tab === tabRequest[tabRequest.length - 2]}
-                  onClick={() => {
-                    const nextTab = tabRequest.find(x => x.code === tab.code + 1);
-                    if (nextTab) setTab(nextTab);
-                  }}
-                  className="h-9 px-4 rounded-md bg-[#4d588b] text-white
-                            hover:bg-[#3f4974] disabled:opacity-50"
-                >
-                  Tiếp tục
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
+                {
+                  tab !== tabRequest[tabRequest.length - 2] &&
+                  <Button
+                    type="button"
+                    
+                    onClick={() => {
+                      const nextTab = tabRequest.find(x => x.code === tab.code + 1);
+                      if (nextTab) setTab(nextTab);
+                    }}
+                    className="h-9 px-4 rounded-md bg-[#4d588b] text-white
+                              hover:bg-[#3f4974] disabled:opacity-50"
+                  >
+                    Tiếp tục
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                }
               </div>
             )}
           </div>
-          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:justify-end sm:items-center">
+          <div className="mt-6 flex flex-col gap-4 justify-end items-end">
             {/* SUBMIT ACTION – chỉ step cuối */}
             {tab.code === tabRequest[3].code && (
               <div className="flex gap-2">

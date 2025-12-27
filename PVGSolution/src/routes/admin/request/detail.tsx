@@ -158,171 +158,204 @@ export default function RequestDetail(): JSX.Element {
   // };
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-lg font-semibold sm:text-2xl leading-snug">
+    <div className="mx-auto w-full max-w-4xl px-3 sm:px-4 lg:px-0 space-y-4">
+
+      {/* Header */}
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
           Chi tiết yêu cầu
-          <span className="block text-sm font-normal text-gray-500 sm:inline sm:text-base">
+          <span className="block sm:inline text-sm sm:text-base font-normal text-gray-500">
             {" / "}{request.productName}
           </span>
         </h1>
       </div>
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* Back */}
+
+      {/* Action bar */}
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Link
           to={adminPaths.ADMIN_REQUESTS}
-          className="inline-flex items-center gap-2
-                    rounded-md border border-green-300
-                    px-3 py-1.5
-                    text-sm font-medium
-                    text-green-700
-                    bg-gradient-to-r from-green-50 to-green-100
-                    hover:from-green-100 hover:to-green-200
-                    transition-all">
-          <span className="text-base">←</span>
-          Quay lại
+          className="inline-flex items-center justify-center gap-2
+                    rounded-lg border border-gray-300
+                    px-4 py-2 text-sm font-medium
+                    text-gray-700 bg-white
+                    hover:bg-gray-50 transition"
+        >
+          ← Quay lại
         </Link>
 
-        {/* Action */}
         {isProcessed ? (
-          <Button
-            type="button"
-            disabled
-            className="inline-flex items-center justify-center
-                      w-full sm:w-auto
-                      px-4 py-2 rounded-md font-medium
-                      bg-[#388700] text-white
-                      cursor-default"
-          >
+          <span className="inline-flex items-center justify-center
+                          rounded-lg px-4 py-2 text-sm font-medium
+                          bg-emerald-600 text-white">
             Đã hoàn tất
-          </Button>
+          </span>
         ) : (
           <Button
             type="button"
             onClick={handleProcessed}
             className="inline-flex items-center justify-center gap-2
-                      w-full sm:w-auto
-                      px-4 py-2 rounded-md font-medium
+                      rounded-lg px-4 py-2 text-sm font-medium
                       text-white
                       bg-gradient-to-r from-blue-500 to-indigo-600
                       hover:from-blue-600 hover:to-indigo-700
-                      focus:outline-none focus:ring-2 focus:ring-indigo-200
-                        transition-all"
-            >
-              <Check className="h-5 w-5" />
-              Xác nhận
-            </Button>
-
+                      focus:ring-2 focus:ring-indigo-200 transition"
+          >
+            <Check className="h-4 w-4" />
+            Xác nhận
+          </Button>
         )}
       </div>
-      <div>
-        {message && (
-          <div
-            className={`mb-4 px-4 py-2 rounded ${
+
+      {/* Message */}
+      {message && (
+        <div
+          className={`rounded-lg px-4 py-3 text-sm font-medium
+            ${
               message.type === "success"
-                ? "bg-green-50 text-green-800"
-                : "bg-red-50 text-red-800"
+                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                : "bg-red-50 text-red-800 border border-red-200"
             }`}
-          >
-            {message.text}
+        >
+          {message.text}
+        </div>
+      )}
+
+      {/* Summary */}
+      <div className="rounded-xl bg-white shadow-sm border p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div>
+            <span className="text-gray-500">Mã đơn</span>
+            <div className="font-medium text-gray-800">{id}</div>
+          </div>
+
+          <div>
+            <span className="text-gray-500">Loại sản phẩm</span>
+            <div className="font-medium text-gray-800">{request.productName}</div>
+          </div>
+
+          <div>
+            <span className="text-gray-500">Số điện thoại</span>
+            <div className="font-medium text-gray-800">
+              {item.find(c => c.key === "phone")?.value}
+            </div>
+          </div>
+
+          <div>
+            <span className="text-gray-500">Ngày tạo</span>
+            <div className="font-medium text-gray-800">
+              {item[0]?.createdDate
+                ? new Date(item[0].createdDate).toLocaleString("vi-VN")
+                : "—"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+        {/* Detail – Mobile */}
+<div className="block sm:hidden space-y-3">
+  {item.map((d, i) => {
+    const isImg = isImageKey(d.key);
+    const urls = isImg ? extractUrls(String(d.value)) : [];
+
+    return (
+      <div
+        key={i}
+        className="rounded-lg border bg-white p-3 shadow-sm"
+      >
+        <div className="text-xs font-medium text-gray-500 mb-1">
+          {RequestCustomerLabels[d.key] ?? d.key}
+        </div>
+
+        {isImg && urls.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {urls.map((u, idx) => (
+              <img
+                key={idx}
+                src={u}
+                onClick={() => openImage(u)}
+                className="h-20 w-28 rounded-lg object-cover border cursor-pointer"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-sm text-gray-800 break-words">
+            {d.value || "—"}
           </div>
         )}
       </div>
-      <div className="bg-white p-6 rounded shadow-sm space-y-4">
-        <div>
-          <b>Mã đơn:</b> {id}
-        </div>
-        <div>
-          <b>Loại sản phẩm:</b> {request.productName}
-        </div>
-        <div>
-          <b>Số điện thoại:</b> {item.find((c) => c.key === "phone")?.value}
-        </div>
-        <div>
-          <b>Ngày tạo:</b>{" "}
-          {item[0]?.createdDate
-            ? new Date(item[0].createdDate).toLocaleString("vi-VN", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              })
-            : "—"}
-        </div>
+    );
+  })}
+</div>
 
-        <div>
-          <table className="w-full text-left table-auto">
-            <thead>
-              <tr className="text-sm text-gray-500">
-                <th className="pr-4 pb-2">Thông tin yêu cầu</th>
-                <th className="pb-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {item.map((d, i) => {
-                const isImg = isImageKey(d.key);
-                const urls = isImg ? extractUrls(String(d.value)) : [];
-                return (
-                  <tr key={i} className="border-t">
-                    <td className="py-2 pr-4 text-sm text-gray-700">
-                      {RequestCustomerLabels[d.key] ?? d.key}
-                    </td>
-                    <td className="py-2 text-sm text-gray-700">
-                      {isImg && urls.length > 0 ? (
-                        <div className="flex gap-3 flex-wrap">
-                          {urls.map((u, idx) => (
-                            <img
-                              key={idx}
-                              src={u}
-                              alt={`${d.key}-${idx}`}
-                              onClick={() => openImage(u)}
-                              className="w-32 h-20 object-cover rounded cursor-pointer border"
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        // fallback: show raw value
-                        <span>{d.value}</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+{/* Detail – Desktop */}
+<div className="hidden sm:block rounded-xl bg-white shadow-sm border overflow-hidden">
+  <div className="px-4 py-3 border-b bg-gray-50 text-sm font-medium text-gray-700">
+    Thông tin yêu cầu
+  </div>
 
-      {/* Modal */}
+  <table className="w-full text-sm">
+    <tbody>
+      {item.map((d, i) => {
+        const isImg = isImageKey(d.key);
+        const urls = isImg ? extractUrls(String(d.value)) : [];
+
+        return (
+          <tr key={i} className="border-t">
+            <td className="w-1/3 px-4 py-3 text-gray-500 align-top">
+              {RequestCustomerLabels[d.key] ?? d.key}
+            </td>
+
+            <td className="px-4 py-3 text-gray-800">
+              {isImg && urls.length > 0 ? (
+                <div className="flex flex-wrap gap-3">
+                  {urls.map((u, idx) => (
+                    <img
+                      key={idx}
+                      src={u}
+                      onClick={() => openImage(u)}
+                      className="h-20 w-32 object-cover rounded-lg border cursor-pointer hover:opacity-90"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <span className="break-words">{d.value || "—"}</span>
+              )}
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>
+
+      {/* Image modal */}
       {isOpen && activeImg && (
-        // overlay
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
           onClick={() => {
             setIsOpen(false);
             setActiveImg(null);
           }}
         >
           <div
-            className="relative max-w-[90%] max-h-[90%] p-4"
-            onClick={(e) => e.stopPropagation()} // prevent overlay close when clicking inside
+            className="relative max-w-full max-h-full"
+            onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-2 right-2 text-white bg-black/50 rounded-full px-3 py-1 text-lg"
+              className="absolute -top-3 -right-3
+                        rounded-full bg-black/70 text-white
+                        w-8 h-8 flex items-center justify-center"
               onClick={() => {
                 setIsOpen(false);
                 setActiveImg(null);
               }}
-              aria-label="Close image"
             >
               ✕
             </button>
+
             <img
               src={activeImg}
-              alt="Preview"
-              className="max-w-full max-h-[80vh] rounded shadow-lg"
+              className="max-h-[85vh] rounded-lg shadow-lg"
             />
           </div>
         </div>
