@@ -698,8 +698,8 @@ export default function RequestCustomerPage(): JSX.Element {
                       type="text"
                       value={form.companyphone}
                       onChange={(e) => onChange("companyphone", e.target.value)}
-                      placeholder="(Nhập số điện thoại bàn công ty)"
-                      title="(Nhập số điện thoại bàn công ty)"
+                      placeholder="Nhập số điện thoại bàn công ty"
+                      title="Nhập số điện thoại bàn công ty"
                       className="rounded-lg border border-gray-300 px-3 py-2 text-sm
                                 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                     />

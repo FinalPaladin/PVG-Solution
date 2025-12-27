@@ -158,175 +158,176 @@ export default function RequestDetail(): JSX.Element {
   // };
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-3 sm:px-4 lg:px-0 space-y-4">
+          <div className="mx-auto w-full max-w-4xl px-3 sm:px-4 lg:px-0 space-y-4">
 
-      {/* Header */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
-          Chi tiết yêu cầu
-          <span className="block sm:inline text-sm sm:text-base font-normal text-gray-500">
-            {" / "}{request.productName}
-          </span>
-        </h1>
-      </div>
-
-      {/* Action bar */}
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          to={adminPaths.ADMIN_REQUESTS}
-          className="inline-flex items-center justify-center gap-2
-                    rounded-lg border border-gray-300
-                    px-4 py-2 text-sm font-medium
-                    text-gray-700 bg-white
-                    hover:bg-gray-50 transition"
-        >
-          ← Quay lại
-        </Link>
-
-        {isProcessed ? (
-          <span className="inline-flex items-center justify-center
-                          rounded-lg px-4 py-2 text-sm font-medium
-                          bg-emerald-600 text-white">
-            Đã hoàn tất
-          </span>
-        ) : (
-          <Button
-            type="button"
-            onClick={handleProcessed}
-            className="inline-flex items-center justify-center gap-2
-                      rounded-lg px-4 py-2 text-sm font-medium
-                      text-white
-                      bg-gradient-to-r from-blue-500 to-indigo-600
-                      hover:from-blue-600 hover:to-indigo-700
-                      focus:ring-2 focus:ring-indigo-200 transition"
-          >
-            <Check className="h-4 w-4" />
-            Xác nhận
-          </Button>
-        )}
-      </div>
-
-      {/* Message */}
-      {message && (
-        <div
-          className={`rounded-lg px-4 py-3 text-sm font-medium
-            ${
-              message.type === "success"
-                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                : "bg-red-50 text-red-800 border border-red-200"
-            }`}
-        >
-          {message.text}
-        </div>
-      )}
-
-      {/* Summary */}
-      <div className="rounded-xl bg-white shadow-sm border p-4 sm:p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-          <div>
-            <span className="text-gray-500">Mã đơn</span>
-            <div className="font-medium text-gray-800">{id}</div>
-          </div>
-
-          <div>
-            <span className="text-gray-500">Loại sản phẩm</span>
-            <div className="font-medium text-gray-800">{request.productName}</div>
-          </div>
-
-          <div>
-            <span className="text-gray-500">Số điện thoại</span>
-            <div className="font-medium text-gray-800">
-              {item.find(c => c.key === "phone")?.value}
+            {/* Header */}
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                Chi tiết yêu cầu
+                <span className="block sm:inline text-sm sm:text-base font-normal text-gray-500">
+                  {" / "}{request.productName}
+                </span>
+              </h1>
             </div>
-          </div>
 
-          <div>
-            <span className="text-gray-500">Ngày tạo</span>
-            <div className="font-medium text-gray-800">
-              {item[0]?.createdDate
-                ? new Date(item[0].createdDate).toLocaleString("vi-VN")
-                : "—"}
+            {/* Action bar */}
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Link
+                to={adminPaths.ADMIN_REQUESTS}
+                className="inline-flex items-center justify-center gap-2
+                          rounded-lg border border-gray-300
+                          px-4 py-2 text-sm font-medium
+                          text-green-700
+                          bg-gradient-to-r from-green-50 to-green-100
+                        hover:from-green-100 hover:to-green-200 transition-all"
+              >
+                ← Quay lại
+              </Link>
+
+              {isProcessed ? (
+                <span className="inline-flex items-center justify-center
+                                rounded-lg px-4 py-2 text-sm font-medium
+                                bg-emerald-600 text-white">
+                  Đã hoàn tất
+                </span>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleProcessed}
+                  className="inline-flex items-center justify-center gap-2
+                            rounded-lg px-4 py-2 text-sm font-medium
+                            text-white
+                            bg-gradient-to-r from-blue-500 to-indigo-600
+                            hover:from-blue-600 hover:to-indigo-700
+                            focus:ring-2 focus:ring-indigo-200 transition"
+                >
+                  <Check className="h-4 w-4" />
+                  Xác nhận
+                </Button>
+              )}
             </div>
-          </div>
-        </div>
-      </div>
 
-        {/* Detail – Mobile */}
-<div className="block sm:hidden space-y-3">
-  {item.map((d, i) => {
-    const isImg = isImageKey(d.key);
-    const urls = isImg ? extractUrls(String(d.value)) : [];
+            {/* Message */}
+            {message && (
+              <div
+                className={`rounded-lg px-4 py-3 text-sm font-medium
+                  ${
+                    message.type === "success"
+                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                      : "bg-red-50 text-red-800 border border-red-200"
+                  }`}
+              >
+                {message.text}
+              </div>
+            )}
 
-    return (
-      <div
-        key={i}
-        className="rounded-lg border bg-white p-3 shadow-sm"
-      >
-        <div className="text-xs font-medium text-gray-500 mb-1">
-          {RequestCustomerLabels[d.key] ?? d.key}
-        </div>
+            {/* Summary */}
+            <div className="rounded-xl bg-white shadow-sm border p-4 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-gray-500">Mã đơn</span>
+                  <div className="font-medium text-gray-800">{id}</div>
+                </div>
 
-        {isImg && urls.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {urls.map((u, idx) => (
-              <img
-                key={idx}
-                src={u}
-                onClick={() => openImage(u)}
-                className="h-20 w-28 rounded-lg object-cover border cursor-pointer"
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-sm text-gray-800 break-words">
-            {d.value || "—"}
-          </div>
-        )}
-      </div>
-    );
-  })}
-</div>
+                <div>
+                  <span className="text-gray-500">Loại sản phẩm</span>
+                  <div className="font-medium text-gray-800">{request.productName}</div>
+                </div>
 
-{/* Detail – Desktop */}
-<div className="hidden sm:block rounded-xl bg-white shadow-sm border overflow-hidden">
-  <div className="px-4 py-3 border-b bg-gray-50 text-sm font-medium text-gray-700">
-    Thông tin yêu cầu
-  </div>
+                <div>
+                  <span className="text-gray-500">Số điện thoại</span>
+                  <div className="font-medium text-gray-800">
+                    {item.find(c => c.key === "phone")?.value}
+                  </div>
+                </div>
 
-  <table className="w-full text-sm">
-    <tbody>
-      {item.map((d, i) => {
-        const isImg = isImageKey(d.key);
-        const urls = isImg ? extractUrls(String(d.value)) : [];
+                <div>
+                  <span className="text-gray-500">Ngày tạo</span>
+                  <div className="font-medium text-gray-800">
+                    {item[0]?.createdDate
+                      ? new Date(item[0].createdDate).toLocaleString("vi-VN")
+                      : "—"}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        return (
-          <tr key={i} className="border-t">
-            <td className="w-1/3 px-4 py-3 text-gray-500 align-top">
-              {RequestCustomerLabels[d.key] ?? d.key}
-            </td>
+              {/* Detail – Mobile */}
+      <div className="block sm:hidden space-y-3">
+        {item.map((d, i) => {
+          const isImg = isImageKey(d.key);
+          const urls = isImg ? extractUrls(String(d.value)) : [];
 
-            <td className="px-4 py-3 text-gray-800">
+          return (
+            <div
+              key={i}
+              className="rounded-lg border bg-white p-3 shadow-sm"
+            >
+              <div className="text-xs font-medium text-gray-500 mb-1">
+                {RequestCustomerLabels[d.key] ?? d.key}
+              </div>
+
               {isImg && urls.length > 0 ? (
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2">
                   {urls.map((u, idx) => (
                     <img
                       key={idx}
                       src={u}
                       onClick={() => openImage(u)}
-                      className="h-20 w-32 object-cover rounded-lg border cursor-pointer hover:opacity-90"
+                      className="h-20 w-28 rounded-lg object-cover border cursor-pointer"
                     />
                   ))}
                 </div>
               ) : (
-                <span className="break-words">{d.value || "—"}</span>
+                <div className="text-sm text-gray-800 break-words">
+                  {d.value || "—"}
+                </div>
               )}
-            </td>
-          </tr>
-        );
-      })}
-    </tbody>
-  </table>
-</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Detail – Desktop */}
+      <div className="hidden sm:block rounded-xl bg-white shadow-sm border overflow-hidden">
+        <div className="px-4 py-3 border-b bg-gray-50 text-sm font-medium text-gray-700">
+          Thông tin yêu cầu
+        </div>
+
+        <table className="w-full text-sm">
+          <tbody>
+            {item.map((d, i) => {
+              const isImg = isImageKey(d.key);
+              const urls = isImg ? extractUrls(String(d.value)) : [];
+
+              return (
+                <tr key={i} className="border-t">
+                  <td className="w-1/3 px-4 py-3 text-gray-500 align-top">
+                    {RequestCustomerLabels[d.key] ?? d.key}
+                  </td>
+
+                  <td className="px-4 py-3 text-gray-800">
+                    {isImg && urls.length > 0 ? (
+                      <div className="flex flex-wrap gap-3">
+                        {urls.map((u, idx) => (
+                          <img
+                            key={idx}
+                            src={u}
+                            onClick={() => openImage(u)}
+                            className="h-20 w-32 object-cover rounded-lg border cursor-pointer hover:opacity-90"
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="break-words">{d.value || "—"}</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Image modal */}
       {isOpen && activeImg && (
