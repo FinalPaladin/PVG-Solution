@@ -7,18 +7,18 @@ type FAQ = {
 
 const FAQ_LIST: FAQ[] = [
     {
-        question: "Thời gian vay mua ô tô tại PVG là bao lâu?",
-        answer: "Khách hàng có thể vay vốn để mua ô tô tại PVG tối đa lên tới 96 tháng.",
+        question: "Ai có thể sử dụng dịch vụ HHG solution?",
+        answer: "Dịch vụ HHG solution được cung cấp cho khách hàng cá nhân là công dân Việt Nam trên 18 tuổi có năng lực pháp luật và hành vi dân sự đầy đủ.",
     },
     {
-        question: "Số tiền cho vay tối đa cho 1 khoản vay là bao nhiêu?",
+        question: "Có phải dịch vụ HHG solution hoạt động liên tục 24 giờ?",
         answer:
-            "Khách hàng có thể vay đến 70% giá trị xe nếu thế chấp bằng chính chiếc xe mua và lên tới 100% giá trị xe nếu thế chấp tài sản đảm bảo khác.",
+            "Đúng, dịch vụ HHG solution hoạt động 24/7, bao gồm cả ngày nghỉ/ngày lễ.",
     },
     {
-        question: "Tôi có thể trả nợ vay như thế nào?",
+        question: "Dịch vụ HHG solution là gì?",
         answer:
-            "Khách hàng có thể trả nợ gốc vay hàng tháng hoặc hàng quý và trả nợ lãi vay hàng tháng theo dư nợ giảm dần.",
+            "Giải pháp hỗ trợ tiếp nhận vốn, Kết nối nhà đầu tư & khách hàng, Fintech kết nối nguồn vốn, Nền tảng kết nối tài chính - ngân hàng.",
     },
     // thêm câu hỏi khác nếu cần
 ];
