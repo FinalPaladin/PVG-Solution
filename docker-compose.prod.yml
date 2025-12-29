@@ -1,8 +1,7 @@
-
 services:
   frontend:
     build:
-      context: .
+      context: ../frontend/PVG-Solution-FE
       dockerfile: Dockerfile
     image: pvg-frontend:v1.0.0-281226
     container_name: pvg-frontend-prod
