@@ -7,7 +7,7 @@ services:
     container_name: pvg-frontend-prod
     restart: always
     ports:
-      - "80:80"
+      - "8081:80"
     networks:
       - pvg_prod_net
 
