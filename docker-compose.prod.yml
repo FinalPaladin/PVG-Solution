@@ -1,10 +1,15 @@
-frontend:
-  image: pvg-frontend:latest
-  container_name: pvg-frontend-prod
-  restart: always
-  ports:
-    - "80:80"
-  depends_on:
-    - backend
-  networks:
-    - pvg_prod_net
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pvg-frontend:v1.0.0-281226
+    container_name: pvg-frontend-prod
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - pvg_prod_net
