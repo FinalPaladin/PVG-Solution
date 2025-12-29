@@ -8,7 +8,9 @@ services:
     restart: always
     ports:
       - "80:80"
-    depends_on:
-      - backend
     networks:
       - pvg_prod_net
+
+networks:
+  pvg_prod_net:
+    external: true
