@@ -98,9 +98,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-10 text-xs text-gray-400">
-            Version REAPS.SIT.v8.50.00.251105
-          </p>
+          <p className="mt-10 text-xs text-gray-400">Version v1.0.0-281225</p>
         </div>
       </div>
 
