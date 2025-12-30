@@ -1,25 +1,23 @@
 import { type JSX, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import {
-  LayoutDashboard,
-  ClipboardList,
-  Menu,
-  ChevronLeft,
-  User2,
-  LogOut,
-  Info,
-} from "lucide-react";
+import { Menu, ChevronLeft, User2, LogOut, Info } from "lucide-react";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
 import { useAuth } from "../../auth/authContext";
+import { useWebConfig } from "@/auth/webConfigContext";
+import { useAlert } from "@/stores/useAlertStore";
+import type { IPageModel } from "@/models/admin/page.model";
+import { useGetMenu } from "@/commons/permission";
+import "@/styles/tiptap.css";
 
 export default function AdminLayout(): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { auth, logout } = useAuth();
+  const { webConfig } = useWebConfig();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -33,8 +31,12 @@ export default function AdminLayout(): JSX.Element {
         method: "POST",
         credentials: "include",
       });
-    } catch (e) {
-      console.error("Logout error", e);
+    } catch (error) {
+      if (error instanceof Error) {
+        useAlert.getState().showError(error.message);
+      } else {
+        useAlert.getState().showError("Đã xảy ra lỗi không xác định");
+      }
     } finally {
       logout();
     }
@@ -49,7 +51,7 @@ export default function AdminLayout(): JSX.Element {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <aside
-        className={`relative h-screen border-r border-gray-200 bg-white flex flex-col transition-all duration-300 ${
+        className={`relative min-h-screen border-r bg-white flex flex-col transition-all duration-300 ${
           collapsed ? "w-20" : "w-72"
         }`}
       >
@@ -62,9 +64,9 @@ export default function AdminLayout(): JSX.Element {
               </span>
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-gray-900">
-                  Admin Panel
+                  {webConfig.WebName}
                 </span>
-                <span className="text-xs text-gray-500">PVG Solution</span>
+                <span className="text-xs text-gray-500">{auth.userName}</span>
               </div>
             </div>
           )}
@@ -84,51 +86,19 @@ export default function AdminLayout(): JSX.Element {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          <Link
-            to="/admin"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin")
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <LayoutDashboard className="h-5 w-5" />
-            {!collapsed && <span>Dashboard</span>}
-          </Link>
-
-          <Link
-            to="/admin/requests"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/admin/requests")
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <ClipboardList className="h-5 w-5" />
-            {!collapsed && <span>Quản lý Yêu cầu khách</span>}
-          </Link>
-          <Link
-            to="/PVG-Solution/admin/configuration"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin/configuration")
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <LayoutDashboard className="h-5 w-5" />
-            {!collapsed && <span>Cài đặt</span>}
-          </Link>
-          <Link
-            to="/PVG-Solution/admin/ChangePassword"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive("/PVG-Solution/admin/configuration")
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <LayoutDashboard className="h-5 w-5" />
-            {!collapsed && <span>Đổi mật khẩu</span>}
-          </Link>
+          {useGetMenu().map((page: IPageModel) => (
+            <Link
+              to={page.path}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                isActive(page.path)
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {page.pathIcon}
+              {!collapsed && <span>{page.pathName}</span>}
+            </Link>
+          ))}
         </nav>
 
         {/* User box bottom-left + Popover */}
@@ -181,7 +151,7 @@ export default function AdminLayout(): JSX.Element {
       </aside>
 
       {/* Main area */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-6">
         <Outlet />
       </main>
     </div>

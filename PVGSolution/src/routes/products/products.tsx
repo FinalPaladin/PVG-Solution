@@ -4,100 +4,171 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
-const products = [
-  {
-    title: "Vay tín chấp theo lương",
-    img: "https://www.vietcombank.com.vn/-/media/Project/VCB-Sites/VCB/KHCN/San-pham-Dich-vu/Vay/SAN-PHAM-TIN-DUNG/Ava_Vay-tin-chap-voi-nguoi-LD_195-x-343_.jpg?h=1125&w=2436&ts=20250529074158",
-    subtitle1: "Mức vay",
-    value1: "Linh hoạt",
-    subtitle2: "Thời hạn vay tối đa",
-    value2: "84 tháng",
-  },
-  {
-    title: "Vay cầm cố giấy tờ có giá",
-    img: "https://www.vietcombank.com.vn/-/media/Project/VCB-Sites/VCB/KHCN/San-pham-Dich-vu/Vay/SAN-PHAM-TIN-DUNG/Ava_Vay-cam-co-giay-to-co-gia_195-x-343_.jpg?h=1125&w=2436&ts=20230815090526",
-    subtitle1: "Mức vay lên tới",
-    value1: "100% giá trị giấy tờ có giá",
-    subtitle2: "Thời hạn vay",
-    value2: "Linh hoạt",
-  },
-  {
-    title: "Vay tiêu dùng có tài sản bảo đảm",
-    img: "https://www.vietcombank.com.vn/-/media/Project/VCB-Sites/VCB/KHCN/San-pham-Dich-vu/Vay/SAN-PHAM-TIN-DUNG/Ava_Vay-tieu-dung-co-tai-san-dam-bao_195-x-343_.jpg?h=1125&w=2436&ts=20230816033310",
-    subtitle1: "Mức vay lên tới",
-    value1: "02 tỷ VND",
-    subtitle2: "Thời hạn vay tối đa",
-    value2: "120 tháng",
-  },
-];
-
-const tabs = [
-  { value: "all", label: "Tất cả sản phẩm" },
-  { value: "vaytieu", label: "Vay tiêu dùng" },
-  { value: "vayoto", label: "Vay mua ô tô" },
-  { value: "vaykd", label: "Vay sản xuất kinh doanh" },
-  { value: "vaybds", label: "Vay nhu cầu bất động sản" },
-];
+import { RedBookBanner } from "./redbookBanner";
+import { LoanBenefits } from "./loanBenefit";
+import { useEffect, useMemo, useState } from "react";
+import { initProductPage } from "@/api/product";
+import type { appCategories, appProducts } from "@/models/appProducts.model";
+import { useAlert } from "@/stores/useAlertStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ProductsPage() {
   const navigate = useNavigate();
 
+  const [categories, setCategories] = useState<appCategories[]>([]);
+  const [products, setProducts] = useState<appProducts[]>([]);
+  const [value, setValue] = useState<string>("");
+
+  // ===== Load init data =====
+  useEffect(() => {
+    const fetchInitData = async () => {
+      try {
+        const res = await initProductPage();
+        if (res.isSuccess && res.result) {
+          setCategories(res.result.categories);
+          setProducts(res.result.products);
+          // default tab = first category (thường là "")
+          setValue(res.result.categories?.[0]?.id ?? "");
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          useAlert.getState().showError(error.message);
+        } else {
+          useAlert.getState().showError("Đã xảy ra lỗi không xác định");
+        }
+      }
+    };
+
+    fetchInitData();
+  }, []);
+
+  // ===== Filter products by category =====
+  const filteredProducts = useMemo(() => {
+    if (!value || value == "all") return products;
+    return products.filter((p) => p.productCategoryId === value);
+  }, [products, value]);
+
+  const WORDS_PER_LINE = 9;
+
+  const calcLinesByWords = (text: string) => {
+    if (!text) return 1;
+    const words = text.trim().split(/\s+/).length;
+    return Math.ceil(words / WORDS_PER_LINE);
+  };
+
+  const maxTitleLines = useMemo(() => {
+    if (!filteredProducts.length) return 1;
+
+    return Math.max(
+      ...filteredProducts.map((p) =>
+        calcLinesByWords(p.name)
+      )
+    ) + 1; // +1 buffer cho an toàn
+  }, [filteredProducts]);
+
   return (
     <>
-      <h1 className="text-3xl font-bold mb-6 mt-6">Danh sách sản phẩm</h1>
-      <Tabs defaultValue="all">
-        <div className="relative pb-4">
-          {/* move the gray baseline slightly up and above the green underline, with higher z-index */}
-          <div
-            className="absolute left-0 right-0 h-px pointer-events-none"
-            style={{ bottom: "25px", backgroundColor: "#e5e7eb", zIndex: 30 }}
-          />
-          <TabsList className="flex gap-8 pb-6 bg-transparent border-none shadow-none">
-            {tabs.map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="tabs-trigger relative px-3 pb-3 text-lg text-gray-700 font-medium bg-transparent border-none shadow-none focus:outline-none"
-                style={{ backgroundColor: "transparent", boxShadow: "none" }}
-              >
-                <span className="tabs-trigger-label">{tab.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-      </Tabs>
+      <RedBookBanner/>
 
-      {/* Product Cards */}
+      <h1 className="text-3xl font-bold mb-6 mt-6">
+        Danh sách sản phẩm cần tư vấn
+      </h1>
+
+      {/* ===== Mobile select ===== */}
+      <div className="md:hidden mb-4">
+        <label htmlFor="productTabsSelect" className="sr-only">
+          Chọn danh mục sản phẩm
+        </label>
+
+        <Select
+          value={value ?? "all"}
+          onValueChange={(v) => {
+            setValue(v === "all" ? "" : v);
+          }}
+        >
+          <SelectTrigger className="w-full rounded-md border border-gray-200 px-4 py-3">
+            <SelectValue placeholder="Tất cả sản phẩm" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {categories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* ===== Desktop / Tablet tabs ===== */}
+      <div className="hidden md:block">
+        <Tabs value={value} onValueChange={setValue}>
+          <div className="relative pb-4">
+            <div
+              className="absolute left-0 right-0 h-px pointer-events-none"
+              style={{ bottom: "25px", backgroundColor: "#e5e7eb", zIndex: 30 }}
+            />
+
+            <TabsList className="flex gap-8 pb-6 bg-transparent border-none shadow-none">
+              {categories.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id} // ⬅️ QUAN TRỌNG
+                  className="tabs-trigger relative px-3 pb-3 text-lg text-gray-700 font-medium bg-transparent border-none shadow-none focus:outline-none"
+                  style={{ backgroundColor: "transparent", boxShadow: "none" }}
+                >
+                  <span className="tabs-trigger-label">{tab.name}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+        </Tabs>
+      </div>
+
+      {/* ===== Product cards ===== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((item, index) => (
+        {filteredProducts.map((item, index) => (
           <motion.div
-            key={index}
+            key={item.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            transition={{ delay: index * 0.08 }}
           >
             <Card className="overflow-hidden shadow-sm hover:shadow-md transition-all rounded-2xl p-0">
               <div
                 className="w-full h-56 bg-center bg-cover rounded-t-xl"
-                style={{ backgroundImage: `url(${item.img})` }}
+                style={{ backgroundImage: `url(${item.imageUrl})` }}
               />
 
               <CardContent className="p-6 space-y-3">
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <h3
+                  className="text-lg font-semibold leading-7 overflow-hidden"
+                  style={{
+                    minHeight: `${maxTitleLines * 1.75}rem`,
+                  }}
+                >
+                  {item.name}
+                </h3>
 
                 <div className="flex justify-between text-sm text-gray-700">
                   <div>
                     <p className="font-medium uppercase text-gray-500">
-                      {item.subtitle1}
+                      Mức vay
                     </p>
-                    <p className="font-semibold">{item.value1}</p>
+                    <p className="font-semibold">{item.loanAmount}</p>
                   </div>
+
                   <div>
                     <p className="font-medium uppercase text-gray-500">
-                      {item.subtitle2}
+                      Thời hạn vay
                     </p>
-                    <p className="font-semibold">{item.value2}</p>
+                    <p className="font-semibold">{item.loanTerm}</p>
                   </div>
                 </div>
               </CardContent>
@@ -105,14 +176,24 @@ export default function ProductsPage() {
               <CardFooter className="flex gap-3 px-6 pb-6">
                 <Button
                   className="bg-[#9cc31c] hover:bg-[#8bb019] text-white flex-1 rounded-md"
-                  onClick={() => navigate(paths.REQUEST)}
+                  onClick={() =>
+                    navigate(paths.REQUEST.replace(":idproduct", item.id))
+                  }
                 >
                   Đăng ký ngay
                 </Button>
+
                 <Button
                   variant="outline"
                   className="flex-1 rounded-md"
-                  onClick={() => navigate(paths.PRODUCT_DETAIL)}
+                  onClick={() =>
+                    navigate(
+                      `${paths.PRODUCT_DETAIL.replace(
+                        ":slug",
+                        item.slug ?? ""
+                      )}`
+                    )
+                  }
                 >
                   Xem chi tiết
                 </Button>
@@ -121,6 +202,8 @@ export default function ProductsPage() {
           </motion.div>
         ))}
       </div>
+
+      <LoanBenefits />
     </>
   );
 }

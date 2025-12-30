@@ -7,6 +7,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { adminPaths, paths } from "./commons/paths.ts";
 import { AuthProvider } from "./auth/authContext.ts";
 import ProtectedRoute from "./auth/protectedRoute.ts";
+import { GlobalErrorAlert } from "./components/common/errorDialog.tsx";
+import { WebConfigProvider } from "./auth/webConfigContext.ts";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+import { hashpermission } from "./commons/const.ts";
+import { HelmetProvider } from "react-helmet-async";
 
 // user site
 const HomePage = React.lazy(() => import("./routes/index.tsx"));
@@ -21,7 +26,9 @@ const NewsPage = React.lazy(() => import("./routes/news/news.tsx"));
 const NewsDetailPage = React.lazy(() => import("./routes/news/detail.tsx"));
 
 // admin
-const AdminDashboard = React.lazy(() => import("./routes/admin/dashboard/dashboard.tsx"));
+const AdminDashboard = React.lazy(
+  () => import("./routes/admin/dashboard/dashboard.tsx")
+);
 const RequestCustomerAdmin = React.lazy(
   () => import("./routes/admin/request/index.tsx")
 );
@@ -30,9 +37,33 @@ const RequestCustomerDetail = React.lazy(
 );
 const AdminLogin = React.lazy(() => import("./routes/admin/login/index.tsx"));
 
-const AdminConfiguration = React.lazy(() => import("./routes/admin/Configuration/index.tsx"));
-const AdminChangePassword = React.lazy(() => import("./routes/admin/ChangePassword/index.tsx"));
+const AdminConfiguration = React.lazy(
+  () => import("./routes/admin/configuration/index.tsx")
+);
+const AdminChangePassword = React.lazy(
+  () => import("./routes/admin/changePassword/index.tsx")
+);
 
+const AdminProduct = React.lazy(
+  () => import("./routes/admin/product/index.tsx")
+);
+const AdminProductDetail = React.lazy(
+  () => import("./routes/admin/product/detail.tsx")
+);
+const AdminProductCategory = React.lazy(
+  () => import("./routes/admin/productCategory/index.tsx")
+);
+
+const AdminNews = React.lazy(() => import("./routes/admin/news/index.tsx"));
+const AdminNewsCreateOrUpdate = React.lazy(
+  () => import("./routes/admin/news/detail.tsx")
+);
+const AdminNewsCategory = React.lazy(
+  () => import("./routes/admin/newsCategory/index.tsx")
+);
+
+const InitWebPage = React.lazy(() => import("./routes/initWeb/index.tsx"));
+const SuccessPage = React.lazy(() => import("./routes/successPage"));
 
 const router = createBrowserRouter([
   {
@@ -45,6 +76,8 @@ const router = createBrowserRouter([
       { path: paths.NEWS, element: <NewsPage /> },
       { path: paths.NEWS_DETAIL, element: <NewsDetailPage /> },
       { path: paths.REQUEST, element: <RequestCustomerPage /> },
+      { path: paths.INITWEB, element: <InitWebPage /> },
+      { path: paths.SUCCESS, element: <SuccessPage /> },
     ],
   },
   {
@@ -59,22 +92,69 @@ const router = createBrowserRouter([
         path: "",
         element: <Admin />, // layout admin
         children: [
-          { index: true, element: <AdminDashboard /> },
+          {
+            index: true, element: <AdminDashboard />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt, hashpermission.admin_sales] }
+          },
           {
             path: adminPaths.ADMIN_REQUESTS,
             element: <RequestCustomerAdmin />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_sales] }
           },
           {
             path: adminPaths.ADMIN_REQUEST_DETAIL,
             element: <RequestCustomerDetail />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_sales] }
           },
           {
             path: adminPaths.ADMIN_CONFIG,
             element: <AdminConfiguration />,
+            handle: { permissions: [hashpermission.admin_system] }
           },
           {
             path: adminPaths.ADMIN_CHANGEPASSWORD,
             element: <AdminChangePassword />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt, hashpermission.admin_sales] }
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCT,
+            element: <AdminProduct />,
+            handle: { permissions: [hashpermission.admin_system] }
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCT_NEW,
+            element: <AdminProductDetail />,
+            handle: { permissions: [hashpermission.admin_system] }
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCT_DETAIL,
+            element: <AdminProductDetail />,
+            handle: { permissions: [hashpermission.admin_system] }
+          },
+          {
+            path: adminPaths.ADMIN_PRODUCTCATEGORY,
+            element: <AdminProductCategory />,
+            handle: { permissions: [hashpermission.admin_system] }
+          },
+          {
+            path: adminPaths.ADMIN_NEWS,
+            element: <AdminNews />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
+          },
+          {
+            path: adminPaths.ADMIN_NEWS_UPDATE,
+            element: <AdminNewsCreateOrUpdate />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
+          },
+          {
+            path: adminPaths.ADMIN_NEWS_CREATE,
+            element: <AdminNewsCreateOrUpdate />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
+          },
+          {
+            path: adminPaths.ADMIN_NEWS_CATEGORY,
+            element: <AdminNewsCategory />,
+            handle: { permissions: [hashpermission.admin_system, hashpermission.admin_mkt] }
           },
         ],
       },
@@ -84,8 +164,17 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <HelmetProvider>
+      <GoogleReCaptchaProvider
+        reCaptchaKey={import.meta.env.VITE_RECAPTCHAV3_KEY}
+      >
+        <WebConfigProvider>
+          <AuthProvider>
+            <RouterProvider router={router} />
+            <GlobalErrorAlert />
+          </AuthProvider>
+        </WebConfigProvider>
+      </GoogleReCaptchaProvider>
+    </HelmetProvider>
   </StrictMode>
 );

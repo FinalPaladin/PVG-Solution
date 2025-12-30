@@ -16,9 +16,11 @@ export interface IObjConfigurationModel
     EmailSmtpHost: string,
     EmailPort: string,
     SDTSales: string,
-    Logo: string,
+    WebName: string,
+    ImgLogo: string,
     ImgHome: string,
     ImgBackground: string,
+    ImgBanner: string,
 }
 
 export interface IRQ_SaveConfigurationModel

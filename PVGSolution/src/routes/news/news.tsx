@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,80 +10,110 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { paths } from "@/commons/paths";
+import { initNewsPage } from "@/api/news.api";
+import type { NewsCategory, NewsListItem } from "@/models/appNews.model";
+import clsx from "clsx";
+import { useIsMobile } from "@/components/hooks/isMobileHook";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-interface INews {
-  id: number;
-  title: string;
-  excerpt: string;
-  date: string;
-  image: string;
+/* =======================
+   Helpers
+======================= */
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+/* =======================
+   Category Pills
+======================= */
+interface CategoryTabsProps {
+  categories: NewsCategory[];
+  activeId: string;
+  onChange: (id: string) => void;
 }
 
-// sampleNews nằm ngoài component => stable
-const sampleNews: INews[] = [
-  {
-    id: 1,
-    title:
-      "Vietcombank chung tay đồng hành cùng các cơ quan thuế TP. Hồ Chí Minh",
-    excerpt:
-      "Sáng ngày 14/11/2025, tại trụ sở Thuế Tp.Hồ Chí Minh đã trang trọng diễn ra buổi Lễ ký kết th...",
-    date: "17/11/25 09:55",
-    image: "/images/news-1.jpg",
-  },
-  {
-    id: 2,
-    title:
-      "Viecombank Hà Nội tổ chức tập huấn, diễn tập các phương án phòng chống tội phạm cướp ngân hàng",
-    excerpt:
-      "Tập huấn và diễn tập công tác phòng chống tội phạm cướp ngân hàng là một trong những hoạt động...",
-    date: "17/11/25 08:39",
-    image: "/images/news-2.jpg",
-  },
-  {
-    id: 3,
-    title:
-      "Vietcombank Đà Nẵng đồng hành cùng Thuế thành phố trong chiến dịch 60 ngày hỗ trợ hộ kinh doanh",
-    excerpt:
-      "Sáng ngày 12/11/2025, Vietcombank Đà Nẵng và Thuế thành phố Đà Nẵng ký kết thỏa thuận...",
-    date: "17/11/25 08:31",
-    image: "/images/news-3.jpg",
-  },
-  {
-    id: 4,
-    title: "Vietcombank thông báo lãi suất trái phiếu VCBH2131005",
-    excerpt:
-      "Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank) thông báo lãi suất áp dụng cho trái...",
-    date: "14/11/25 16:00",
-    image: "/images/news-4.jpg",
-  },
-];
+const CategoryTabs = memo(
+  ({ categories, activeId, onChange }: CategoryTabsProps) => {
+    const isMobile = useIsMobile();
 
-interface INewsCardProps {
-  item: INews;
-}
+    // ===== MOBILE =====
+    if (isMobile) {
+      return (
+        <div className="mb-6">
+          <Select value={String(activeId)} onValueChange={onChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Chọn danh mục" />
+            </SelectTrigger>
 
-function NewsCardInner({ item }: INewsCardProps) {
-  const navigate = useNavigate();
-  // local fallback flag để tránh setState nhiều lần
-  const [imgSrc, setImgSrc] = useState(item.image);
-
-  // onError chỉ set 1 lần => không gây re-render loop
-  const handleImgError = () => {
-    if (imgSrc !== "/images/news-placeholder.png") {
-      setImgSrc("/images/news-placeholder.png");
+            <SelectContent>
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
     }
-  };
+
+    // ===== DESKTOP =====
+    return (
+      <div className="flex flex-wrap gap-3 mb-8">
+        {categories.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => onChange(String(c.id))}
+            className={clsx(
+              "px-5 py-2 rounded-full text-sm font-medium transition",
+              activeId === c.id
+                ? "bg-green-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            )}
+          >
+            {c.name}
+          </button>
+        ))}
+      </div>
+    );
+  }
+);
+
+/* =======================
+   News Card
+======================= */
+interface NewsCardProps {
+  item: NewsListItem;
+}
+
+const NewsCard = memo(({ item }: NewsCardProps) => {
+  const navigate = useNavigate();
+  const [imgSrc, setImgSrc] = useState(item.thumbnail);
+
+  const handleImgError = useCallback(() => {
+    setImgSrc("/images/news-placeholder.png");
+  }, []);
 
   return (
     <Card className="flex flex-col md:flex-row gap-4 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="w-full md:w-44 flex-shrink-0">
+      <div className="w-full md:w-44 shrink-0">
         <div className="aspect-square w-full overflow-hidden rounded-xl bg-gray-100">
           <img
             src={imgSrc}
             alt={item.title}
             className="object-cover w-full h-full"
             onError={handleImgError}
-            // prevent image from being focusable/tabbable unnecessarily
             draggable={false}
           />
         </div>
@@ -97,19 +127,25 @@ function NewsCardInner({ item }: INewsCardProps) {
         </CardHeader>
 
         <CardContent className="p-0 mt-2 flex-1">
-          <p className="text-sm md:text-base text-gray-600 line-clamp-3">
-            {item.excerpt}
-          </p>
+          {/* backend chưa trả excerpt → để trống */}
         </CardContent>
 
         <CardFooter className="p-0 mt-4 flex items-center justify-between">
-          <div className="text-xs text-gray-400">{item.date}</div>
+          <div className="text-xs text-gray-400">
+            {formatDate(item.createdDate)}
+          </div>
+
           <Button
             variant="ghost"
             size="sm"
             className="flex items-center gap-2"
             onClick={() => {
-              navigate(paths.NEWS_DETAIL);
+              navigate(
+                `${paths.NEWS_DETAIL.replace(
+                  ":category",
+                  item.slugCategory
+                ).replace(":slug", item.slug)}`
+              );
             }}
           >
             Xem chi tiết <ArrowRight size={16} />
@@ -118,14 +154,43 @@ function NewsCardInner({ item }: INewsCardProps) {
       </div>
     </Card>
   );
-}
+});
 
-// memo để tránh re-render khi props không đổi
-const NewsCard = memo(NewsCardInner);
-
+/* =======================
+   Page
+======================= */
 const NewsPage: React.FC = () => {
-  // dev-help: bật console.log nếu vẫn nghi ngờ re-render
-  // console.log("Rendering NewsPage");
+  const [categories, setCategories] = useState<NewsCategory[]>([]);
+  const [news, setNews] = useState<NewsListItem[]>([]);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    initNewsPage()
+      .then((res) => {
+        if (!res.result) return;
+
+        setCategories([
+          { id: "all", name: "Tất cả" },
+          ...res.result.categories,
+        ]);
+        setNews(res.result.news);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filteredNews = useMemo(() => {
+    if (activeCategory === "all") return news;
+    return news.filter((n) => n.categoryId === activeCategory);
+  }, [news, activeCategory]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-10 text-center text-gray-400">
+        Đang tải tin tức...
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -133,23 +198,21 @@ const NewsPage: React.FC = () => {
         Tin tức & Sự kiện
       </h1>
 
+      <CategoryTabs
+        categories={categories}
+        activeId={activeCategory}
+        onChange={setActiveCategory}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {sampleNews.map((n) => (
+        {filteredNews.map((n) => (
           <NewsCard key={n.id} item={n} />
         ))}
       </div>
 
-      <div className="mt-8 flex justify-center">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            Trang trước
-          </Button>
-          <div className="px-3 py-1 rounded-md text-sm">1 / 10</div>
-          <Button variant="outline" size="sm">
-            Trang sau
-          </Button>
-        </div>
-      </div>
+      {filteredNews.length === 0 && (
+        <div className="text-center text-gray-400 mt-10">Không có tin tức</div>
+      )}
     </div>
   );
 };

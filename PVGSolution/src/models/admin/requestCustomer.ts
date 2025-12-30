@@ -1,23 +1,31 @@
 import type { IPagingResponse } from "../baseReponse";
 
 export interface IRequestCustomerField {
-    key: string;
-    value: string;
+  key: string;
+  value: string;
 }
 
 export interface IRequestCustomerItemDetails {
-    requestCode: string;
-    phone: string;
-    productId: string;
-    details: IRequestCustomerField[];
-    createdDate: string
+  requestCode: string;
+  phone: string;
+  productId: string;
+  details: IRequestCustomerField[];
+  createdDate: string;
+  fullName: string;
+  isProcessed: boolean;
+  isSentEmail: boolean;
+  strCreatedDate: string;
+  isDeleled: boolean;
+  emailTitle: string;
+  productName: string;
 }
 
 export interface IGetRequestCustomerResponse extends IPagingResponse {
-    items: IRequestCustomerItemDetails[];
+  items: IRequestCustomerItemDetails[];
 }
 
 export interface IRequestCustomerDetail {
+    isProcessed:boolean;
     id: string;
     requestCode: string;
     phone: string;
@@ -25,4 +33,49 @@ export interface IRequestCustomerDetail {
     value: string;
     productId: string;
     createdDate: string; // ISO datetime string
+}
+
+export interface IRQ_GetRequestCustomerModel{
+  requestCode: string;
+  productName: string;
+}
+
+export interface IRS_GetRequestCustomerModel{
+  data: IRequestCustomerItemDetails;
+  details: IRequestCustomerDetail[];
+}
+
+export interface IRQ_ProcessedModel{
+  requestCode: string;
+  userName: string;
+}
+
+export interface IRQ_DeleteRequestCustomerModel{
+  requestCode: string;
+  userDelete: string;
+  idDetail: string;
+}
+
+export interface IRQ_InserRequestCustomerModel{
+  requestCode: string;
+  phone: string;
+  productId: string;
+  fullName: string;
+  token: string;
+  data: IRequestCustomerField[],
+  dataImage: string[];
+}
+
+export interface IRS_InserRequestCustomerModel{
+  requestCode: string;
+}
+
+export interface IRS_UploadImageRequestCustomerModel{
+  key: string;
+  publicUrl: string;
+}
+
+export interface IRQ_RemoveImageRequestCustomerModel{
+  key: string;
+  requestCode: string;
 }

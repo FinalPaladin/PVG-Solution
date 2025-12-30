@@ -1,138 +1,260 @@
-import { memo, useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Calendar, Printer, Share2 } from "lucide-react";
+import { getNewsBySlug, initNewsPage } from "@/api/news.api";
+import type { NewsDetailResponse, NewsListItem } from "@/models/appNews.model";
+import clsx from "clsx";
+import { paths } from "@/commons/paths";
 
-/**
- * NOTE:
- * - Nếu vẫn reload vô hạn sau khi thay code này: mở DevTools -> Console & Network.
- * - Kiểm tra xem có lỗi "Maximum update depth exceeded" (setState trong render/effect).
- * - Kiểm tra Network: có request lặp cho 1 URL (ảnh / api / route)? paste cho t.
- */
+/* =======================
+   Helpers
+======================= */
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
-// Sample data (demo)
-const sampleNews = [
-  {
-    id: "1",
-    title:
-      "Vietcombank chung tay đồng hành cùng các cơ quan thuế TP. Hồ Chí Minh và các hộ kinh doanh trên địa bàn thực hiện chuyển đổi mô hình, phương thức quản lý thuế",
-    date: "17/11/2025 09:55",
-    intro:
-      "Sáng ngày 14/11/2025, tại trụ sở Thuế Tp.Hồ Chí Minh đã trang trọng diễn ra buổi Lễ ký kết thỏa thuận hợp tác 'Các giải pháp hỗ trợ đối với hộ kinh doanh giữa Thuế Tp.Hồ Chí Minh và các nhà cung cấp giải pháp'.",
-    content: [
-      "Tham dự buổi lễ có ông Nguyễn Văn Thành - Phó trưởng Thuế Tp.Hồ Chí Minh; bà Nguyễn Thị Cúc - Chủ tịch Hội tư vấn Thuế Việt Nam; đại diện lãnh đạo các đơn vị nghiệp vụ Thuế Tp.Hồ Chí Minh và 29 Thuế cơ sở trên địa bàn, cùng đại diện của các ngân hàng, nhà cung cấp giải pháp và các cơ quan thông tin báo chí, truyền hình.",
-      "Về phía Vietcombank có bà Đoàn Hồng Nhung - Thành viên Ban điều hành, Giám đốc Khối bán lẻ; các ông/bà là lãnh đạo các đơn vị có liên quan của Trụ sở chính và đại diện Ban Giám đốc của 27 chi nhánh Vietcombank trên địa bàn thành phố.",
-      "Tại buổi Lễ, ông Nguyễn Văn Thành - Phó trưởng Thuế Tp.Hồ Chí Minh đã phát biểu: “Việc thực hiện chuyển đổi mô hình từ thuế khoán sang thuế kê khai theo Nghị định 198 của Quốc hội từ ngày 1/1/2026 là rất đúng đắn và cần thiết, giúp các hộ kinh doanh quản lý, thực hiện nghĩa vụ thuế với nhà nước một cách hiệu quả và bền vững.”",
-    ],
-    image: "/images/news-1.jpg",
-  },
-];
+/* =======================
+   Skeleton
+======================= */
+const Skeleton = () => (
+  <div className="animate-pulse space-y-6">
+    <div className="h-6 bg-gray-200 rounded w-2/3" />
+    <div className="h-4 bg-gray-200 rounded w-1/3" />
+    <div className="h-64 bg-gray-200 rounded-xl" />
+    <div className="space-y-3">
+      <div className="h-4 bg-gray-200 rounded" />
+      <div className="h-4 bg-gray-200 rounded w-5/6" />
+      <div className="h-4 bg-gray-200 rounded w-4/6" />
+    </div>
+  </div>
+);
 
+/* =======================
+   Page
+======================= */
 function NewsDetailPageInner() {
-  const { id } = useParams();
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
 
-  // debug help: bật nếu muốn theo dõi render
-  // console.log("NewsDetailPage render, id=", id);
+  const [data, setData] = useState<NewsDetailResponse | null>(null);
+  const [related, setRelated] = useState<NewsListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  // const [imgSrc, setImgSrc] = useState<string | null>(null);
 
-  // stable item computation (bảo đảm không chạy logic nặng mỗi render)
-  const item = useMemo(() => {
-    if (!id) return sampleNews[0];
-    return sampleNews.find((s) => s.id === id) ?? sampleNews[0];
-  }, [id]);
+  /* Fetch detail */
+  useEffect(() => {
+    if (!slug) return;
 
-  // Image fallback state: chỉ set fallback 1 lần để tránh loop khi file placeholder không tồn tại
-  const [imgSrc, setImgSrc] = useState(
-    item.image ?? "/images/news-placeholder.png"
+    setLoading(true);
+    getNewsBySlug(slug)
+      .then((res) => {
+        if (res.result) {
+          setData(res.result);
+          // setImgSrc(res.result.thumbnail || res.result.imageLink);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  /* Fetch related news */
+  useEffect(() => {
+    if (!data?.categoryId) return;
+
+    initNewsPage().then((res) => {
+      if (!res.result) return;
+
+      const sameCategory = res.result.news.filter(
+        (n) => n.categoryId === data.categoryId && n.slug !== data.slug
+      );
+
+      setRelated(sameCategory.slice(0, 4));
+    });
+  }, [data]);
+
+  // const handleImgError = useCallback(() => {
+  //   setImgSrc("/images/news-placeholder.png");
+  // }, []);
+
+  const handleShare = useCallback(() => {
+    if (!data) return;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: data.title,
+          text: data.description,
+          url: `${window.location.origin}/${paths.NEWS_SHARE}/${data.slug}`,
+        })
+        .catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(
+        `${window.location.origin}/${paths.NEWS_SHARE}/${data.slug}`
+      );
+    }
+  }, [data]);
+
+  const pageTitle = useMemo(
+    () => (data ? `${data.title} | Tin tức` : "Tin tức"),
+    [data]
   );
-  const [didFallback, setDidFallback] = useState(false);
 
-  const handleImgError = () => {
-    // nếu đã fallback rồi thì thôi (ngăn setState lặp)
-    if (didFallback) return;
-    setDidFallback(true);
-    setImgSrc("/images/news-placeholder.png");
-  };
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-10">
+        <Skeleton />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="container mx-auto px-4 py-10 text-center text-gray-400">
+        Không tìm thấy bài viết
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <nav className="text-sm text-gray-400 mb-4">
-        <Link to="" className="hover:underline">
-          Trang thông tin điện tử
-        </Link>
-        <span className="mx-2">/</span>
-        <Link to="/news" className="hover:underline">
-          Tin tức và sự kiện
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-gray-500">Đơn vị thành viên</span>
-      </nav>
+    <>
+      {/* SEO */}
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={data.description} />
+        <meta property="og:title" content={data.title} />
+        <meta property="og:description" content={data.description} />
+        <meta property="og:image" content={data.thumbnail} />
+      </Helmet>
 
-      <header className="mb-8">
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-          {item.title}
-        </h1>
+      <div className="container mx-auto px-4 py-10">
+        {/* Breadcrumb */}
+        <nav className="text-sm text-gray-400 mb-4">
+          <Link to="/" className="hover:underline">
+            Trang chủ
+          </Link>
+          <span className="mx-2">/</span>
+          <Link to={paths.NEWS} className="hover:underline">
+            Tin tức & Sự kiện
+          </Link>
+          <span className="mx-2">/</span>
+          <span
+            className={clsx(
+              "inline-block px-4 py-1 rounded-full text-sm font-medium",
+              "bg-green-100 text-green-700"
+            )}
+          >
+            {data.categoryName}
+          </span>
+        </nav>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-gray-400 flex items-center gap-4">
-            <div className="flex items-center gap-2">
+        {/* Category pill */}
+        {/* <div className="mb-6">
+          <span
+            className={clsx(
+              "inline-block px-4 py-1 rounded-full text-sm font-medium",
+              "bg-green-100 text-green-700"
+            )}
+          >
+            {data.categoryName}
+          </span>
+        </div> */}
+
+        {/* Header */}
+        <header className="mb-8">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+            {data.title}
+          </h1>
+
+          <div className="mt-4 flex items-center justify-between flex-wrap gap-4">
+            <div className="text-sm text-gray-400 flex items-center gap-2">
               <Calendar size={16} />
-              <span>{item.date}</span>
+              <span>{formatDate(data.createdDate)}</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.print()}
+              >
+                <Printer size={16} />
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleShare}>
+                <Share2 size={16} />
+                <span className="ml-2 hidden md:inline">Chia sẻ</span>
+              </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer size={16} />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // simple share dialog — không setState
-                if (navigator.share) {
-                  navigator
-                    .share({ title: item.title, text: item.intro })
-                    .catch(() => {});
-                } else {
-                  navigator.clipboard?.writeText(window.location.href);
-                }
-              }}
-            >
-              <Share2 size={16} />
-              <span className="ml-2 hidden md:inline">Chia sẻ</span>
-            </Button>
-          </div>
-        </div>
+          <hr className="mt-6 border-gray-200" />
+        </header>
 
-        <hr className="mt-6 border-gray-200" />
-      </header>
+        {/* Content */}
+        <main>
+          <p className="text-lg md:text-xl font-medium">{data.description}</p>
 
-      <main className="prose max-w-none">
-        <p className="lead text-lg md:text-xl font-medium">{item.intro}</p>
-
-        <figure className="my-6 rounded-lg overflow-hidden shadow-sm">
-          <img
-            src={imgSrc}
-            alt={item.title}
-            className="w-full object-cover"
-            onError={handleImgError}
-            draggable={false}
+          <div
+            className="article-content mt-6"
+            dangerouslySetInnerHTML={{ __html: data.content }}
           />
-        </figure>
+        </main>
 
-        {item.content.map((p, idx) => (
-          <p key={idx} className="text-base text-gray-700">
-            {p}
-          </p>
-        ))}
+        {/* Related news - compact */}
+        {related.length > 0 && (
+          <section className="mt-14">
+            <h2 className="text-xl font-bold mb-6">Tin liên quan</h2>
 
-        <div className="mt-8">
-          <Link to="/news" className="text-sm text-green-600 hover:underline">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+              {related.map((n) => (
+                <div
+                  key={n.id}
+                  onClick={() =>
+                    navigate(
+                      paths.NEWS_DETAIL.replace(
+                        ":category",
+                        String(n.categoryId)
+                      ).replace(":slug", n.slug)
+                    )
+                  }
+                  className="group cursor-pointer"
+                >
+                  {/* Thumbnail */}
+                  <div className="aspect-video overflow-hidden rounded-lg bg-gray-100">
+                    <img
+                      src={n.thumbnail}
+                      alt={n.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="mt-3 text-sm font-medium line-clamp-2 group-hover:text-green-600 transition">
+                    {n.title}
+                  </h3>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div className="mt-12">
+          <Link
+            to={paths.NEWS}
+            className="text-sm text-green-600 hover:underline"
+          >
             ← Quay lại danh sách tin
           </Link>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -13,64 +12,122 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { adminPaths } from "@/commons/paths";
-import { getCustomerRequest } from "@/api/admin/adRequestCustomer";
+import {
+  exportDataCustomerRequest,
+  getCustomerRequest,
+} from "@/api/admin/adRequestCustomer";
 import type { IRequestCustomerItemDetails } from "@/models/admin/requestCustomer";
+import { ChevronLeft, ChevronRight, Download, ReceiptText, Search } from "lucide-react";
 
 interface IRequestSearchParams {
   phone: string;
+  fullName: string;
+  isProcessed: string;
   page: number;
   pageSize: number;
 }
 
+const searchObj = {
+  phone: "",
+  fullName: "",
+  isProcessed: "",
+}
+
 const RequestsListTable = () => {
   const [items, setItems] = useState<IRequestCustomerItemDetails[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [requestSearchParams, setRequestSearchParams] =
     useState<IRequestSearchParams>({
       phone: "",
+      fullName: "",
+      isProcessed: "",
       page: 1,
       pageSize: 10,
     });
 
   // state cho ô input search (để gõ mà không gọi API liên tục)
-  const [searchPhone, setSearchPhone] = useState("");
+  const [search, setSearch] = useState(searchObj);
+
+  const [total, setTotal] = useState<number>(0);
+  const [listLoading, setListLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // ---- HÀM LOAD DATA TÁCH RIÊNG RA ----
   const loadData = useCallback(async (params: IRequestSearchParams) => {
-    setLoading(true);
+    setListLoading(true);
     setError(null);
     try {
       const query = buildRequestQuery(params);
       const res = await getCustomerRequest(query);
-      debugger
       if (!res.isSuccess) throw new Error(`HTTP ${res.message}`);
       const data = res.result?.items || [];
       setItems([...data]);
+      
+      setTotal(res?.result?.totalItems ? res?.result?.totalItems : 0);
     } catch (err: unknown) {
+      setTotal(0);
       setError(err instanceof Error ? err.message : "Load error");
     } finally {
-      setLoading(false);
+      setListLoading(false);
     }
   }, []);
 
   // gọi lại loadData mỗi khi requestSearchParams đổi (lần đầu và khi search)
   useEffect(() => {
     loadData(requestSearchParams);
-  }, [loadData, requestSearchParams]);
+  }, [loadData, requestSearchParams?.page, requestSearchParams?.pageSize]);
 
   // ---- HANDLE SEARCH ----
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    setRequestSearchParams((prev) => ({
-      ...prev,
-      phone: searchPhone.trim(),
-      page: 1, // search thì về page 1
-    }));
+    const params = {
+      ...requestSearchParams,
+      phone: search.phone.trim(),
+      fullName: search.fullName,
+      isProcessed: search.isProcessed ? search.isProcessed : "",
+      page: 1
+    };
+    setRequestSearchParams(params);
+    loadData(params);
     // không cần gọi loadData ở đây, useEffect sẽ tự bắn lại khi state đổi
+  };
+
+  const handleExport = async () => {
+    setIsLoading(true);
+    const query = buildRequestQuery(requestSearchParams);
+    const res = await exportDataCustomerRequest(query);
+
+    if (!(res instanceof Blob)) {
+      console.log("Response is not a Blob", res);
+      return;
+    }
+
+    const url = window.URL.createObjectURL(res);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "Report.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    setIsLoading(false);
+  };
+
+  const lastPage = Math.max(1, Math.ceil(total / requestSearchParams.pageSize));
+  const startItem = (requestSearchParams.page - 1) * requestSearchParams.pageSize + 1;
+  const endItem = Math.min(total, requestSearchParams.page * requestSearchParams.pageSize);
+  
+  const goToPage = (p: number) => {
+    const lastPage = Math.max(1, Math.ceil(total / requestSearchParams.pageSize));
+    const np = Math.max(1, Math.min(p, lastPage));
+    setRequestSearchParams({...requestSearchParams, page: np});
+  };
+
+  const changePageSize = (ps: number) => {
+    setRequestSearchParams({...requestSearchParams, pageSize: ps});
   };
 
   return (
@@ -78,24 +135,57 @@ const RequestsListTable = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Quản lý Yêu cầu khách</h1>
 
-        {/* form search: Enter hoặc click nút đều chạy handleSearch */}
-        <form onSubmit={handleSearch} className="flex items-center gap-2">
-          <Input
-            placeholder="Tìm theo SĐT..."
-            value={searchPhone}
-            onChange={(e) => setSearchPhone(e.target.value)}
-            className="w-64"
-          />
-          <Button type="submit">Tìm kiếm</Button>
-        </form>
-
+        <Button disabled={isLoading} type="button" onClick={handleExport} className="bg-[#388700]">
+          <span className="flex">
+            <Download className="h-5 w-5" />
+            &nbsp;{isLoading ? "Đang tải..." : "Tải báo cáo"}
+          </span>
+        </Button>
         {/* Nếu muốn nút tạo mới thì thêm bên này hoặc chuyển vào form */}
         {/* <Button onClick={() => navigate('/admin/requests/new')}>Tạo yêu cầu mới</Button> */}
       </div>
 
+      <div className="grid grid-cols-3 gap-4 bg-white p-6 rounded shadow-sm">
+        <div className=" rid-cols-1">
+            <input
+              type="tel"
+              placeholder="Tìm theo số điện thoại khách hàng..."
+              value={search.phone}
+              onChange={(e) => setSearch({...search, phone: e.target.value})}
+              className="border border-gray-200 rounded-md w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+            />
+            <input
+              type="tel"
+              value={search.fullName}
+              onChange={(e) => setSearch({...search, fullName: e.target.value})}
+              className="border border-gray-200 rounded-md w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 mt-2"
+              placeholder="Tìm theo tên khách hàng..."
+            />
+        </div>
+        <div className="grid-cols-1">
+          <select className="w-full px-3 py-2 border rounded-md"
+          defaultValue={""}
+          onChange={(e) => {setSearch({...search, isProcessed: e.target.value});}}>
+              <option value={""}>Tất cả</option>
+              <option value={"false"}>Chưa xử lý</option>
+              <option value={"true"}>Đã xử lý</option>
+          </select>
+        </div>
+        <div className="grid-cols-1">
+          <div className="flex items-center justify-between">
+            <Button type="button" className="bg-[#a8a8a8]" onClick={handleSearch}>
+              <span className="flex">
+                <Search className="h-5 w-5" />
+                &nbsp;Tìm kiếm
+              </span>
+            </Button>
+          </div>
+        </div>
+      </div>
+      
       {error && <div className="text-red-600 mb-4">{error}</div>}
 
-      <div className="overflow-auto rounded border">
+      <div className="overflow-auto rounded border mt-5">
         <Table>
           <TableHeader>
             <TableRow>
@@ -106,7 +196,7 @@ const RequestsListTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loading ? (
+            {listLoading ? (
               // show 6 skeleton rows while loading
               Array.from({ length: 6 }).map((_, idx) => (
                 <TableRow key={idx}>
@@ -140,16 +230,21 @@ const RequestsListTable = () => {
               </TableRow>
             ) : (
               items.map((it) => {
-                const fullname =
-                  it.details.find((d) => d.key === "fullname")
-                    ?.value ?? "—";
-                const phone =
-                  it.details.find((d) => d.key === "phone")
-                    ?.value ?? "—";
-                const createdAt = new Date(it.createdDate).toLocaleString();
+                const fullname = it.fullName ?? "—";
+                const phone = it.phone ?? "—";
+                const createdAt = new Date(it.strCreatedDate).toLocaleString(
+                  "vi-VN",
+                  {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  }
+                );
 
-                const status: string =
-                  (it as unknown as { status?: string }).status ?? "new";
+                const status: string = it.isProcessed == true ? "Đã xử lý" : "Chưa xử lý";
 
                 return (
                   <TableRow key={it.requestCode}>
@@ -182,8 +277,12 @@ const RequestsListTable = () => {
                             )
                           }
                           size="sm"
+                          className="bg-[#6b92d6]"
                         >
-                          Chi tiết
+                          <span className="flex">
+                            <ReceiptText className="h-5 w-5" />
+                            &nbsp;Chi tiết
+                          </span>
                         </Button>
                       </div>
                     </TableCell>
@@ -196,7 +295,56 @@ const RequestsListTable = () => {
       </div>
 
       <div className="mt-4 text-sm text-gray-600">
-        Tổng: {items.length} yêu cầu
+        {/* Pagination controls */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-sm text-muted-foreground">
+            {total === 0
+              ? "0 items"
+              : `Hiển thị ${startItem} - ${endItem} trên ${total} mục`}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => goToPage(requestSearchParams.page - 1)}
+                disabled={requestSearchParams.page <= 1 || listLoading}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="px-2">
+                <span>{requestSearchParams.page}</span>
+                <span className="mx-1">/</span>
+                <span>{lastPage}</span>
+              </div>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => goToPage(requestSearchParams.page + 1)}
+                disabled={requestSearchParams.page >= lastPage || listLoading}
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-sm">Kết quả / Trang</label>
+              <select
+                value={requestSearchParams.pageSize}
+                onChange={(e) => changePageSize(parseInt(e.target.value, 10))}
+                className="rounded border px-2 py-1"
+                disabled={listLoading}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
