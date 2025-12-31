@@ -7,16 +7,16 @@ type FAQ = {
 
 const FAQ_LIST: FAQ[] = [
     {
-        question: "Ai có thể sử dụng dịch vụ HHG solution?",
+        question: "Ai có thể sử dụng dịch vụ HHGSolution?",
         answer: "Dịch vụ HHG solution được cung cấp cho khách hàng cá nhân là công dân Việt Nam trên 18 tuổi có năng lực pháp luật và hành vi dân sự đầy đủ.",
     },
     {
-        question: "Có phải dịch vụ HHG solution hoạt động liên tục 24 giờ?",
+        question: "Có phải dịch vụ HHGSolution hoạt động liên tục 24 giờ?",
         answer:
             "Đúng, dịch vụ HHG solution hoạt động 24/7, bao gồm cả ngày nghỉ/ngày lễ.",
     },
     {
-        question: "Dịch vụ HHG solution là gì?",
+        question: "Dịch vụ HHGSolution là gì?",
         answer:
             "Giải pháp hỗ trợ tiếp nhận vốn, Kết nối nhà đầu tư & khách hàng, Fintech kết nối nguồn vốn, Nền tảng kết nối tài chính - ngân hàng.",
     },
