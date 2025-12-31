@@ -7,6 +7,7 @@ import { paths } from "@/commons/paths";
 export function RedBookBanner() {
   const { webConfig } = useWebConfig();
   const navigate = useNavigate();
+  const today = new Date();
   
   return (
     <div className="mt-6">
@@ -92,7 +93,7 @@ export function RedBookBanner() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-slate-900">2025</p>
+                  <p className="text-lg font-semibold text-slate-900">{today.getFullYear()}</p>
                   <p className="text-xs text-slate-500">
                     Chính sách &amp; quy trình được chuẩn hoá
                   </p>
