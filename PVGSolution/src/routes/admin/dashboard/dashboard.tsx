@@ -29,21 +29,19 @@ export default function AdminDashboard(): JSX.Element {
     requestYesterdayProcessed: 0,
     viewHome: 0,
     viewNews: 0,
-    viewProducts: 0
+    viewProducts: 0,
   } as IRS_DashboardInitPageModel);
 
   useEffect(() => {
     const loadform = async () => {
       const res = await initDashboard();
-      if(res && res.isSuccess)
-      {
-        if(res.result)
-          setData(res?.result);       
+      if (res && res.isSuccess) {
+        if (res.result) setData(res?.result);
       }
-    }
+    };
 
     loadform();
-  }, [])
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -65,13 +63,20 @@ export default function AdminDashboard(): JSX.Element {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
           <p className="text-sm text-gray-700">
-            Tất cả: <span className="font-semibold text-gray-600">{data.total}</span>
+            Tất cả:{" "}
+            <span className="font-semibold text-gray-600">{data.total}</span>
           </p>
           <div className="text-sm text-gray-700">
-            Đã xử lý: <span className="font-semibold text-green-700">{data.totalProcessed}</span>
+            Đã xử lý:{" "}
+            <span className="font-semibold text-green-700">
+              {data.totalProcessed}
+            </span>
           </div>
           <div className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">{data.total - data.totalProcessed}</span>
+            Chưa xử lý:{" "}
+            <span className="font-semibold text-orange-600">
+              {data.total - data.totalProcessed}
+            </span>
           </div>
         </div>
       </div>
@@ -79,70 +84,98 @@ export default function AdminDashboard(): JSX.Element {
       {/* Thống kê theo thời gian */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Hôm nay */}
-        <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-green-50 to-white p-5">
-          <h5 className="mb-2 text-sm font-medium text-gray-600">
-            Hôm nay
-          </h5>
+        <div className="rounded-lg border border-gray-200 bg-linear-to-br from-green-50 to-white p-5">
+          <h5 className="mb-2 text-sm font-medium text-gray-600">Hôm nay</h5>
           <p className="text-sm text-gray-700">
-            Tất cả: <span className="font-semibold text-gray-600">{data.requestToday}</span>
+            Tất cả:{" "}
+            <span className="font-semibold text-gray-600">
+              {data.requestToday}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Đã xử lý: <span className="font-semibold text-green-700">{data.requestTodayProcessed}</span>
+            Đã xử lý:{" "}
+            <span className="font-semibold text-green-700">
+              {data.requestTodayProcessed}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestToday - data.requestTodayProcessed}</span>
+            Chưa xử lý:{" "}
+            <span className="font-semibold text-orange-600">
+              {data.requestToday - data.requestTodayProcessed}
+            </span>
           </p>
         </div>
 
         {/* Hôm qua */}
-        <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-green-50 to-white p-5">
-          <h5 className="mb-2 text-sm font-medium text-gray-600">
-            Hôm qua
-          </h5>
+        <div className="rounded-lg border border-gray-200 bg-linear-to-br from-green-50 to-white p-5">
+          <h5 className="mb-2 text-sm font-medium text-gray-600">Hôm qua</h5>
           <p className="text-sm text-gray-700">
-            Tất cả: <span className="font-semibold text-gray-600">{data.requestYesterday}</span>
+            Tất cả:{" "}
+            <span className="font-semibold text-gray-600">
+              {data.requestYesterday}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Đã xử lý: <span className="font-semibold text-green-700">{data.requestYesterdayProcessed}</span>
+            Đã xử lý:{" "}
+            <span className="font-semibold text-green-700">
+              {data.requestYesterdayProcessed}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestYesterday - data.requestYesterdayProcessed}</span>
+            Chưa xử lý:{" "}
+            <span className="font-semibold text-orange-600">
+              {data.requestYesterday - data.requestYesterdayProcessed}
+            </span>
           </p>
         </div>
 
         {/* Tuần này */}
-        <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-white p-5">
-          <h5 className="mb-2 text-sm font-medium text-gray-600">
-            Tuần này
-          </h5>
+        <div className="rounded-lg border border-gray-200 bg-linear-to-br from-blue-50 to-white p-5">
+          <h5 className="mb-2 text-sm font-medium text-gray-600">Tuần này</h5>
           <p className="text-sm text-gray-700">
-            Tất cả: <span className="font-semibold text-gray-600">{data.requestThisWeek}</span>
+            Tất cả:{" "}
+            <span className="font-semibold text-gray-600">
+              {data.requestThisWeek}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Đã xử lý: <span className="font-semibold text-green-700">{data.requestThisWeekProcessed}</span>
+            Đã xử lý:{" "}
+            <span className="font-semibold text-green-700">
+              {data.requestThisWeekProcessed}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestThisWeek - data.requestThisWeekProcessed}</span>
+            Chưa xử lý:{" "}
+            <span className="font-semibold text-orange-600">
+              {data.requestThisWeek - data.requestThisWeekProcessed}
+            </span>
           </p>
         </div>
 
         {/* Tháng này */}
-        <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-purple-50 to-white p-5">
-          <h5 className="mb-2 text-sm font-medium text-gray-600">
-            Tháng này
-          </h5>
+        <div className="rounded-lg border border-gray-200 bg-linear-to-br from-purple-50 to-white p-5">
+          <h5 className="mb-2 text-sm font-medium text-gray-600">Tháng này</h5>
           <p className="text-sm text-gray-700">
-            Tất cả: <span className="font-semibold text-gray-600">{data.requestThisMonth}</span>
+            Tất cả:{" "}
+            <span className="font-semibold text-gray-600">
+              {data.requestThisMonth}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Đã xử lý: <span className="font-semibold text-green-700">{data.requestThisMonthProcessed}</span>
+            Đã xử lý:{" "}
+            <span className="font-semibold text-green-700">
+              {data.requestThisMonthProcessed}
+            </span>
           </p>
           <p className="text-sm text-gray-700">
-            Chưa xử lý: <span className="font-semibold text-orange-600">{data.requestThisMonth - data.requestThisMonthProcessed}</span>
+            Chưa xử lý:{" "}
+            <span className="font-semibold text-orange-600">
+              {data.requestThisMonth - data.requestThisMonthProcessed}
+            </span>
           </p>
         </div>
       </div>
-    
+
       {/* Tổng quan */}
       <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
         <h4 className="text-sm font-medium text-gray-600 mb-4">
@@ -157,13 +190,22 @@ export default function AdminDashboard(): JSX.Element {
             Sản phẩm: <span className="font-semibold text-green-700">{data.viewProducts}</span>
           </div> */}
           <div className="text-sm text-gray-700">
-            Trang chủ: <span className="font-semibold text-green-700">{data.viewProducts}</span>
+            Trang chủ:{" "}
+            <span className="font-semibold text-green-700">
+              {data.viewProducts}
+            </span>
           </div>
           <div className="text-sm text-gray-700">
-            Sản phẩm chi tiết: <span className="font-semibold text-green-700">{data.viewProduct}</span>
+            Sản phẩm chi tiết:{" "}
+            <span className="font-semibold text-green-700">
+              {data.viewProduct}
+            </span>
           </div>
           <div className="text-sm text-gray-700">
-            Tin tức chi tiết: <span className="font-semibold text-green-700">{data.viewNews}</span>
+            Tin tức chi tiết:{" "}
+            <span className="font-semibold text-green-700">
+              {data.viewNews}
+            </span>
           </div>
         </div>
       </div>

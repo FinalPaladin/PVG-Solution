@@ -29,4 +29,9 @@ export const adminPaths = {
   ADMIN_NEWS_UPDATE: `${BASE_ADMIN_URL}/news/:id`,
   ADMIN_NEWS_CREATE: `${BASE_ADMIN_URL}/news/create`,
   ADMIN_NEWS_CATEGORY: `${BASE_ADMIN_URL}/news-category`,
+  ADMIN_AUTHORS_ROLES: `${BASE_ADMIN_URL}/authors-roles`,
+  ADMIN_AUTHORS_USERS: `${BASE_ADMIN_URL}/authors-users`,
+  ADMIN_FAQS: `${BASE_ADMIN_URL}/faqs`,
+  ADMIN_FAQS_CREATE: `${BASE_ADMIN_URL}/faqs/create`,
+  ADMIN_FAQS_UPDATE: `${BASE_ADMIN_URL}/faqs/:id`,
 };
