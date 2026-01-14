@@ -1,5 +1,5 @@
 import React, { useEffect, useState, type JSX } from "react";
-import { insertRequestCustomer, RemoveImageRequestCustomer, SendEmailRequest, UploadImageRequestCustomer } from "@/api/requestCustomer";
+import { insertRequestCustomer, RemoveImageRequestCustomer, UploadImageRequestCustomer } from "@/api/requestCustomer";
 import type { IResponseUpdateImage } from "@/models/requestCustomer";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Recycle, Send } from "lucide-react";
@@ -285,24 +285,26 @@ export default function RequestCustomerPage(): JSX.Element {
   }
 
   const handleSendEmail = async () => {
-    setLoading(true);
-    try
-    {
-      const res = await SendEmailRequest(requestCode);
-      if (!res.isSuccess) {
-        throw new Error(res.message || `HTTP lỗi`);
-      }
+    navigate(paths.SUCCESS);
+    
+    // setLoading(true);
+    // try
+    // {
+    //   const res = await SendEmailRequest(requestCode);
+    //   if (!res.isSuccess) {
+    //     throw new Error(res.message || `HTTP lỗi`);
+    //   }
 
-      useAlert.getState().show("Yêu cầu đã hoàn tất.", "success");
-      navigate(paths.SUCCESS)
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Unknown error";
+    //   useAlert.getState().show("Yêu cầu đã hoàn tất.", "success");
+    //   navigate(paths.SUCCESS);
+    // } catch (err: unknown) {
+    //   const errorMessage =
+    //     err instanceof Error ? err.message : "Unknown error";
 
-      useAlert.getState().showError(`Gửi thất bại: ${errorMessage}`);
-    } finally {
-      setLoading(false);
-    }
+    //   useAlert.getState().showError(`Gửi thất bại: ${errorMessage}`);
+    // } finally {
+    //   setLoading(false);
+    // }
   }
 
   return (
